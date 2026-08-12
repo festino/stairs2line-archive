@@ -1,0 +1,1820 @@
+// Migrated artwork groups. Legacy media IDs are resolved to physical files during the resolve step.
+{
+  "artworks": [
+    {
+      "id": "artwork-0121",
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "major",
+          "media": [
+            {
+              "id": "artwork-0121/v01/m01",
+              "legacyIds": [
+                "n3bzihZRif1s4v84ho3_1280"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 121
+      }
+    },
+    {
+      "id": "artwork-0122",
+      "title": {
+        "ja": "落書き"
+      },
+      "description": {
+        "ja": "人の子うちの子色々と"
+      },
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "top",
+          "media": [
+            {
+              "id": "artwork-0122/v01/m01",
+              "legacyIds": [
+                "n5esbhepR11s4v84ho9_400",
+                "45737425_p2"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1,
+            "inferredPostIds": [
+              "pixiv:45737425"
+            ]
+          }
+        },
+        {
+          "id": "v02",
+          "scope": "major",
+          "media": [
+            {
+              "id": "artwork-0122/v02/m01",
+              "legacyIds": [
+                "09e3501cc219226e773c2a01328978200885f29d2a8e-gHmXvK_fw1200"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 2
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 122,
+        "inferredPostIds": [
+          "pixiv:45737425"
+        ]
+      }
+    },
+    {
+      "id": "artwork-0123",
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "decorative",
+          "media": [
+            {
+              "id": "artwork-0123/v01/m01",
+              "legacyIds": [
+                "n5esbhepR11s4v84ho1_400"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 123
+      }
+    },
+    {
+      "id": "artwork-0124",
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "decorative",
+          "media": [
+            {
+              "id": "artwork-0124/v01/m01",
+              "legacyIds": [
+                "n5esbhepR11s4v84ho2_400"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1
+          }
+        },
+        {
+          "id": "v02",
+          "scope": "decorative",
+          "media": [
+            {
+              "id": "artwork-0124/v02/m01",
+              "legacyIds": [
+                "n5esbhepR11s4v84ho2_r1_400"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 2
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 124
+      }
+    },
+    {
+      "id": "artwork-0125",
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "decorative",
+          "media": [
+            {
+              "id": "artwork-0125/v01/m01",
+              "legacyIds": [
+                "n5esbhepR11s4v84ho3_400"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 125
+      }
+    },
+    {
+      "id": "artwork-0126",
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "decorative",
+          "media": [
+            {
+              "id": "artwork-0126/v01/m01",
+              "legacyIds": [
+                "n5esbhepR11s4v84ho4_400"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1
+          }
+        },
+        {
+          "id": "v02",
+          "scope": "decorative",
+          "media": [
+            {
+              "id": "artwork-0126/v02/m01",
+              "legacyIds": [
+                "n5esbhepR11s4v84ho4_r2_400"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 2
+          }
+        },
+        {
+          "id": "v03",
+          "scope": "decorative",
+          "media": [
+            {
+              "id": "artwork-0126/v03/m01",
+              "legacyIds": [
+                "n5esbhepR11s4v84ho4_r3_400"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 3
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 126
+      }
+    },
+    {
+      "id": "artwork-0127",
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "decorative",
+          "media": [
+            {
+              "id": "artwork-0127/v01/m01",
+              "legacyIds": [
+                "n5esbhepR11s4v84ho5_r1_400"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1
+          }
+        },
+        {
+          "id": "v02",
+          "scope": "decorative",
+          "media": [
+            {
+              "id": "artwork-0127/v02/m01",
+              "legacyIds": [
+                "n5esbhepR11s4v84ho5_r2_400"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 2
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 127
+      }
+    },
+    {
+      "id": "artwork-0128",
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "decorative",
+          "media": [
+            {
+              "id": "artwork-0128/v01/m01",
+              "legacyIds": [
+                "n5esbhepR11s4v84ho6_400"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 128
+      }
+    },
+    {
+      "id": "artwork-0129",
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "decorative",
+          "media": [
+            {
+              "id": "artwork-0129/v01/m01",
+              "legacyIds": [
+                "n5esbhepR11s4v84ho7_400"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 129
+      }
+    },
+    {
+      "id": "artwork-0130",
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "decorative",
+          "media": [
+            {
+              "id": "artwork-0130/v01/m01",
+              "legacyIds": [
+                "n5esbhepR11s4v84ho8_400"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 130
+      }
+    },
+    {
+      "id": "artwork-0131",
+      "title": {
+        "ja": "クイッ"
+      },
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "sketchy",
+          "media": [
+            {
+              "id": "artwork-0131/v01/m01",
+              "legacyIds": [
+                "n6ee06RFsJ1s4v84ho3_400",
+                "43473490_p0"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1,
+            "inferredPostIds": [
+              "pixiv:43473490"
+            ]
+          }
+        },
+        {
+          "id": "v02",
+          "scope": "major",
+          "media": [
+            {
+              "id": "artwork-0131/v02/m01",
+              "legacyIds": [
+                "nl55ocl5Qy1s4v84ho2_400",
+                "50366222_p0"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 2,
+            "inferredPostIds": [
+              "pixiv:50366222"
+            ]
+          }
+        },
+        {
+          "id": "v03",
+          "scope": "decorative",
+          "media": [
+            {
+              "id": "artwork-0131/v03/m01",
+              "legacyIds": [
+                "CrgqsYvUEAAbhhK"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 3,
+            "inferredPostIds": [
+              "twitter:772414331656949761"
+            ]
+          }
+        },
+        {
+          "id": "v04",
+          "scope": "decorative",
+          "media": [
+            {
+              "id": "artwork-0131/v04/m01",
+              "legacyIds": [
+                "105538623_p0",
+                "FpUgVWMaYAA43tb",
+                "8618999a6f92255ebdabc924612f2573294f8885"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 4,
+            "inferredPostIds": [
+              "pixiv:105538623",
+              "twitter:1627242952576876547"
+            ]
+          }
+        },
+        {
+          "id": "v05",
+          "scope": "sketchy",
+          "media": [
+            {
+              "id": "artwork-0131/v05/m01",
+              "legacyIds": [
+                "5e14690f3f13ab4b7dacb48345c7471392f16a1c"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 5
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 131,
+        "inferredPostIds": [
+          "pixiv:43473490",
+          "pixiv:50366222",
+          "twitter:772414331656949761",
+          "pixiv:105538623",
+          "twitter:1627242952576876547"
+        ]
+      }
+    },
+    {
+      "id": "artwork-0132",
+      "title": {
+        "ja": "サラリ"
+      },
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "top",
+          "media": [
+            {
+              "id": "artwork-0132/v01/m01",
+              "legacyIds": [
+                "n6ee06RFsJ1s4v84ho2_400",
+                "43689350_p0"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1,
+            "inferredPostIds": [
+              "pixiv:43689350"
+            ]
+          }
+        },
+        {
+          "id": "v02",
+          "scope": "major",
+          "media": [
+            {
+              "id": "artwork-0132/v02/m01",
+              "legacyIds": [
+                "nt0ld5znZ21s4v84ho6_400",
+                "CG4itIGVIAEIXVJ"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 2,
+            "inferredPostIds": [
+              "twitter:607461159269105664"
+            ]
+          }
+        },
+        {
+          "id": "v03",
+          "scope": "major",
+          "media": [
+            {
+              "id": "artwork-0132/v03/m01",
+              "legacyIds": [
+                "FAxAmMyUcAM-Lhr",
+                "105494534_p0",
+                "f9aa55a34610db5ace4bc8c859c8bab19e0e4d59",
+                "218ebe5ecb4b1d4922eaa0f949305f9627ed09ba"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 3,
+            "inferredPostIds": [
+              "twitter:1444600677578067969",
+              "pixiv:105494534"
+            ]
+          }
+        },
+        {
+          "id": "v04",
+          "scope": "decorative",
+          "media": [
+            {
+              "id": "artwork-0132/v04/m01",
+              "legacyIds": [
+                "HBj3kfFbgAAhwof",
+                "141421623_p2",
+                "df1f3bddd48a471b13d4de6c09217a39883e7b97"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 4,
+            "inferredPostIds": [
+              "twitter:2024641088326361472",
+              "pixiv:141421623"
+            ]
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 132,
+        "inferredPostIds": [
+          "pixiv:43689350",
+          "twitter:607461159269105664",
+          "twitter:1444600677578067969",
+          "pixiv:105494534",
+          "twitter:2024641088326361472",
+          "pixiv:141421623"
+        ]
+      }
+    },
+    {
+      "id": "artwork-0133",
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "top",
+          "media": [
+            {
+              "id": "artwork-0133/v01/m01",
+              "legacyIds": [
+                "n6ee06RFsJ1s4v84ho1_400"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 133
+      }
+    },
+    {
+      "id": "artwork-0134",
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "major",
+          "media": [
+            {
+              "id": "artwork-0134/v01/m01",
+              "legacyIds": [
+                "n6ee06RFsJ1s4v84ho4_400"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 134
+      }
+    },
+    {
+      "id": "artwork-0135",
+      "title": {
+        "ja": "落書き"
+      },
+      "description": {
+        "ja": "人の子うちの子色々と"
+      },
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "sketchy",
+          "media": [
+            {
+              "id": "artwork-0135/v01/m01",
+              "legacyIds": [
+                "n6v19ybjjE1s4v84ho1_1280"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1
+          }
+        },
+        {
+          "id": "v02",
+          "scope": "sketchy",
+          "media": [
+            {
+              "id": "artwork-0135/v02/m01",
+              "legacyIds": [
+                "45737425_p10"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 2,
+            "inferredPostIds": [
+              "pixiv:45737425"
+            ]
+          }
+        },
+        {
+          "id": "v03",
+          "scope": "major",
+          "media": [
+            {
+              "id": "artwork-0135/v03/m01",
+              "legacyIds": [
+                "CVEJr2QUwAAbqTk"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 3,
+            "inferredPostIds": [
+              "twitter:671328469398237184"
+            ]
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 135,
+        "inferredPostIds": [
+          "pixiv:45737425",
+          "twitter:671328469398237184"
+        ]
+      }
+    },
+    {
+      "id": "artwork-0136",
+      "title": {
+        "ja": "miku"
+      },
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "top",
+          "media": [
+            {
+              "id": "artwork-0136/v01/m01",
+              "legacyIds": [
+                "44214320_p0",
+                "n7hv7vbEhF1s4v84ho1_500"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1,
+            "inferredPostIds": [
+              "pixiv:44214320"
+            ]
+          }
+        },
+        {
+          "id": "v02",
+          "scope": "decorative",
+          "media": [
+            {
+              "id": "artwork-0136/v02/m01",
+              "legacyIds": [
+                "nqazruJfbd1s4v84ho1_1280"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 2
+          }
+        },
+        {
+          "id": "v03",
+          "scope": "decorative",
+          "media": [
+            {
+              "id": "artwork-0136/v03/m01",
+              "legacyIds": [
+                "nqazruJfbd1s4v84ho1_r1_1280"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 3
+          }
+        },
+        {
+          "id": "v04",
+          "scope": "decorative",
+          "media": [
+            {
+              "id": "artwork-0136/v04/m01",
+              "legacyIds": [
+                "nqazruJfbd1s4v84ho1_r2_1280",
+                "52383833_p0"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 4,
+            "inferredPostIds": [
+              "pixiv:52383833"
+            ]
+          }
+        },
+        {
+          "id": "v05",
+          "scope": "major",
+          "media": [
+            {
+              "id": "artwork-0136/v05/m01",
+              "legacyIds": [
+                "CKV8LDKUsAAEazq"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 5,
+            "inferredPostIds": [
+              "twitter:623040653585321984"
+            ]
+          }
+        },
+        {
+          "id": "v06",
+          "scope": "decorative",
+          "media": [
+            {
+              "id": "artwork-0136/v06/m01",
+              "legacyIds": [
+                "Crgqr0jUsAALvYu"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 6,
+            "inferredPostIds": [
+              "twitter:772414331656949761"
+            ]
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 136,
+        "inferredPostIds": [
+          "pixiv:44214320",
+          "pixiv:52383833",
+          "twitter:623040653585321984",
+          "twitter:772414331656949761"
+        ]
+      }
+    },
+    {
+      "id": "artwork-0137",
+      "title": {
+        "ja": "落書き"
+      },
+      "description": {
+        "ja": "人の子うちの子色々と"
+      },
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "decorative",
+          "media": [
+            {
+              "id": "artwork-0137/v01/m01",
+              "legacyIds": [
+                "n9pnoy5yWF1s4v84ho1_1280",
+                "45737425_p0"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1,
+            "inferredPostIds": [
+              "pixiv:45737425"
+            ]
+          }
+        },
+        {
+          "id": "v02",
+          "scope": "top",
+          "media": [
+            {
+              "id": "artwork-0137/v02/m01",
+              "legacyIds": [
+                "n9pnoy5yWF1s4v84ho2_1280"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 2
+          }
+        },
+        {
+          "id": "v03",
+          "scope": "sketchy",
+          "media": [
+            {
+              "id": "artwork-0137/v03/m01",
+              "legacyIds": [
+                "45737425_p11"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 3,
+            "inferredPostIds": [
+              "pixiv:45737425"
+            ]
+          }
+        },
+        {
+          "id": "v04",
+          "scope": "major",
+          "media": [
+            {
+              "id": "artwork-0137/v04/m01",
+              "legacyIds": [
+                "CViFEaWUAAAe5hj"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 4,
+            "inferredPostIds": [
+              "twitter:673434455864832000"
+            ]
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 137,
+        "inferredPostIds": [
+          "pixiv:45737425",
+          "twitter:673434455864832000"
+        ]
+      }
+    },
+    {
+      "id": "artwork-0138",
+      "title": {
+        "ja": "だらり"
+      },
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "major",
+          "media": [
+            {
+              "id": "artwork-0138/v01/m01",
+              "legacyIds": [
+                "naji065Ic11s4v84ho2_400",
+                "45220270_p0"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1,
+            "inferredPostIds": [
+              "pixiv:45220270"
+            ]
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 138,
+        "inferredPostIds": [
+          "pixiv:45220270"
+        ]
+      }
+    },
+    {
+      "id": "artwork-0139",
+      "title": {
+        "ja": "+"
+      },
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "sketchy",
+          "media": [
+            {
+              "id": "artwork-0139/v01/m01",
+              "legacyIds": [
+                "45342986_p0",
+                "naji065Ic11s4v84ho1_1280",
+                "nl55ocl5Qy1s4v84ho3_1280"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1,
+            "inferredPostIds": [
+              "pixiv:45342986"
+            ]
+          }
+        },
+        {
+          "id": "v02",
+          "scope": "top",
+          "media": [
+            {
+              "id": "artwork-0139/v02/m01",
+              "legacyIds": [
+                "CKV8LDSUwAAtud4"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 2,
+            "inferredPostIds": [
+              "twitter:623040653585321984"
+            ]
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 139,
+        "inferredPostIds": [
+          "pixiv:45342986",
+          "twitter:623040653585321984"
+        ]
+      }
+    },
+    {
+      "id": "artwork-0140",
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "top",
+          "media": [
+            {
+              "id": "artwork-0140/v01/m01",
+              "legacyIds": [
+                "naji065Ic11s4v84ho5_640"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 140
+      }
+    },
+    {
+      "id": "artwork-0141",
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "sketchy",
+          "media": [
+            {
+              "id": "artwork-0141/v01/m01",
+              "legacyIds": [
+                "naji065Ic11s4v84ho6_640"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1
+          }
+        },
+        {
+          "id": "v02",
+          "scope": "major",
+          "media": [
+            {
+              "id": "artwork-0141/v02/m01",
+              "legacyIds": [
+                "COJhPv9UsAAvk7w"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 2
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 141
+      }
+    },
+    {
+      "id": "artwork-0142",
+      "title": {
+        "ja": "落書き7"
+      },
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "decorative",
+          "media": [
+            {
+              "id": "artwork-0142/v01/m01",
+              "legacyIds": [
+                "naji065Ic11s4v84ho7_640"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1
+          }
+        },
+        {
+          "id": "v02",
+          "scope": "major",
+          "media": [
+            {
+              "id": "artwork-0142/v02/m01",
+              "legacyIds": [
+                "56793430-7"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 2,
+            "inferredPostIds": [
+              "pixiv:56793430"
+            ]
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 142,
+        "inferredPostIds": [
+          "pixiv:56793430"
+        ]
+      }
+    },
+    {
+      "id": "artwork-0143",
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "top",
+          "media": [
+            {
+              "id": "artwork-0143/v01/m01",
+              "legacyIds": [
+                "naji065Ic11s4v84ho8_540"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 143
+      }
+    },
+    {
+      "id": "artwork-0144",
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "sketchy",
+          "media": [
+            {
+              "id": "artwork-0144/v01/m01",
+              "legacyIds": [
+                "sENMiFJpci"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1,
+            "inferredPostIds": [
+              "instagram:sENMiFJpci"
+            ]
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 144,
+        "inferredPostIds": [
+          "instagram:sENMiFJpci"
+        ]
+      }
+    },
+    {
+      "id": "artwork-0145",
+      "title": {
+        "ja": "▲"
+      },
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "top",
+          "media": [
+            {
+              "id": "artwork-0145/v01/m01",
+              "legacyIds": [
+                "45663109_p0",
+                "ncz33nRI5f1s4v84ho2_1280",
+                "nl55ocl5Qy1s4v84ho4_1280"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1,
+            "inferredPostIds": [
+              "pixiv:45663109"
+            ]
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 145,
+        "inferredPostIds": [
+          "pixiv:45663109"
+        ]
+      }
+    },
+    {
+      "id": "artwork-0146",
+      "title": {
+        "ja": "落書き"
+      },
+      "description": {
+        "ja": "人の子うちの子色々と"
+      },
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "top",
+          "media": [
+            {
+              "id": "artwork-0146/v01/m01",
+              "legacyIds": [
+                "45737425_p1"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1,
+            "inferredPostIds": [
+              "pixiv:45737425"
+            ]
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 146,
+        "inferredPostIds": [
+          "pixiv:45737425"
+        ]
+      }
+    },
+    {
+      "id": "artwork-0147",
+      "title": {
+        "ja": "落書き"
+      },
+      "description": {
+        "ja": "人の子うちの子色々と"
+      },
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "top",
+          "media": [
+            {
+              "id": "artwork-0147/v01/m01",
+              "legacyIds": [
+                "45737425_p3",
+                "ncz33nRI5f1s4v84ho3_500"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1,
+            "inferredPostIds": [
+              "pixiv:45737425"
+            ]
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 147,
+        "inferredPostIds": [
+          "pixiv:45737425"
+        ]
+      }
+    },
+    {
+      "id": "artwork-0148",
+      "title": {
+        "ja": "落書き"
+      },
+      "description": {
+        "ja": "人の子うちの子色々と"
+      },
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "major",
+          "media": [
+            {
+              "id": "artwork-0148/v01/m01",
+              "legacyIds": [
+                "45737425_p8"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1,
+            "inferredPostIds": [
+              "pixiv:45737425"
+            ]
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 148,
+        "inferredPostIds": [
+          "pixiv:45737425"
+        ]
+      }
+    },
+    {
+      "id": "artwork-0149",
+      "title": {
+        "ja": "長門"
+      },
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "sketchy",
+          "media": [
+            {
+              "id": "artwork-0149/v01/m01",
+              "legacyIds": [
+                "45789819_p0"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1,
+            "inferredPostIds": [
+              "pixiv:45789819"
+            ]
+          }
+        },
+        {
+          "id": "v02",
+          "scope": "major",
+          "media": [
+            {
+              "id": "artwork-0149/v02/m01",
+              "legacyIds": [
+                "ncz33nRI5f1s4v84ho6_640"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 2
+          }
+        },
+        {
+          "id": "v03",
+          "scope": "sketchy",
+          "media": [
+            {
+              "id": "artwork-0149/v03/m01",
+              "legacyIds": [
+                "CBmatzXUEAAHQ60"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 3,
+            "inferredPostIds": [
+              "twitter:583667739211898880"
+            ]
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 149,
+        "inferredPostIds": [
+          "pixiv:45789819",
+          "twitter:583667739211898880"
+        ]
+      }
+    },
+    {
+      "id": "artwork-0150",
+      "title": {
+        "ja": "そっち"
+      },
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "top",
+          "media": [
+            {
+              "id": "artwork-0150/v01/m01",
+              "legacyIds": [
+                "ncz33nRI5f1s4v84ho5_500",
+                "46358406_p0"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1,
+            "inferredPostIds": [
+              "pixiv:46358406"
+            ]
+          }
+        },
+        {
+          "id": "v02",
+          "scope": "sketchy",
+          "media": [
+            {
+              "id": "artwork-0150/v02/m01",
+              "legacyIds": [
+                "DRUe0rsVQAAqo1W"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 2,
+            "inferredPostIds": [
+              "twitter:942696559136800768"
+            ]
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 150,
+        "inferredPostIds": [
+          "pixiv:46358406",
+          "twitter:942696559136800768"
+        ]
+      }
+    },
+    {
+      "id": "artwork-0151",
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "top",
+          "media": [
+            {
+              "id": "artwork-0151/v01/m01",
+              "legacyIds": [
+                "ncz33nRI5f1s4v84ho1_640"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1
+          }
+        },
+        {
+          "id": "v02",
+          "scope": "major",
+          "media": [
+            {
+              "id": "artwork-0151/v02/m01",
+              "legacyIds": [
+                "2a3f3d3aef60b6a6dea6953e98893507"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 2
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 151
+      }
+    },
+    {
+      "id": "artwork-0152",
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "major",
+          "media": [
+            {
+              "id": "artwork-0152/v01/m01",
+              "legacyIds": [
+                "ncz33nRI5f1s4v84ho4_400"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 152
+      }
+    },
+    {
+      "id": "artwork-0153",
+      "title": {
+        "ja": "落書き6"
+      },
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "major",
+          "media": [
+            {
+              "id": "artwork-0153/v01/m01",
+              "legacyIds": [
+                "ncz33nRI5f1s4v84ho7_1280",
+                "52383833-3"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1,
+            "inferredPostIds": [
+              "pixiv:52383833"
+            ]
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 153,
+        "inferredPostIds": [
+          "pixiv:52383833"
+        ]
+      }
+    },
+    {
+      "id": "artwork-0154",
+      "title": {
+        "ja": "落書き"
+      },
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "major",
+          "media": [
+            {
+              "id": "artwork-0154/v01/m01",
+              "legacyIds": [
+                "ndzf80Ljry1s4v84ho1_500",
+                "48695004_p1"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1,
+            "inferredPostIds": [
+              "pixiv:48695004"
+            ]
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 154,
+        "inferredPostIds": [
+          "pixiv:48695004"
+        ]
+      }
+    },
+    {
+      "id": "artwork-0155",
+      "title": {
+        "ja": "ドボン"
+      },
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "sketchy",
+          "media": [
+            {
+              "id": "artwork-0155/v01/m01",
+              "legacyIds": [
+                "nemmvkNP4U1s4v84ho1_640"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1
+          }
+        },
+        {
+          "id": "v02",
+          "scope": "top",
+          "media": [
+            {
+              "id": "artwork-0155/v02/m01",
+              "legacyIds": [
+                "nemmvkNP4U1s4v84ho1_r1_640"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 2
+          }
+        },
+        {
+          "id": "v03",
+          "scope": "top",
+          "media": [
+            {
+              "id": "artwork-0155/v03/m01",
+              "legacyIds": [
+                "nemmvkNP4U1s4v84ho2_540"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 3
+          }
+        },
+        {
+          "id": "v04",
+          "scope": "sketchy",
+          "media": [
+            {
+              "id": "artwork-0155/v04/m01",
+              "legacyIds": [
+                "46952854_p0",
+                "DuSkgiMUYAA2dHW"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 4,
+            "inferredPostIds": [
+              "pixiv:46952854",
+              "twitter:1073163955281907712"
+            ]
+          }
+        },
+        {
+          "id": "v05",
+          "scope": "major",
+          "media": [
+            {
+              "id": "artwork-0155/v05/m01",
+              "legacyIds": [
+                "CW_CaEkUoAAkSwq"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 5,
+            "inferredPostIds": [
+              "twitter:679975827577044992"
+            ]
+          }
+        },
+        {
+          "id": "v06",
+          "scope": "decorative",
+          "media": [
+            {
+              "id": "artwork-0155/v06/m01",
+              "legacyIds": [
+                "Crgqs4UVYAE49FD"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 6,
+            "inferredPostIds": [
+              "twitter:772414331656949761"
+            ]
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 155,
+        "inferredPostIds": [
+          "pixiv:46952854",
+          "twitter:1073163955281907712",
+          "twitter:679975827577044992",
+          "twitter:772414331656949761"
+        ]
+      }
+    },
+    {
+      "id": "artwork-0156",
+      "title": {
+        "ja": "落書き"
+      },
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "sketchy",
+          "media": [
+            {
+              "id": "artwork-0156/v01/m01",
+              "legacyIds": [
+                "new8j9Y1sz1s4v84ho1_400"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1
+          }
+        },
+        {
+          "id": "v02",
+          "scope": "top",
+          "media": [
+            {
+              "id": "artwork-0156/v02/m01",
+              "legacyIds": [
+                "48695004_p4",
+                "CTAhXJBUsAAU_2m"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 2,
+            "inferredPostIds": [
+              "pixiv:48695004",
+              "twitter:662065828867670016"
+            ]
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 156,
+        "inferredPostIds": [
+          "pixiv:48695004",
+          "twitter:662065828867670016"
+        ]
+      }
+    },
+    {
+      "id": "artwork-0157",
+      "title": {
+        "ja": "落書き"
+      },
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "top",
+          "media": [
+            {
+              "id": "artwork-0157/v01/m01",
+              "legacyIds": [
+                "new8j9Y1sz1s4v84ho2_500",
+                "CTAhXKIUEAAmGsZ",
+                "48695004_p5"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1,
+            "inferredPostIds": [
+              "twitter:662065828867670016",
+              "pixiv:48695004"
+            ]
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 157,
+        "inferredPostIds": [
+          "twitter:662065828867670016",
+          "pixiv:48695004"
+        ]
+      }
+    },
+    {
+      "id": "artwork-0158",
+      "title": {
+        "ja": "落書き"
+      },
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "top",
+          "media": [
+            {
+              "id": "artwork-0158/v01/m01",
+              "legacyIds": [
+                "new8j9Y1sz1s4v84ho3_400",
+                "CTAhXKJVAAAoVeH",
+                "48695004_p6"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1,
+            "inferredPostIds": [
+              "twitter:662065828867670016",
+              "pixiv:48695004"
+            ]
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 158,
+        "inferredPostIds": [
+          "twitter:662065828867670016",
+          "pixiv:48695004"
+        ]
+      }
+    },
+    {
+      "id": "artwork-0159",
+      "title": {
+        "ja": "じろーっ"
+      },
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "top",
+          "media": [
+            {
+              "id": "artwork-0159/v01/m01",
+              "legacyIds": [
+                "47304887_p0",
+                "nfwvayXN6j1s4v84ho3_400"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1,
+            "inferredPostIds": [
+              "pixiv:47304887"
+            ]
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 159,
+        "inferredPostIds": [
+          "pixiv:47304887"
+        ]
+      }
+    },
+    {
+      "id": "artwork-0160",
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "sketchy",
+          "media": [
+            {
+              "id": "artwork-0160/v01/m01",
+              "legacyIds": [
+                "nfwvayXN6j1s4v84ho1_400"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1
+          }
+        },
+        {
+          "id": "v02",
+          "scope": "major",
+          "media": [
+            {
+              "id": "artwork-0160/v02/m01",
+              "legacyIds": [
+                "nfwvayXN6j1s4v84ho1_r1_400"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 2
+          }
+        },
+        {
+          "id": "v03",
+          "scope": "decorative",
+          "media": [
+            {
+              "id": "artwork-0160/v03/m01",
+              "legacyIds": [
+                "DRUezh5VwAA_mGw"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 3,
+            "inferredPostIds": [
+              "twitter:942696559136800768"
+            ]
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 160,
+        "inferredPostIds": [
+          "twitter:942696559136800768"
+        ]
+      }
+    }
+  ]
+}

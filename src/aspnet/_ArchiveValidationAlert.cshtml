@@ -1,0 +1,25 @@
+@using Stairs2line.Archive
+@inject Stairs2lineArchiveFileValidator ArchiveValidator
+@{
+    var validation = ArchiveValidator.Validate();
+}
+
+@if (!validation.IsValid)
+{
+    <div class="alert alert-danger" role="alert">
+        <strong>Archive files are out of sync.</strong>
+        <div>Missing on disk: @validation.MissingOnDisk.Count</div>
+        <div>Unlisted on disk: @validation.UnlistedOnDisk.Count</div>
+        <details>
+            <summary>Show details</summary>
+            @foreach (var path in validation.MissingOnDisk)
+            {
+                <div>Missing: <code>@path</code></div>
+            }
+            @foreach (var path in validation.UnlistedOnDisk)
+            {
+                <div>Unlisted: <code>@path</code></div>
+            }
+        </details>
+    </div>
+}

@@ -1,0 +1,18 @@
+// Migrated pixivFANBOX posts. Status is stored on every post.
+{
+  "posts": [
+    {
+      "key": "pixivFANBOX:2956",
+      "platform": "pixivFANBOX",
+      "id": "2956",
+      "status": "deleted",
+      "href": "https://www.pixiv.net/fanbox/user/1593221/entry/2956",
+      "originalLanguage": "ja",
+      "description": {
+        "ja": "第12回　メイキング　渋谷凛　後編/せんたっき空間/せんたっき[pixivFANBOX] : オマカバーに行ったことはありますか、私はあります。 おしぼりがちょっぴり臭かったことだけ覚えています。 一人で焼肉に行ったことはありますか、私は先日行ってきました。   先月まで続いたルームシ ..."
+      },
+      "legacyAutoLink": true,
+      "media": []
+    }
+  ]
+}

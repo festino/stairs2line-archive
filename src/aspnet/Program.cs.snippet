@@ -1,0 +1,10 @@
+using Stairs2line.Archive;
+
+var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddStairs2lineArchive();
+
+var app = builder.Build();
+app.UseStaticFiles();
+app.MapStairs2lineArchiveValidation();
+
+app.Run();

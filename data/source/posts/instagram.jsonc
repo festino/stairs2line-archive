@@ -1,0 +1,60 @@
+// Migrated instagram posts. Status is stored on every post.
+{
+  "posts": [
+    {
+      "key": "instagram:sENMiFJpci",
+      "platform": "instagram",
+      "id": "sENMiFJpci",
+      "status": "alive",
+      "publishedAt": "2014-08-24T03:20:38.000Z",
+      "href": "https://www.instagram.com/p/sENMiFJpci",
+      "originalLanguage": "ja",
+      "legacyAutoLink": true,
+      "media": [
+        "artwork-0144/v01/m01"
+      ]
+    },
+    {
+      "key": "instagram:BAE8QEnppWX",
+      "platform": "instagram",
+      "id": "BAE8QEnppWX",
+      "status": "alive",
+      "publishedAt": "2016-01-03T12:39:41.000Z",
+      "href": "https://www.instagram.com/p/BAE8QEnppWX",
+      "originalLanguage": "ja",
+      "description": {
+        "ja": "ちっちゃい！"
+      },
+      "legacyAutoLink": true,
+      "media": [
+        "artwork-0190/v01/m01"
+      ]
+    },
+    {
+      "key": "instagram:BL22lBzFl4s",
+      "platform": "instagram",
+      "id": "BL22lBzFl4s",
+      "status": "alive",
+      "publishedAt": "2016-10-22T07:37:29.000Z",
+      "href": "https://www.instagram.com/p/BL22lBzFl4s",
+      "originalLanguage": "ja",
+      "legacyAutoLink": true,
+      "media": [
+        "artwork-0218/v04/m01"
+      ]
+    },
+    {
+      "key": "instagram:BL23kSdlQJX",
+      "platform": "instagram",
+      "id": "BL23kSdlQJX",
+      "status": "alive",
+      "publishedAt": "2016-10-22T07:46:07.000Z",
+      "href": "https://www.instagram.com/p/BL23kSdlQJX",
+      "originalLanguage": "ja",
+      "legacyAutoLink": true,
+      "media": [
+        "artwork-0218/v05/m01"
+      ]
+    }
+  ]
+}

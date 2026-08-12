@@ -1,0 +1,50 @@
+// User interface strings for ja.
+{
+  "nav": {
+    "artworks": "作品",
+    "posts": "投稿",
+    "platforms": "プラットフォーム",
+    "admin": "編集"
+  },
+  "common": {
+    "newest": "新しい順",
+    "oldest": "古い順",
+    "feed": "フィード",
+    "pages": "ページ",
+    "previous": "前へ",
+    "next": "次へ",
+    "page": "{page}ページ",
+    "unknownDate": "日付不明",
+    "deleted": "削除済み",
+    "alive": "公開中",
+    "source": "出典",
+    "posts": "投稿",
+    "versions": "バージョン",
+    "files": "ファイル",
+    "open": "開く",
+    "noItems": "項目がありません。"
+  },
+  "artworks": {
+    "popular": "人気",
+    "major": "主要",
+    "versions": "全バージョン",
+    "all": "発見済みすべて",
+    "pageTitle": "stairs2line 作品",
+    "created": "{date}に制作",
+    "knownNotAfter": "{date}以前に存在",
+    "firstPost": "最初に確認された投稿: {date}",
+    "genericDescription": "stairs2line の作品。{versions}バージョン、{media}メディア。"
+  },
+  "posts": {
+    "pageTitle": "stairs2line 投稿",
+    "all": "すべての投稿",
+    "grouped": "プラットフォーム別",
+    "platformTitle": "{platform}の投稿",
+    "genericDescription": "{platform}にある stairs2line のアーカイブ投稿。"
+  },
+  "validation": {
+    "title": "アーカイブ検証",
+    "errors": "エラー: {count}",
+    "warnings": "警告: {count}"
+  }
+}

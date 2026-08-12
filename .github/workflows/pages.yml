@@ -1,0 +1,63 @@
+name: Build and deploy stairs2line archive
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Choose the GitHub Pages base path
+        shell: bash
+        run: |
+          if [[ "${GITHUB_REPOSITORY#*/}" == "${GITHUB_REPOSITORY_OWNER}.github.io" ]]; then
+            echo "ARCHIVE_BASE_PATH=/" >> "$GITHUB_ENV"
+          else
+            echo "ARCHIVE_BASE_PATH=/${GITHUB_REPOSITORY#*/}/" >> "$GITHUB_ENV"
+          fi
+
+      - name: Run tests
+        run: npm test
+
+      - name: Build the static archive
+        run: >-
+          node src/cli.mjs build
+          --source data/source
+          --media-root wwwroot/media/stairs2line
+          --output _site
+          --base-path "$ARCHIVE_BASE_PATH"
+          --site-origin "https://${GITHUB_REPOSITORY_OWNER}.github.io"
+          --copy-media
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

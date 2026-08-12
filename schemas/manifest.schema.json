@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/stairs2line/manifest.schema.json",
+  "title": "Compiled stairs2line archive manifest",
+  "type": "object",
+  "required": ["schemaVersion", "site", "files", "media", "artworks", "posts", "summary"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "site": { "type": "object" },
+    "platforms": { "type": "array" },
+    "languages": { "type": "array", "items": { "type": "string" } },
+    "defaultLanguage": { "type": "string" },
+    "files": { "type": "object", "additionalProperties": { "type": "object" } },
+    "media": { "type": "object", "additionalProperties": { "type": "object" } },
+    "artworks": { "type": "array", "items": { "type": "object" } },
+    "posts": { "type": "array", "items": { "type": "object" } },
+    "summary": {
+      "type": "object",
+      "required": ["artworkCount", "versionCount", "mediaCount", "postCount", "fileCount", "errorCount", "warningCount"]
+    }
+  },
+  "additionalProperties": true
+}

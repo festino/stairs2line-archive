@@ -1,0 +1,996 @@
+// Migrated artwork groups. Legacy media IDs are resolved to physical files during the resolve step.
+{
+  "artworks": [
+    {
+      "id": "artwork-0001",
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "top",
+          "media": [
+            {
+              "id": "artwork-0001/v01/m01",
+              "legacyIds": [
+                "mimgqbVocD1s4v84ho1_500"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 1
+      }
+    },
+    {
+      "id": "artwork-0002",
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "major",
+          "media": [
+            {
+              "id": "artwork-0002/v01/m01",
+              "legacyIds": [
+                "miovzn9G8g1s4v84ho1_500"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 2
+      }
+    },
+    {
+      "id": "artwork-0003",
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "sketchy",
+          "media": [
+            {
+              "id": "artwork-0003/v01/m01",
+              "legacyIds": [
+                "mj1kbpLdKZ1s4v84ho1_1280"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 3
+      }
+    },
+    {
+      "id": "artwork-0004",
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "sketchy",
+          "media": [
+            {
+              "id": "artwork-0004/v01/m01",
+              "legacyIds": [
+                "mjb1u5tkNU1s4v84ho1_640"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 4
+      }
+    },
+    {
+      "id": "artwork-0005",
+      "title": {
+        "ja": "ミク"
+      },
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "top",
+          "media": [
+            {
+              "id": "artwork-0005/v01/m01",
+              "legacyIds": [
+                "mjz7mp8ZL51s4v84ho1_400",
+                "34412323_p0"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1,
+            "inferredPostIds": [
+              "pixiv:34412323"
+            ]
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 5,
+        "inferredPostIds": [
+          "pixiv:34412323"
+        ]
+      }
+    },
+    {
+      "id": "artwork-0006",
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "major",
+          "media": [
+            {
+              "id": "artwork-0006/v01/m01",
+              "legacyIds": [
+                "mk07wdYHk41s4v84ho1_400"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 6
+      }
+    },
+    {
+      "id": "artwork-0007",
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "top",
+          "media": [
+            {
+              "id": "artwork-0007/v01/m01",
+              "legacyIds": [
+                "mk45e16R1h1s4v84ho1_400",
+                "BGCo3enCAAEt-99"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 7
+      }
+    },
+    {
+      "id": "artwork-0008",
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "sketchy",
+          "media": [
+            {
+              "id": "artwork-0008/v01/m01",
+              "legacyIds": [
+                "mkjt2tvpMT1s4v84ho1_500"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 8
+      }
+    },
+    {
+      "id": "artwork-0009",
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "sketchy",
+          "media": [
+            {
+              "id": "artwork-0009/v01/m01",
+              "legacyIds": [
+                "mlkikn7GOH1s4v84ho1_1280"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 9
+      }
+    },
+    {
+      "id": "artwork-0010",
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "major",
+          "media": [
+            {
+              "id": "artwork-0010/v01/m01",
+              "legacyIds": [
+                "mlx3o4Ukuu1s4v84ho1_1280"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 10
+      }
+    },
+    {
+      "id": "artwork-0011",
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "major",
+          "media": [
+            {
+              "id": "artwork-0011/v01/m01",
+              "legacyIds": [
+                "mmbt5jQQb81s4v84ho1_1280"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 11
+      }
+    },
+    {
+      "id": "artwork-0012",
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "major",
+          "media": [
+            {
+              "id": "artwork-0012/v01/m01",
+              "legacyIds": [
+                "mmbt6izvmZ1s4v84ho1_1280"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 12
+      }
+    },
+    {
+      "id": "artwork-0013",
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "sketchy",
+          "media": [
+            {
+              "id": "artwork-0013/v01/m01",
+              "legacyIds": [
+                "mnegkgnTmF1s4v84ho1_400"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 13
+      }
+    },
+    {
+      "id": "artwork-0014",
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "sketchy",
+          "media": [
+            {
+              "id": "artwork-0014/v01/m01",
+              "legacyIds": [
+                "mnegndcrim1s4v84ho1_1280"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 14
+      }
+    },
+    {
+      "id": "artwork-0015",
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "sketchy",
+          "media": [
+            {
+              "id": "artwork-0015/v01/m01",
+              "legacyIds": [
+                "mneyjkX3LK1s4v84ho1_1280"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 15
+      }
+    },
+    {
+      "id": "artwork-0016",
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "sketchy",
+          "media": [
+            {
+              "id": "artwork-0016/v01/m01",
+              "legacyIds": [
+                "mnry1qRa1t1s4v84ho1_400"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 16
+      }
+    },
+    {
+      "id": "artwork-0017",
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "sketchy",
+          "media": [
+            {
+              "id": "artwork-0017/v01/m01",
+              "legacyIds": [
+                "mns0ceqIIb1s4v84ho1_1280"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 17
+      }
+    },
+    {
+      "id": "artwork-0018",
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "sketchy",
+          "media": [
+            {
+              "id": "artwork-0018/v01/m01",
+              "legacyIds": [
+                "moh76cEAUP1s4v84ho1_640"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 18
+      }
+    },
+    {
+      "id": "artwork-0019",
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "sketchy",
+          "media": [
+            {
+              "id": "artwork-0019/v01/m01",
+              "legacyIds": [
+                "mouywvDY3I1s4v84ho1_540"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 19
+      }
+    },
+    {
+      "id": "artwork-0020",
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "major",
+          "media": [
+            {
+              "id": "artwork-0020/v01/m01",
+              "legacyIds": [
+                "mouyz12UbO1s4v84ho1_640"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 20
+      }
+    },
+    {
+      "id": "artwork-0021",
+      "title": {
+        "ja": "みく"
+      },
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "sketchy",
+          "media": [
+            {
+              "id": "artwork-0021/v01/m01",
+              "legacyIds": [
+                "mouyz12UbO1s4v84ho2_400"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1
+          }
+        },
+        {
+          "id": "v02",
+          "scope": "top",
+          "media": [
+            {
+              "id": "artwork-0021/v02/m01",
+              "legacyIds": [
+                "36628281_p0"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 2,
+            "inferredPostIds": [
+              "pixiv:36628281"
+            ]
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 21,
+        "inferredPostIds": [
+          "pixiv:36628281"
+        ]
+      }
+    },
+    {
+      "id": "artwork-0022",
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "major",
+          "media": [
+            {
+              "id": "artwork-0022/v01/m01",
+              "legacyIds": [
+                "mp7wrti95Y1s4v84ho1_640"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 22
+      }
+    },
+    {
+      "id": "artwork-0023",
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "sketchy",
+          "media": [
+            {
+              "id": "artwork-0023/v01/m01",
+              "legacyIds": [
+                "mpbmrlugYR1s4v84ho1_400"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1
+          }
+        },
+        {
+          "id": "v02",
+          "scope": "major",
+          "media": [
+            {
+              "id": "artwork-0023/v02/m01",
+              "legacyIds": [
+                "mpbmrlugYR1s4v84ho2_400"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 2
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 23
+      }
+    },
+    {
+      "id": "artwork-0024",
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "major",
+          "media": [
+            {
+              "id": "artwork-0024/v01/m01",
+              "legacyIds": [
+                "mpkkfvNQ031s4v84ho1_400"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 24
+      }
+    },
+    {
+      "id": "artwork-0025",
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "major",
+          "media": [
+            {
+              "id": "artwork-0025/v01/m01",
+              "legacyIds": [
+                "mpkkfvNQ031s4v84ho2_400"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 25
+      }
+    },
+    {
+      "id": "artwork-0026",
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "sketchy",
+          "media": [
+            {
+              "id": "artwork-0026/v01/m01",
+              "legacyIds": [
+                "mqaqosCbWR1s4v84ho1_1280"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 26
+      }
+    },
+    {
+      "id": "artwork-0027",
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "top",
+          "media": [
+            {
+              "id": "artwork-0027/v01/m01",
+              "legacyIds": [
+                "mqyc2huSHA1s4v84ho1_400"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 27
+      }
+    },
+    {
+      "id": "artwork-0028",
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "sketchy",
+          "media": [
+            {
+              "id": "artwork-0028/v01/m01",
+              "legacyIds": [
+                "mr1h3kMgta1s4v84ho1_1280"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1
+          }
+        },
+        {
+          "id": "v02",
+          "scope": "major",
+          "media": [
+            {
+              "id": "artwork-0028/v02/m01",
+              "legacyIds": [
+                "37670521-1"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 2,
+            "inferredPostIds": [
+              "pixiv:37670521"
+            ]
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 28,
+        "inferredPostIds": [
+          "pixiv:37670521"
+        ]
+      }
+    },
+    {
+      "id": "artwork-0029",
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "top",
+          "media": [
+            {
+              "id": "artwork-0029/v01/m01",
+              "legacyIds": [
+                "mrb9iuQgMy1s4v84ho1_400"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 29
+      }
+    },
+    {
+      "id": "artwork-0030",
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "major",
+          "media": [
+            {
+              "id": "artwork-0030/v01/m01",
+              "legacyIds": [
+                "mrb9iuQgMy1s4v84ho2_640"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 30
+      }
+    },
+    {
+      "id": "artwork-0031",
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "sketchy",
+          "media": [
+            {
+              "id": "artwork-0031/v01/m01",
+              "legacyIds": [
+                "mrdp12V9y81s4v84ho1_400"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 31
+      }
+    },
+    {
+      "id": "artwork-0032",
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "top",
+          "media": [
+            {
+              "id": "artwork-0032/v01/m01",
+              "legacyIds": [
+                "mrdp12V9y81s4v84ho2_400"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 32
+      }
+    },
+    {
+      "id": "artwork-0033",
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "major",
+          "media": [
+            {
+              "id": "artwork-0033/v01/m01",
+              "legacyIds": [
+                "mrmyqsfDMb1s4v84ho1_1280"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 33
+      }
+    },
+    {
+      "id": "artwork-0034",
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "major",
+          "media": [
+            {
+              "id": "artwork-0034/v01/m01",
+              "legacyIds": [
+                "mrmyqsfDMb1s4v84ho2_400"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 34
+      }
+    },
+    {
+      "id": "artwork-0035",
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "sketchy",
+          "media": [
+            {
+              "id": "artwork-0035/v01/m01",
+              "legacyIds": [
+                "ms8i3j4j8l1s4v84ho1_500"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 35
+      }
+    },
+    {
+      "id": "artwork-0036",
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "sketchy",
+          "media": [
+            {
+              "id": "artwork-0036/v01/m01",
+              "legacyIds": [
+                "ms8i3j4j8l1s4v84ho2_500"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 36
+      }
+    },
+    {
+      "id": "artwork-0037",
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "sketchy",
+          "media": [
+            {
+              "id": "artwork-0037/v01/m01",
+              "legacyIds": [
+                "msaxwpnFbr1s4v84ho1_400"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 37
+      }
+    },
+    {
+      "id": "artwork-0038",
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "sketchy",
+          "media": [
+            {
+              "id": "artwork-0038/v01/m01",
+              "legacyIds": [
+                "msaxwpnFbr1s4v84ho2_400"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 38
+      }
+    },
+    {
+      "id": "artwork-0039",
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "major",
+          "media": [
+            {
+              "id": "artwork-0039/v01/m01",
+              "legacyIds": [
+                "msaxwpnFbr1s4v84ho3_400"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 39
+      }
+    },
+    {
+      "id": "artwork-0040",
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "major",
+          "media": [
+            {
+              "id": "artwork-0040/v01/m01",
+              "legacyIds": [
+                "msaxwpnFbr1s4v84ho4_400"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 40
+      }
+    }
+  ]
+}

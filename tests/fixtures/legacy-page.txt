@@ -1,0 +1,1657 @@
+Предложи, как можно получше задать медиа, разные версии одного медиа и связь с постами (сейчас она практически через имена файлов, но их менять не планируется). Также хотелось бы уйти от загрузки списка файлов из файловой системы, так как страницу планируется хостить в GitHub Pages. Но страница на ASP.NET сайте останется, так что можно сделать проверку, все ли файлы из файловой системы, которые подгружаются по текущей логике, есть по новой логике, и сообщать (alert), если это не так.
+
+@inject IWebHostEnvironment WebHostEnvironment
+@{
+    ViewData["Title"] = "stairs2line archive";
+    ViewData["Description"] = "Все найденные версии всех рисунков и анимаций stairs2line.";
+    ViewData["ImagePreview"] = "/media/stairs2line/tumblr/143559403624_tumblr_o6dg5xA0UN1s4v84ho1_400.png";
+
+    var wwwRootPath = WebHostEnvironment.WebRootPath;
+    /*var files = Directory.GetFiles(System.IO.Path.Combine(wwwRootPath, "media", "stairs2line", "twitter"))
+        .Concat(Directory.GetFiles(System.IO.Path.Combine(wwwRootPath, "media", "stairs2line", "tumblr")))
+        .Concat(Directory.GetFiles(System.IO.Path.Combine(wwwRootPath, "media", "stairs2line", "pixiv")))
+        .Concat(Directory.GetFiles(System.IO.Path.Combine(wwwRootPath, "media", "stairs2line", "other")));
+    int offset = System.IO.Path.Combine(wwwRootPath, "media", "stairs2line").Length + 1;
+    var filesStr = string.Join("`, `", files.Select(f => f[offset..]));*/
+    var files = Directory.GetFiles(System.IO.Path.Combine(wwwRootPath, "media", "stairs2line", "twitter")).Select(path => "twitter/" + System.IO.Path.GetFileName(path))
+        .Concat(Directory.GetFiles(System.IO.Path.Combine(wwwRootPath, "media", "stairs2line", "tumblr")).Select(path => "tumblr/" + System.IO.Path.GetFileName(path)))
+        .Concat(Directory.GetFiles(System.IO.Path.Combine(wwwRootPath, "media", "stairs2line", "pixiv")).Select(path => "pixiv/" + System.IO.Path.GetFileName(path)))
+        .Concat(Directory.GetFiles(System.IO.Path.Combine(wwwRootPath, "media", "stairs2line", "other")).Select(path => "other/" + System.IO.Path.GetFileName(path)));
+    var filesStr = string.Join("`, `", files);
+}
+
+<style>
+    .main-platforms {
+        display: flex;
+        height: 1.8em;
+        gap: 0.3em;
+        margin-bottom: 0.3em;
+    }
+
+    .platforms {
+        visibility: hidden;
+        display: flex;
+        height: 1.8em;
+        gap: 0.3em;
+        position: absolute;
+        right: 0.3em;
+        top: 0.3em;
+    }
+
+    .inactive-platform {
+        opacity: 0.3;
+        cursor: default;
+    }
+
+    .media-with-links:hover .platforms {
+        visibility: visible;
+    }
+
+    .media-with-links {
+        position: relative;
+    }
+
+    a {
+        text-decoration: none;
+    }
+
+    main {
+        justify-items: center;
+    }
+
+    .filter-option span {
+        visibility: hidden;
+    }
+
+    .filter-option.selected span {
+        visibility: visible;
+    }
+
+    .year-label {
+        width: 100%;
+        text-align: center;
+    }
+</style>
+
+<div class="d-flex align-items-baseline" style="gap:0.7em;">
+    <h1>stairs2line</h1> <!--Tarutaru Sentakki, たるたる せんたっき, michinoku800, ツネヒゴロ-->
+    <!--Can it be http://medium-spicy.com/illust/index.html ?-->
+
+    <div class="main-platforms">
+        <!--Created 1359216801 (26.01.2013 13:13:21)-->
+        <!--Description: 10℃を下回ると更新が途絶えます-->
+        <a href="https://michinoku800.tumblr.com" target="_blank" rel="noreferrer" class="fit-media" title="ツネヒゴロ (Tsunehigoro?)">
+            <img src="/media/stairs2line/misc/tumblr_favicon.ico" />
+        </a>
+        <!--Created before 2013.01.27 02:04:05 ? (profile pic path /user-profile/img/2013/01/27/02/04/05/5739104_5274017814b1f7ce5df2a11a222deef5_170.png)-->
+        <!--Can be approximated using first posts of nearly registrated users / or by inspecting requests deeper-->
+        <!--Description: ぐぬぬ-->
+        <a href="https://www.pixiv.net/en/users/1593221" target="_blank" rel="noreferrer" class="fit-media" title="せんたっき (Sentakki)">
+            <img src="/media/stairs2line/misc/pixiv_favicon20250122.ico" />
+        </a>
+        <!--Created 1326635072 (Sun Jan 15 13:44:32 +0000 2012)-->
+        <!--Description: ラーメンズ大好きです、絵が好きです。芸術に触れたい。-->
+        <a href="https://twitter.com/stairs2line" target="_blank" rel="noreferrer" class="fit-media" title="たるたる (Tarutaru)">
+            <img src="/media/stairs2line/misc/twitter-icon-free-png.webp" />
+        </a>
+    </div>
+</div>
+
+<div class="d-flex align-items-baseline" style="gap:0.3em;">
+    <div><button class="btn btn-secondary sort-option" onclick="onSortClick(this)">Дата <span>🟥</span></button></div>
+
+    <div><button class="btn btn-secondary sort-group" onclick="onSortGroupClick(this)">Группировать <span>☐</span></button></div>
+    
+    <div class="dropdown filter-dropdown">
+        <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+            Версии
+        </button>
+        <ul class="dropdown-menu">
+            <li>
+                <div class="dropdown-item filter-option" filter-option="top" onclick="onFilterClick(this)">Популярные <span>🟥</span></div>
+                <div class="dropdown-item filter-option" filter-option="major" onclick="onFilterClick(this)">Основные <span>🟥</span></div>
+                <div class="dropdown-item filter-option" filter-option="sketchy" onclick="onFilterClick(this)">Все версии <span>🟥</span></div>
+                <div class="dropdown-item filter-option" filter-option="decorative" onclick="onFilterClick(this)">Все найденные <span>🟥</span></div>
+            </li>
+        </ul>
+    </div>
+
+    <div class="dropdown hint dropdown-menu-end">
+        <button class="btn btn-secondary" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+            i
+        </button>
+        <div class="dropdown-menu" style="min-width: 20em; padding: 0.5em;">
+            <h6>Источники</h6>
+            <p>Официальные аккаунты, на момент марта 2026 многие посты удалены, некоторые совсем недавно.</p>
+            <p>Скраппинг tumblr восстановил практически все посты, но возможно утеряны некоторые из 2013.</p>
+            <div>Репринты на 
+                <a target="_blank" href="https://tumblrgallery.xyz/tumblrblog/gallery/1026534/2.html">tumblrgallery</a>,
+                <a target="_blank" href="https://buhitter.com/author/stairs2line">buhitter</a>,
+                <a target="_blank" href="https://twstalker.com/stairs2line">twstalker</a>,
+                <a target="_blank" href="https://pixiv.navirank.com/user/1593221/">navirank</a>,
+                <a target="_blank" href="https://danbooru.donmai.us/posts?tags=sentakki">danbooru</a>,
+                <a target="_blank" href="https://kr.pinterest.com/Xiaoy_Z/せんたっき/">Pinterest</a>,
+                huaban (<a target="_blank" href="https://huaban.com/boards/18900368">1</a>,
+                        <a target="_blank" href="https://huaban.com/boards/48235376">2</a>,
+                        <a target="_blank" href="https://huaban.com/boards/47888771">3</a>,
+                        <a target="_blank" href="https://huaban.com/boards/28210387">4</a>,
+                        <a target="_blank" href="https://huaban.com/boards/42400362">5</a>,
+                        <a target="_blank" href="https://huaban.com/boards/50388118">6</a>,
+                        <a target="_blank" href="https://huaban.com/boards/76437547">7</a>).
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--
+    to check
+    https://huaban.com/boards/17675776
+    https://weibo.com/u/2724207565?tabtype=album
+    https://weibo.com/5578066349/Ed7ieB5tO
+    https://jkagme2x.fanbox.cc/ (web archive is empty?? https://web.archive.org/web/20230319022452/https://jkagme2x.fanbox.cc/)
+-->
+
+<div id="stairs2lineMedia" class="media-container d-flex flex-row flex-wrap justify-content-center">
+    <h4 id="undatedMediaHeader" class="year-label" fullname="0">Без дат</h4>
+</div>
+
+<script>
+    const $container = $(`#stairs2lineMedia`);
+
+    const platformsPosts = {
+        "twitter": {
+            "alive": [
+                { post: "315437644974784512", description: `みっくみく` },
+                { post: "437560548058599425", description: `ざっくばらん` },
+                { post: "615545487463088128", description: `ガミガミ光線` },
+                { post: "662065828867670016", description: `さむい` },
+                { post: "671328469398237184", description: `これもかなりお気に入り` },
+                { post: "678705239327772676", description: `ちょこん` },
+                { post: "679975827577044992", description: `綺麗な線を意識する年だった #2015自分が選ぶ今年の4枚 https://twitter.com/hashtag/2015自分が選ぶ今年の4枚` },
+                { post: "682476291841327104", description: `まだかな` },
+                { post: "684389164448481280", description: `@@trcoot https://twitter.com/trcoot てらさんお誕生日おめでとうございます！！お洒落とセンスが錬金された唯一無二の絵が大好きです、良い一日を！！` },
+                { post: "685793462763950081", description: `【ポケモン】なおきさん(@@_NaokiSaito https://twitter.com/_NaokiSaito )とオーバを描きあってみました。` },
+                { post: "690927158793928704", description: `@@sakurai_energy https://twitter.com/sakurai_energy 櫻井さんお誕生日おめでとうございます🎊！！！！良い一日を！！！` },
+                { post: "692664609057038336", description: `円弧` },
+                { post: "694451726816940032", description: `後ろ向き` },
+                { post: "703208246358573056", description: `冬コミで参加していたOUTLiNEの本が届きました、紙媒体はよいな` },
+                { post: "714071166944555008", description: `HatraのAW16 SHOWROOMに招待してもらいました。斬新な切り口からデザインされる抜群の発想が魅力的で、空間に広がる刺激はとても心地よい。` },
+                { post: "734017914211160064", description: `大好きな絵描きさん達と飲み会しました` },
+                { post: "738710004660740096", description: `楕円` },
+                { post: "754156330894499845", description: `暑くて溶けそう` },
+                { post: "757950680682278912", description: `by @@hatroid` },
+                { post: "772048970210086913", description: `リウイチ会やりました！伝統の集合色紙` },
+                { post: "772414331656949761", description: `` },
+                { post: "790055702207148032", description: `先日、ハトラ／Okayの展示会に行ってきました。心地良さと枯れぬ斬新さが融合した素敵な場所、ちょこっとお手伝いしてます。` },
+                { post: "799228235296829440", description: `【絵柄のまったく違う絵師達が、ポケットモンスター サン・ムーンを描いてみた】
+★ア・メリカ
+★げみ
+★さいとうなおき
+★たるたる
+★どむ
+★ヒョーゴノスケ
+★ヘスン` },
+                { post: "814496337655758850", description: `12/1発売の『ILLUSTRATION 2017』に掲載させて頂きました、 十人十色の個性溢れる人達が詰まった素敵な本。お見かけの際はぜひよろしくお願いします。　http://shoeisha.co.jp/book/preview/9784798147567` },
+                { post: "1073163955281907712", description: `まとめ作品を除くと全部ミクちゃん、ほんと好き。
+#自分のPixivブクマTOP3をあげる https://twitter.com/hashtag/自分のPixivブクマTOP3をあげる` },
+                { post: "1444237624500129795", description: `構成` },
+                { post: "1444600677578067969", description: `鼓動` },
+                { post: "1626858807279390720", description: `軌道` },
+                { post: "1627242952576876547", description: `ミク` },
+                { post: "1628683582561562628", description: `ぐったり` },
+                { post: "1919748300133011553", description: `じー` },
+                { post: "2012145323582595126", description: `ゆらぎ` },
+                { post: "2012457846886334907", description: `ごろん` },
+                { post: "2017534570459971939", description: `ミク` },
+                { post: "2017897137342926901", description: `鬼` },
+                { post: "2022603498349826424", description: `△` },
+                { post: "2024641088326361472", description: `` },
+                { post: "2078406837687455778", description: `ふわり` },
+                { post: "2078768563939414075", description: `和` },
+                
+                { post: "414774255033675779", user: "otumamin", description: `冬コミ告知です！！【２日目東コ-54b】、bigburnで頒布される合同誌に金剛比叡の漫画７ページ描きました！一冊400円で頒布予定です～！当日はスペースに居ますので来られる方はぜひぜひお会いしましょう！` },
+                { post: "611514892709855232", user: "hatrangam", description: `15AWコラボレーターの @@stairs2line https://twitter.com/stairs2line 先生に描き下ろしてもらったモノです` },
+                { post: "787963630520184833", user: "hatra_official", description: `HATRA SS17 TOKYO SHOWROOM
+http://hatra.tumblr.com/post/151922372697/hatra-ss17-tokyo-showroom-date-1019wed` },
+                { post: "835063184520204289", user: "hatra_official", description: `in stock @@Bonita_kanazawa https://twitter.com/Bonita_kanazawa
+#HATRA https://twitter.com/hashtag/HATRA #ハトラ https://twitter.com/hashtag/ハトラ #SS17 https://twitter.com/hashtag/SS17` },
+                { post: "1014082314396024832", user: "cfm_snowmiku", description: `続いてパーカーです！！せんたっきさんのイラストはドット調を起用していて、
+最高にスタイリッシュです！！プリントもこだわりのハイクオリティー！！
+裏地はパイル地で通気性も抜群！男性女性どちらも普段使いにおすすめ☆
+#雪ミクスカイタウン https://twitter.com/hashtag/雪ミクスカイタウン #雪ミク https://twitter.com/hashtag/雪ミク #初音ミク https://twitter.com/hashtag/初音ミク` },
+                { post: "1085028359120142337", user: "hiraizm", description: `#ILLUSTRATION2019 https://twitter.com/hashtag/ILLUSTRATION2019 ではドット絵で表現するピクセルアートスタイルの作家として、YACOYONさんとヘルミッペさんのお二方がいます🎮
+
+シリーズの既刊には豊井さんやせんたっき（たるたる）さんも、ドット絵（GIF）やそれに近しいスタイル（2値ペン）の作家さんかと思います■` }
+            ],
+            "dead": [
+                { post: "583667739211898880", description: `修正ながもん` },
+                { post: "607461159269105664", description: `パラリ` },
+                { post: "623040653585321984", description: `まとめ` },
+                { post: "673434455864832000", description: `1pxの線` },
+                { post: "687855074966507521", description: `It's not 3D` },
+                { post: "701021001526579200", description: `【絵柄がまったく違う絵師達がロケット団を描いてみた】さいとうなおき(@@_NaokiSaito https://twitter.com/_NaokiSaito)たるたる(@@stairs2line https://twitter.com/stairs2line)どむ（@@10domu08 https://twitter.com/10domu08）ヒョーゴノスケ（@@hyogonosuke https://twitter.com/hyogonosuke)` },
+                { post: "704683561182318592", description: `おやすみ` },
+                { post: "784692392053977088", description: `静` },
+                { post: "814496801692581888", description: `去年は線を考える1年でしたが、今年はバランスを考える1年でした。
+#2016自分が選ぶ今年の4枚 https://twitter.com/search?q=2016自分が選ぶ今年の4枚` },
+                { post: "942696559136800768", description: `` },
+                { post: "942758747167866880", description: `隙間` },
+                { post: "1071381965645869056", description: `上下反転` },
+                { post: "1444589381948379139", description: `「………」
+「あっ」` },
+                { post: "1449658930657849347", description: `朝が早い` },
+                { post: "1919315718937416068", description: null },
+            ]
+        },
+        "pixiv": {
+            "alive": [
+                { post: "34412323", time: 1363838895000, title: `ミク`, description: `` },
+                { post: "36243734", time: 1370695445000, title: `あづいﾞ`, description: `` },
+                { post: "36628281", time: 1372137138000, title: `みく`, description: `` },
+                { post: "41839221", time: 1393192640000, title: `ざっくばらん`, description: `` },
+                { post: "42421426", time: 1395543700000, title: `ネプトン`, description: `うちのこです` },
+                { post: "44214320", time: 1403311418000, title: `miku`, description: `` },
+                { post: "45342986", time: 1407963586000, title: `+`, description: `` },
+                { post: "45663109", time: 1409315124000, title: `▲`, description: `` },
+                { post: "45737425", time: 1409584223000, title: `落書き`, description: `人の子うちの子色々と` },
+                { post: "45789819", time: 1409845789000, title: `長門`, description: `` },
+                { post: "46952854", time: 1415310965000, title: `ドボン`, description: `` },
+                { post: "47304887", time: 1417186969000, title: `じろーっ`, description: `` },
+                { post: "47612067", time: 1418841142000, title: `爆音`, description: `` },
+                { post: "48695004", time: 1423666911000, title: `落書き`, description: `` },
+                { post: "49576288", time: 1427790849000, title: `三角錐`, description: `` },
+                { post: "49831165", time: 1428937541000, title: `だらり`, description: `` },
+                { post: "53557244", time: 1447513638000, title: `さむい`, description: `季節になりました` },
+                { post: "54283685", time: 1451228739000, title: `角形`, description: `綺麗な線を目指して` },
+                { post: "54980568", time: 1454109474000, title: `VSオーバ`, description: `「きみの いきおい かんじる あつい きもち つたわってくる！」` },
+                { post: "55038245", time: 1454339956000, title: `コンパス`, description: `` },
+                { post: "55958136", time: 1458658962000, title: `てん死`, description: `てらさん(user/2764844 https://www.pixiv.net/en/users/2764844)ちの子です` },
+                { post: "56808104", time: 1462806117000, title: `3Dじゃないよ`, description: `色んなミクのメイキング集です` },
+                { post: "105494534", time: 1676715452000, title: `鼓動`, description: `静かな音のイメージ、過去のリメイク。` },
+                { post: "105494744", time: 1676715872000, title: `構成`, description: `` },
+                { post: "105494821", time: 1676716017000, title: `軌道`, description: `` },
+                { post: "105538623", time: 1676819537000, title: `ミク`, description: `お気に入りのポーズ、過去のリメイク。` },
+                { post: "105724983", time: 1677383221000, title: `ぐったり`, description: `` },
+                { post: "126228727", time: 1736868671000, title: `ゆらり`, description: `` },
+                { post: "130163321", time: 1746639366000, title: `じー`, description: `` },
+                { post: "140032321", time: 1768617045000, title: `ゆらぎ`, description: `` },
+                { post: "140060128", time: 1768662273000, title: `ごろん`, description: `` },
+                { post: "140653012", time: 1769950375000, title: `鬼`, description: `ｵﾆｵﾆ` },
+                { post: "140700255", time: 1770044492000, title: `ミク`, description: `` },
+                { post: "141188113", time: 1771081368000, title: `△`, description: `` },
+                { post: "141421623", time: 1771599917000, title: `シンメトリー`, description: `` },
+                { post: "147357899", time: 1784376360000, title: `ふわり`, description: `` },
+                { post: "147401423", time: 1784462820000, title: `和`, description: `過去絵のリメイク` },
+            ],
+            "dead": [
+                { post: "37670521", time: 1376012169, title: null, description: null }, // ??? images
+                { post: "39798495", time: 1384692865, title: null, description: null }, // ??? images
+                { post: "40147983", time: 1386412942, title: `落書き3`, description: null }, // 7 images
+                { post: "40532231", time: 1388064656, title: `みっくみく2`, description: null }, // 7 images
+                { post: "42229693", time: 1394792068, title: `角形`, description: null }, // 1 image
+                { post: "42381943", time: 1395396281, title: `天子`, description: null }, // 1 image
+                { post: "42995412", time: 1397961553, title: `靴紐`, description: null }, // 1 image
+                { post: "43473490", time: 1399913477, title: `クイッ`, description: null }, // 1 image
+                { post: "43689350", time: 1400943971, title: `サラリ`, description: null }, // 1 image
+                { post: "44671723", time: 1405177620, title: `みっくみく3`, description: null }, // 8 images
+                { post: "44930075", time: 1406306025, title: `ごろん`, description: null }, // 1 image
+                { post: "45220270", time: 1407511317, title: `だらり`, description: null }, // 1 image
+                { post: "46358406", time: 1412445577, title: `そっち`, description: null }, // 1 image
+                { post: "48819292", time: 1424185720, title: `だらん`, description: null }, // 1 image
+                { post: "50319824", time: 1431274788, title: `ちょこん`, description: null }, // 1 image
+                { post: "50366222", time: 1431559785, title: `スラン`, description: null }, // 1 image
+                { post: "50563768", time: 1432566441, title: `水面境界`, description: null }, // 1 image
+                { post: "51368414", time: 1436626960, title: `流れ星`, description: null }, // 1 image
+                { post: "51941560", time: 1439392580, title: `発声練習`, description: null }, // 1 image
+                { post: "52039307", time: 1439824318, title: `半重力`, description: null }, // 1 image
+                { post: "52283276", time: 1440946973, title: `ちょっと待って`, description: null }, // 1 image
+                { post: "52383833", time: 1441465325, title: `落書き6`, description: null }, // 9 images
+                { post: "53920815", time: 1449414877, title: `すいっ`, description: null }, // 1 image
+                { post: "56793430", time: 1462721428, title: `落書き7`, description: null }, // 16 images
+                { post: "58165714", time: 1469890802, title: `パンク`, description: null }, // 1 image
+                { post: "59993262", time: 1479394805, title: `ていっ`, description: null }, // 1 image
+                { post: "66348336", time: 1513609207, title: `隙間`, description: null }, // 1 image
+            ]
+        },
+        "tumblr": {
+            "alive": [
+                { post: "45855739676", time: 1363811426, description: `` },
+                { post: "46066388369", time: 1364041801, description: `` },
+                { post: "65998519870", time: 1383578114, description: `` },
+                { post: "69081668209", time: 1386260350, description: `` },
+                { post: "71205857328", time: 1388071875, description: `` },
+                { post: "75998276207", time: 1391869122, description: `` },
+                { post: "78007815029", time: 1393511247, description: `` },
+                { post: "79730073848", time: 1394946373, description: `` },
+                { post: "79868800621", time: 1395065983, description: `` },
+                { post: "81351166350", time: 1396318860, description: `` },
+                { post: "81351785103", time: 1396319240, description: `` },
+                { post: "81353252961", time: 1396320139, description: `` },
+                { post: "85412229284", time: 1399810018, description: `` },
+                { post: "87312206189", time: 1401471081, description: `` },
+                { post: "88187258284", time: 1402247736, description: `` },
+                { post: "92164287224", time: 1405708643, description: `・2014/7/19　
+
+・2013/9/9
+
+寝続ける` },
+                { post: "93645357179", time: 1407035700, description: `` },
+                { post: "95168716109", time: 1408428015, description: `むむむ` },
+                { post: "99220698919", time: 1412514425, description: `` },
+                { post: "100882755344", time: 1414209745, description: `` },
+                { post: "101934300099", time: 1415292754, description: `` },
+                { post: "102446579819", time: 1415799681, description: `` },
+                { post: "104079454414", time: 1417449852, description: `` },
+                { post: "105565571734", time: 1418950486, description: `` },
+                { post: "105565614824", time: 1418950524, description: `` },
+                { post: "113499005479", time: 1426234621, description: `` },
+                { post: "120030092179", time: 1432744373, description: `` },
+                { post: "122089998854", time: 1434904987, description: `` },
+                { post: "123811035304", time: 1436627237, description: `` },
+                { post: "126578508869", time: 1439458602, description: `` },
+                { post: "126650146534", time: 1439532378, description: `` },
+                { post: "128031054124", time: 1441031890, description: `` },
+                { post: "129002027914", time: 1442161144, description: `` },
+                { post: "132933921049", time: 1447161011, description: `` },
+                { post: "135899998849", time: 1451033635, description: `` },
+                { post: "137491300699", time: 1453053666, description: `` },
+                { post: "139165453739", time: 1455275414, description: `` },
+                { post: "710217462683172864", time: 1677316153, description: `` },
+                { post: "710218934614376448", time: 1677317556, description: `` },
+                { post: "772663486221287424", time: 1736869322, description: `【雪ミク スカイタウン】
+10周年お祝いイラスト` },
+                { post: "783086275245867008", time: 1746809268, description: `` },
+                { post: "805953449568157696", time: 1768617105, description: `` },
+                { post: "806000851033456640", time: 1768662310, description: `寝続ける
+https://www.tumblr.com/michinoku800/92164287224` },
+                { post: "807351584863485952", time: 1769950470, description: `` },
+                { post: "808543229379313664", time: 1771086911, description: `` },
+                { post: "808543242321903616", time: 1771086923, description: `` },
+                { post: "808999046186418176", time: 1771521612, description: `` },
+                { post: "809079143597768704", time: 1771597999, description: `` },
+            ],
+            "dead": [
+                { post: "43719198508", time: 1361537076, description: `2月22日は猫の日なんですよ、わんわん` },
+                { post: "43826810984", time: 1361650164, description: `初音祭りのよかん` },
+                { post: "44376831152", time: 1362241574, description: `もう3月やないか…！` },
+                { post: "44797884703", time: 1362684174, description: `` },
+                { post: "45904172911", time: 1363858430, description: `` },
+                { post: "46798901117", time: 1364772342, description: `` },
+                { post: "48458651037", time: 1366485001, description: `` },
+                { post: "49006824730", time: 1367072214, description: `` },
+                { post: "49682032131", time: 1367758425, description: `たまにはほっこり塗り` },
+                { post: "49682058500", time: 1367758460, description: `` },
+                { post: "51375316236", time: 1369561714, description: `新鮮で楽しい` },
+                { post: "51375434820", time: 1369561803, description: `ブシドーVS悪夢を運ぶ者
+
+世界樹アニメ化してほしいな` },
+                { post: "51398236774", time: 1369584993, description: `トラックぇー！` },
+                { post: "51978133015", time: 1370190878, description: `ぐぬぬ！
+
+こういう雰囲気の書きたいんだけども
+
+何かが違う…!
+
+夏休みに覚醒するよ！` },
+                { post: "51981904813", time: 1370193855, description: `オロナミンC書いた絵がどっかいった
+
+覚醒タイム` },
+                { post: "53088491193", time: 1371369110, description: `扇風機で今年の夏は乗り越えようと思ってました。(エアコンつける)` },
+                { post: "53689823471", time: 1372011585, description: `締切今日だよギャース！！
+
+あわわわてたらまけだだから！` },
+                { post: "53689916013", time: 1372011663, description: `昼ぐらいの落書き
+
+久しぶりに漫画読んだのですが
+
+『いなり、こんこん、恋いろは。』すっごいオススメ
+
+何もかもがツボでした` },
+                { post: "54272871617", time: 1372615339, description: `7月です。
+
+パワパフガールズが可愛すぎてつらい` },
+                { post: "54443894863", time: 1372788994, description: `どっちがいいのかどっちもないのか
+
+ぐぬぬ` },
+                { post: "54829899172", time: 1373205884, description: `周りの意識の高さ。
+
+昇華` },
+                { post: "56065028153", time: 1374427039, description: `江の島。
+
+夏休みになったら風景や背景の勉強していきたいな
+
+初めての一人旅が江の島でした` },
+                { post: "57238498060", time: 1375527834, description: `夏休みです
+
+夏休み！` },
+                { post: "57394894419", time: 1375674321, description: `艦コレのぜかましちゃん
+
+書けば出るともっぱらの噂ですが騙されました` },
+                { post: "57872053383", time: 1376131063, description: `最近外に出たら絶対メモ帳1ページは書くように心がけてます
+
+暑い！` },
+                { post: "57981307583", time: 1376244471, description: `1日1枚
+3日坊主を予定しております` },
+                { post: "58436115690", time: 1376676966, description: `迷子` },
+                { post: "59573860756", time: 1377681825, description: `うおーｯ！たのしい！` },
+                { post: "59690538540", time: 1377795634, description: `` },
+                { post: "60735916600", time: 1378710166, description: `そろそろ夏休み終了です
+
+心残りというとSAIマスターになれなかったいうこと､悔しい！` },
+                { post: "61383879024", time: 1379307607, description: `左上が最初に書いた物。右上がその時の位置関係
+
+そして左下、右下の順に右の足が伸びていく。
+
+足の長さが変ではないかと最初の絵で意見をもらうがわからず、
+
+自然なのか不自然なのかと考えてみるがどうなのだろう
+
+この3枚の中におかしい絵があるのか、不自然な絵があるのかよくわからない` },
+                { post: "61571325816", time: 1379486367, description: `　波　突風
+
+遅刻　ケーキ` },
+                { post: "61704687471", time: 1379629414, description: `⑦
+
+⑤⑥
+
+②①
+
+④③
+
+2013/1/5～9/20` },
+                { post: "64390483901", time: 1382109048, description: `` },
+                { post: "65144069024", time: 1382804606, description: `バチバチ` },
+                { post: "65785166959", time: 1383400938, description: `落書き` },
+                { post: "67110559418", time: 1384567807, description: `` },
+                { post: "67832137305", time: 1385196607, description: `メガネミク` },
+                { post: "75684732245", time: 1391603445, description: `` },
+                { post: "75774790703", time: 1391666706, description: `よつばとを読むと夏って素敵だなって思い馳せる
+
+いざ夏になると秋の風景に胸躍らせる
+
+先にある楽しみほど幸福なものはない
+
+話変わって私は受験が終わって以来スマホを使い続けている
+
+機種名はArrowsとかいう
+
+性能を求めすぎたあまり　
+
+電池という名の寿命を放棄した
+
+糞のようなAndroidである。
+
+そのArrowsは堂々たる風格とコーティングされた赤と黒の配色で誰に見せても恥ずかしくない自慢のスマホだった
+
+買った当初の私は
+
+「これが次世代のケータイか、すごいな！」
+
+と感動しつつ画面を指紋だらけにしたものだ
+
+事態に気付き始めたのはその1週間後であった
+
+友達と遊ぶために目的地までバスに1時間揺られることに
+
+当然私は真新しいArrowsを取り出しまんざらでもない顔で乗客に見せびらかすのである。
+
+やはり時間がたつのが早い、もう名古屋駅に着いたではないか
+
+その瞬間手にもっているAndroidから光が奪われた
+
+What?
+
+おいどうしたんだ
+
+冗談はよせよアローズ、
+
+お前さっきまで70%あったじゃないか。
+
+おい！おい！！！
+
+そして私は友達を探すのに1時間使ったのであった
+
+その1週間後、充電部分の接続部位がポロリと取れた
+
+モンハンか、
+
+何故はぎ取れた
+
+そして時はまたぎ、先月にしてようやく充電器を買うことにしたのだ
+
+重い腰を下ろしたとかそういうレベルじゃない、断腸の思い。
+
+高いのだ、5000円もした、5000円だぞ
+
+2週間も経たなかった
+
+寝起きに足元にあった充電器を踏み接触部分がぶっ飛ぶ
+
+すべてArrowsのせいだと思うことにし現実逃避のため2度寝しようとする
+
+しかしArrowsを3年契約したことを思い出し寝れない
+
+3月は私の誕生日だ、踏んでも壊れない充電器を買ってもらうことにする。` },
+                { post: "78635095373", time: 1394009854, description: `200×40` },
+                { post: "78852321001", time: 1394206849, description: `オリジナルキャラクターのネプトンです。` },
+                { post: "80239552937", time: 1395380690, description: `ネプトン
+
+頭の猫耳っぽいのは髪の毛
+
+海王星` },
+                { post: "89410326229", time: 1403312972, description: `` },
+                { post: "111275517544", time: 1424180293, description: `` },
+                { post: "121877671364", time: 1434673018, description: `` },
+                { post: "126917699479", time: 1439826590, description: `` },
+                { post: "129414719209", time: 1442667561, description: `` },
+                { post: "137222440149", time: 1452698808, description: `` },
+                { post: "137329797129", time: 1452835409, description: `` },
+                { post: "137459018534", time: 1453007256, description: `「・・・？」` },
+                { post: "137491054639", time: 1453053420, description: `` },
+                { post: "143559403624", time: 1461893397, description: `` },
+                { post: "147522375114", time: 1468724518, description: `` },
+                { post: "153302626089", time: 1479394103, description: `` },
+                { post: "159976260374", time: 1493128574, description: `` },
+                { post: "170852315454", time: 1518569849, description: `` },
+                { post: "171514650839", time: 1520160046, description: `` },
+                { post: "181033018374", time: 1544579284, description: `` },
+                { post: "663928878095564800", time: 1633171918, description: `` },
+                { post: "666172885249966080", time: 1635311970, description: `` },
+                { post: "709544231144947712", time: 1676674109, description: `` },
+                { post: "710217409092567040", time: 1677316102, description: `` },
+            ]
+        },
+        "other": {
+            "alive": [
+                { platform: "instagram", post: "sENMiFJpci", description: ``, time: 1408850438000, href: `https://www.instagram.com/p/sENMiFJpci` },
+                { platform: "instagram", post: "BAE8QEnppWX", description: `ちっちゃい！`, time: 1451824781000, href: `https://www.instagram.com/p/BAE8QEnppWX`},
+                { platform: "instagram", post: "BL22lBzFl4s", description: ``, time: 1477121849000, href: `https://www.instagram.com/p/BL22lBzFl4s` },
+                { platform: "instagram", post: "BL23kSdlQJX", description: ``, time: 1477122367000, href: `https://www.instagram.com/p/BL23kSdlQJX` },
+                { platform: "snowmiku.com", post: "cfm_snowmiku_skytown_st10th_message.html_post1869918372462506421", time: 1734658256000, href: `https://snowmiku.com/skytown/st10th/message.html`, description: `スカイタウンの10周年に際し、
+スカイタウンにゆかりのある作家の皆さまに
+色紙をお贈りいただきました！`  }, // https://x.com/cfm_snowmiku/status/1869918372462506421
+                { platform: "piapro", post: "NK1806281", time: 1530172809000, href: `https://blog.piapro.net/2018/06/nk1806281-1.html`, title: `【雪ミク スカイタウン】7月13日(金)から発売の新商品をご紹介！`, description: `こんばんは( *´ｴ\`)ﾉ
+
+ 
+
+朝起きると雨の音が聞こえる梅雨の時期が続きますが、本日は、
+
+「雪ミク スカイタウン」からこの夏発売の新商品のお知らせです！
+ 
+
+7月13日（金）から、「ニコニコ超会議2018」で先行販売をした
+
+たらんぼマンさんのアクリルキーホルダーやなじょさんの缶バッジに加え、
+
+ 
+
+eruriさんの「With MIKU」シリーズ、
+
+たらんぼマンさんの「Play With Snow」シリーズ、
+
+なじょさんの「Happy Shopping!」シリーズ、
+
+そして新たに！！
+
+kiseさんに描き下ろしていただいた「Shiny＊Snow」シリーズと
+
+せんたっきさんに描き下ろしていただいた「Anti gravity」シリーズの
+
+店頭販売がスタートいたします！なんて豪華･･･！
+
+ 
+
+気になるお二方の描き下ろしイラストはこちらです･･･！
+
+<images>
+
+せんたっきさんは2バージョン！
+
+ドット調なミクさんもかっこよくて素敵ですねぇ。
+
+kiseさんのはじける笑顔の6人もたまりません☆
+
+ 
+
+それでは早速、素敵なイラスト5種類を使用した新グッズをﾄﾞﾄﾞﾝとご紹介！！` }, // "Anti gravity"
+                { platform: "piapro", post: "NK1807031", time: 1530604847000, href: `https://blog.piapro.net/2018/07/nk1807031-1.html`, title: `【雪ミク スカイタウン】さらに追加で7月発売の新商品をご紹介！キャンペーンもスタート！`, description: `こんばんは( *´ｴ\`)ﾉ
+
+ 
+
+先週の記事の最後でチラッとお伝えしましたが、
+
+ 
+
+…そう！まだまだあるのです！
+
+ 
+
+「雪ミク スカイタウン」にて7月13日(金)から発売される夏の新商品！！
+ 
+
+そして、こちらの記事の最後には素敵なお知らせも…！？
+
+ 
+
+それでは今週もﾄﾞﾄﾞﾝとご紹介！！さっそく見てみましょう～～！
+
+<images>
+
+さらに！！新シリーズの登場を記念して、キャンペーンを行います☆(*゜ｴ゜)
+
+ 
+
+【キャンペーン実施期間：2018年7月13日（金）～先着順、なくなり次第終了】
+
+ 
+
+上記期間中、「雪ミク スカイタウン」内で商品を2,000円（税込）お買い上げ毎に、
+
+クリアカード1枚（全3種・ランダム）をプレゼント！
+
+ 
+
+注意事項などの詳細はキャンペーンページよりご確認ください！
+
+<images>
+
+上から順にkiseさん、せんたっきさん、なじょさんの3種類で、
+
+こちらの画像だと確認できないのですが、背景の透けた仕様がとても綺麗で可愛いカードになっています♪
+
+ 
+
+次の機会に現物のお写真も載せますので、お楽しみに！
+
+ 
+
+さぁ、今年の夏は雪ミク スカイタウンと初音ミク「マジカルミライ 2018」で決まり☆
+
+近くへお越しの際には、ぜひお立ち寄りください！
+
+
+
+それではまた次の更新でお会いしましょう(*´ｴ\`)ﾉｼ` },
+            ],
+            "dead": [
+                { platform: "pixivFANBOX", post: "2956", time: undefined, href: "https://www.pixiv.net/fanbox/user/1593221/entry/2956", description: `第12回　メイキング　渋谷凛　後編/せんたっき空間/せんたっき[pixivFANBOX] : オマカバーに行ったことはありますか、私はあります。 おしぼりがちょっぴり臭かったことだけ覚えています。 一人で焼肉に行ったことはありますか、私は先日行ってきました。   先月まで続いたルームシ ...` }, // https://huaban.com/pins/1540579834
+            ]
+        }
+    }
+    const posts = [];
+    for (const platform of Object.keys(platformsPosts)) {
+        for (const post of platformsPosts[platform].alive) {
+            if (!post.platform) post.platform = platform;
+            post.alive = true;
+            posts.push(post);
+        }
+        for (const post of platformsPosts[platform].dead) {
+            if (!post.platform) post.platform = platform;
+            post.alive = false;
+            posts.push(post);
+        }
+    }
+
+    const mediaGroups = [
+        { versions: [ { scope: "top", media: [ "mimgqbVocD1s4v84ho1_500" ] } ] },
+        { versions: [ { scope: "major", media: [ "miovzn9G8g1s4v84ho1_500" ] } ] },
+        { versions: [ { scope: "sketchy", media: [ "mj1kbpLdKZ1s4v84ho1_1280" ] } ] },
+        { versions: [ { scope: "sketchy", media: [ "mjb1u5tkNU1s4v84ho1_640" ] } ] },
+        { versions: [ { scope: "top", media: [ "mjz7mp8ZL51s4v84ho1_400", "34412323_p0" ] } ] },
+        { versions: [ { scope: "major", media: [ "mk07wdYHk41s4v84ho1_400" ] } ] },
+        { versions: [ { scope: "top", media: [ "mk45e16R1h1s4v84ho1_400", "BGCo3enCAAEt-99" ] } ] },
+        { versions: [ { scope: "sketchy", media: [ "mkjt2tvpMT1s4v84ho1_500" ] } ] },
+        { versions: [ { scope: "sketchy", media: [ "mlkikn7GOH1s4v84ho1_1280" ] } ] },
+        { versions: [ { scope: "major", media: [ "mlx3o4Ukuu1s4v84ho1_1280" ] } ] },
+        { versions: [ { scope: "major", media: [ "mmbt5jQQb81s4v84ho1_1280" ] } ] },
+        { versions: [ { scope: "major", media: [ "mmbt6izvmZ1s4v84ho1_1280" ] } ] },
+        { versions: [ { scope: "sketchy", media: [ "mnegkgnTmF1s4v84ho1_400" ] } ] },
+        { versions: [ { scope: "sketchy", media: [ "mnegndcrim1s4v84ho1_1280" ] } ] },
+        { versions: [ { scope: "sketchy", media: [ "mneyjkX3LK1s4v84ho1_1280" ] } ] },
+        { versions: [ { scope: "sketchy", media: [ "mnry1qRa1t1s4v84ho1_400" ] } ] },
+        { versions: [ { scope: "sketchy", media: [ "mns0ceqIIb1s4v84ho1_1280" ] } ] },
+        { versions: [ { scope: "sketchy", media: [ "moh76cEAUP1s4v84ho1_640" ] } ] },
+        { versions: [ { scope: "sketchy", media: [ "mouywvDY3I1s4v84ho1_540" ] } ] },
+        { versions: [ { scope: "major", media: [ "mouyz12UbO1s4v84ho1_640" ] } ] },
+        { versions: [
+            { scope: "sketchy", media: [ "mouyz12UbO1s4v84ho2_400" ] },
+            { scope: "top", media: [ "36628281_p0" ] },
+        ] },
+        { versions: [ { scope: "major", media: [ "mp7wrti95Y1s4v84ho1_640" ] } ] },
+        { versions: [
+            { scope: "sketchy", media: [ "mpbmrlugYR1s4v84ho1_400" ] },
+            { scope: "major", media: [ "mpbmrlugYR1s4v84ho2_400" ] },
+        ] },
+        { versions: [ { scope: "major", media: [ "mpkkfvNQ031s4v84ho1_400" ] } ] },
+        { versions: [ { scope: "major", media: [ "mpkkfvNQ031s4v84ho2_400" ] } ] },
+        { versions: [ { scope: "sketchy", media: [ "mqaqosCbWR1s4v84ho1_1280" ] } ] },
+        { versions: [ { scope: "top", media: [ "mqyc2huSHA1s4v84ho1_400" ] } ] },
+        { versions: [
+            { scope: "sketchy", media: [ "mr1h3kMgta1s4v84ho1_1280" ] },
+            { scope: "major", media: [ "37670521-1" ] }
+        ] },
+        { versions: [ { scope: "top", media: [ "mrb9iuQgMy1s4v84ho1_400" ] } ] },
+        { versions: [ { scope: "major", media: [ "mrb9iuQgMy1s4v84ho2_640" ] } ] },
+        { versions: [ { scope: "sketchy", media: [ "mrdp12V9y81s4v84ho1_400" ] } ] },
+        { versions: [ { scope: "top", media: [ "mrdp12V9y81s4v84ho2_400" ] } ] },
+        { versions: [ { scope: "major", media: [ "mrmyqsfDMb1s4v84ho1_1280" ] } ] },
+        { versions: [ { scope: "major", media: [ "mrmyqsfDMb1s4v84ho2_400" ] } ] },
+        { versions: [ { scope: "sketchy", media: [ "ms8i3j4j8l1s4v84ho1_500" ] } ] },
+        { versions: [ { scope: "sketchy", media: [ "ms8i3j4j8l1s4v84ho2_500" ] } ] },
+        { versions: [ { scope: "sketchy", media: [ "msaxwpnFbr1s4v84ho1_400" ] } ] },
+        { versions: [ { scope: "sketchy", media: [ "msaxwpnFbr1s4v84ho2_400" ] } ] },
+        { versions: [ { scope: "major", media: [ "msaxwpnFbr1s4v84ho3_400" ] } ] },
+        { versions: [ { scope: "major", media: [ "msaxwpnFbr1s4v84ho4_400" ] } ] },
+        { versions: [
+            { scope: "sketchy", media: [ "msaxwpnFbr1s4v84ho5_400" ] },
+            { scope: "top", media: [ "msaxwpnFbr1s4v84ho5_r1_400" ] },
+        ] },
+        { versions: [
+            { scope: "top", media: [ "msaxwpnFbr1s4v84ho6_400", "36243734_p0" ] },
+            { scope: "decorative", media: [ "n1ygvurXbo1s4v84ho4_250" ] },
+            { scope: "decorative", media: [ "n1ygvurXbo1s4v84ho5_250" ] }
+        ] },
+        { versions: [ { scope: "major", media: [ "msujkjn8Kb1s4v84ho2_400" ] } ] },
+        { versions: [ { scope: "major", media: [ "msujkjn8Kb1s4v84ho4_400" ] } ] },
+        { versions: [ { scope: "major", media: [ "msujkjn8Kb1s4v84ho5_400" ] } ] },
+        { versions: [
+            { scope: "major", media: [ "msujkjn8Kb1s4v84ho6_400" ] },
+            { scope: "decorative", media: [ "n1ygvurXbo1s4v84ho2_250" ] }
+        ] },
+        { versions: [
+            { scope: "sketchy", media: [ "msujkjn8Kb1s4v84ho1_500" ] },
+            { scope: "major", media: [ "nuxdexjnEQ1s4v84ho1_r1_500" ] },
+        ] },
+        { versions: [
+            { scope: "top", media: [ "msujkjn8Kb1s4v84ho3_500", "n8x7q9MNVH1s4v84ho2_500" ], time: new Date("2013-09-09").getTime() },
+            { scope: "top", media: [ "n8x7q9MNVH1s4v84ho1_540" ] },
+            { scope: "sketchy", media: [ "CKV8LBnUAAA57nu" ] },
+            { scope: "major", media: [ "44930075_p0" ] },
+            { scope: "top", media: [ "G-2vtGRXEAAxsGa", "140060128_p0", "eba8736e9dacf17be929d57f0371f94a19737731" ] },
+            { scope: "decorative", media: [ "HBj3j79bUAAsLCb", "141421623_p1", "29674e06cd848a6954e54e43bfecfa4458997cf6" ] },
+        ] },
+        { versions: [
+            { scope: "sketchy", media: [ "mt7ck0rkmp1s4v84ho1_400" ] },
+            { scope: "sketchy", media: [ "mt7ck0rkmp1s4v84ho2_400" ] },
+            { scope: "top", media: [ "mt7ck0rkmp1s4v84ho3_400", "mtb6hobl8x1s4v84ho2_400" ] },
+            { scope: "sketchy", media: [ "mt7ck0rkmp1s4v84ho4_400" ] },
+        ] },
+        { versions: [
+            { scope: "top", media: [ "mtb6hobl8x1s4v84ho1_400" ] },
+            { scope: "decorative", media: [ "n1ygvurXbo1s4v84ho7_250" ] }
+        ] },
+        { versions: [ { scope: "major", media: [ "mtb6hobl8x1s4v84ho3_r1_400" ] } ] },
+        { versions: [ { scope: "major", media: [ "mtb6hobl8x1s4v84ho4_400" ] } ] },
+        { versions: [ { scope: "sketchy", media: [ "mte8v2HxWN1s4v84ho1_1280" ] } ] },
+        { versions: [ { scope: "major", media: [ "mte8v2HxWN1s4v84ho2_1280" ] } ] },
+        { versions: [ { scope: "major", media: [ "mte8v2HxWN1s4v84ho3_640" ] } ] },
+        { versions: [ { scope: "sketchy", media: [ "mte8v2HxWN1s4v84ho4_1280" ] } ] },
+        { versions: [
+            { scope: "sketchy", media: [ "mte8v2HxWN1s4v84ho5_400" ] },
+            { scope: "sketchy", media: [ "mte8v2HxWN1s4v84ho6_400" ] },
+        ] },
+        { versions: [ { scope: "major", media: [ "mte8v2HxWN1s4v84ho7_1280" ] } ] },
+        { versions: [
+            { scope: "major", media: [ "muve5w0d8I1s4v84ho1_400" ] },
+            { scope: "sketchy", media: [ "muve5w0d8I1s4v84ho2_400" ] },
+            { scope: "decorative", media: [ "n1ygvurXbo1s4v84ho6_250" ] },
+        ] },
+        { versions: [
+            { scope: "major", media: [ "muve5w0d8I1s4v84ho3_400" ] },
+            { scope: "sketchy", media: [ "muve5w0d8I1s4v84ho4_400" ] },
+        ] },
+        { versions: [
+            { scope: "sketchy", media: [ "39798495-1" ] },
+            { scope: "major", media: [ "mvaav1veKf1s4v84ho1_1280" ] },
+        ] },
+        { versions: [ { scope: "sketchy", media: [ "mvn2znNxA31s4v84ho10_1280" ] } ] },
+        { versions: [ { scope: "sketchy", media: [ "mvn2znNxA31s4v84ho2_1280" ] } ] },
+        { versions: [ { scope: "sketchy", media: [ "mvn2znNxA31s4v84ho3_540" ] } ] },
+        { versions: [ { scope: "sketchy", media: [ "mvn2znNxA31s4v84ho4_1280" ] } ] },
+        { versions: [ { scope: "sketchy", media: [ "mvn2znNxA31s4v84ho5_1280" ] } ] },
+        { versions: [ { scope: "sketchy", media: [ "mvn2znNxA31s4v84ho6_500" ] } ] },
+        { versions: [ { scope: "sketchy", media: [ "mvn2znNxA31s4v84ho7_1280" ] } ] },
+        { versions: [ { scope: "sketchy", media: [ "mvn2znNxA31s4v84ho8_640" ] } ] },
+        { versions: [ { scope: "sketchy", media: [ "mvn2znNxA31s4v84ho9_500" ] } ] },
+        { versions: [
+            { scope: "sketchy", media: [ "mvqvpc3qkK1s4v84ho1_540" ] },
+            { scope: "top", media: [ "CXikkdzU0AAvnXJ" ] },
+            { scope: "sketchy", media: [ "n3byitfswV1s4v84ho4_500", "45737425_p9" ] },
+        ] },
+        { versions: [
+            { scope: "sketchy", media: [ "mvqvpc3qkK1s4v84ho2_1280" ] },
+            { scope: "top", media: [ "o13zdtDHPu1s4v84ho1_500", "56793430-4" ] },
+            { scope: "sketchy", media: [ "CXikju8UMAAIRNR" ] },
+        ] },
+        { versions: [ { scope: "sketchy", media: [ "mwc3cr62SS1s4v84ho1_1280" ] } ] },
+        { versions: [ { scope: "major", media: [ "mwc3cr62SS1s4v84ho2_1280" ] } ] },
+        { versions: [ { scope: "top", media: [ "mwc3cr62SS1s4v84ho3_400", "40147983_p4" ] } ] },
+        { versions: [
+            { scope: "top", media: [ "mwc3cr62SS1s4v84ho4_400" ] },
+            { scope: "decorative", media: [ "n1ygvurXbo1s4v84ho1_250" ] }
+        ] },
+        { versions: [ { scope: "top", media: [ "mwc3cr62SS1s4v84ho5_400" ] } ] },
+        { versions: [ { scope: "major", media: [ "mwc3cr62SS1s4v84ho6_400" ] } ] },
+        { versions: [ { scope: "top", media: [ "mwpkjiTFBH1s4v84ho1_400" ] } ] },
+        { versions: [ { scope: "top", media: [ "mwpkjiTFBH1s4v84ho2_400" ] } ] },
+        { versions: [
+            { scope: "top", media: [ "mxcdbukeil1s4v84ho1_400" ] },
+            { scope: "decorative", media: [ "n1ygvurXbo1s4v84ho8_250" ] }
+        ] },
+        { versions: [
+            { scope: "top", media: [ "mxcdbukeil1s4v84ho2_400" ] },
+            { scope: "decorative", media: [ "n1ygvurXbo1s4v84ho3_250" ] },
+            { scope: "major", media: [ "ndzf80Ljry1s4v84ho2_400", "48695004_p0" ] }
+        ] },
+        { versions: [
+            { scope: "top", media: [ "mxcdbukeil1s4v84ho3_400" ] },
+            { scope: "major", media: [ "CaMwKl3VIAA1BMV" ] }
+        ] },
+        { versions: [ { scope: "top", media: [ "mxcdbukeil1s4v84ho4_r1_400" ] }, { scope: "major", media: [ "HNlE917aUAETN8l", "147401423_p0" ] } ] },
+        { versions: [ { scope: "major", media: [ "mxcdbukeil1s4v84ho5_400" ] } ] },
+        { versions: [ { scope: "major", media: [ "40147983_p0" ] } ] },
+        { versions: [
+            { scope: "sketchy", media: [ "BcGS_MYCcAAJj09" ] },
+            { scope: "major", media: [ "n3byitfswV1s4v84ho5_1280" ] }
+        ] },
+        { versions: [ { scope: "top", media: [ "myf741beQw1s4v84ho1_400", "40532231_p0" ] } ] },
+        { versions: [ { scope: "major", media: [ "myf741beQw1s4v84ho2_400" ] } ] },
+        { versions: [ { scope: "major", media: [ "myf741beQw1s4v84ho3_400" ] } ] },
+        { versions: [ { scope: "major", media: [ "myf741beQw1s4v84ho4_400" ] } ] },
+        { versions: [ { scope: "top", media: [ "n0iw38tre31s4v84ho1_1280" ] } ] },
+        { versions: [ { scope: "sketchy", media: [ "inline_n0ka28TEGE1rej7f3", "inline_p9cwe5S2p81rej7f3_500", "inline_pk0gu31bjO1tjpcqg_500" ] } ] },
+        { versions: [
+            { scope: "top", media: [ "n0ol35PjEb1s4v84ho2_400" ] },
+            { scope: "top", media: [ "n0ol35PjEb1s4v84ho3_400" ] },
+            { scope: "sketchy", media: ["44671723_p0"] },
+            { scope: "decorative", media: ["56808104_p0"] }
+        ] },
+        { versions: [ { scope: "decorative", media: [ "687855074966507521" ] } ] },
+        { versions: [
+            { scope: "major", media: [ "BhKHAAsCEAAV9B4" ] },
+            { scope: "sketchy", media: [ "n2iji77FzN1s4v84ho4_400" ] },
+            { scope: "top", media: [ "41839221_p0", "ntybbmm0to1s4v84ho2_400" ] }
+        ] },
+        { versions: [
+            { scope: "sketchy", media: [ "n1ns5m1u6l1s4v84ho1_500" ] },
+            { scope: "sketchy", media: [ "n1ns5m1u6l1s4v84ho2_500" ] },
+            { scope: "sketchy", media: [ "n1ns5m1u6l1s4v84ho3_500" ] },
+            { scope: "sketchy", media: [ "n1ns5m1u6l1s4v84ho8_500" ] },
+            { scope: "major", media: [ "n1ns5m1u6l1s4v84ho4_500" ] }
+        ] },
+        { versions: [
+            { scope: "decorative", media: [ "n22ovzKHpJ1s4v84ho1_1280" ] },
+            { scope: "major", media: [ "n22ovzKHpJ1s4v84ho1_r1_1280" ] },
+            { scope: "decorative", media: [ "n2rumjoEVG1s4v84ho3_r1_500" ] },
+            { scope: "decorative", media: [ "n2rumjoEVG1s4v84ho4_1280" ] },
+            { scope: "top", media: [ "n2rumjoEVG1s4v84ho1_r1_1280" ] },
+            { scope: "sketchy", media: [ "45737425_p4" ] },
+        ] },
+        { versions: [
+            { scope: "sketchy", media: [ "n2iji77FzN1s4v84ho1_540" ] },
+            { scope: "sketchy", media: [ "42229693_p0" ] },
+            { scope: "major", media: [ "CWs-0YwUsAAOgmG" ] },
+            { scope: "sketchy", media: [ "nzwopv5ok21s4v84ho1_400" ] },
+            { scope: "top", media: [ "DuSkfSNVAAAyTfO", "54283685_p0" ] },
+        ] },
+        { versions: [ { scope: "top", media: [ "n2iji77FzN1s4v84ho2_400" ] } ] },
+        { versions: [
+            { scope: "top", media: [ "n2iji77FzN1s4v84ho3_400" ] },
+            { scope: "sketchy", media: [ "1f604a562838353097692d8bf71ab255ba8a5d2ab91f-hNfwbt_fw1200" ], time: new Date("2016-10-12").getTime() }
+        ] },
+        { versions: [
+            { scope: "major", media: [ "n2iji77FzN1s4v84ho5_400" ] },
+            { scope: "sketchy", media: [ "nt0ld5znZ21s4v84ho2_1280_1" ], time: new Date("2015-08-23").getTime() } // !!!
+        ] },
+        { versions: [ { scope: "major", media: [ "n2iji77FzN1s4v84ho6_400" ] } ] },
+        { versions: [ { scope: "sketchy", media: [ "n2iji77FzN1s4v84ho7_400" ] } ] },
+        { versions: [
+            { scope: "major", media: [ "n2l3sueEpZ1s4v84ho1_400" ] },
+            { scope: "top", media: [ "42381943_p0" ] } // y_Sentakki_2 2nd part__せんたっき_2 第二辑， 二值笔除了绝对的平涂这一特点，营造出来的像素画面感也非常有趣呢～
+        ] },
+        { versions: [
+            { scope: "sketchy", media: [ "n2rumjoEVG1s4v84ho2_1280" ] },
+            { scope: "major", media: [ "45737425_p6" ] }
+        ] },
+        { versions: [
+            { scope: "top", media: [ "42421426_p0", "n2rumjoEVG1s4v84ho5_400" ] },
+            { scope: "decorative", media: [ "CrgqtfNUkAADLLU" ] }
+        ] },
+        { versions: [ { scope: "top", media: [ "n2rumjoEVG1s4v84ho6_r1_1280", "naji065Ic11s4v84ho3_1280", "45737425_p5" ] } ] },
+        { versions: [ { scope: "major", media: [ "n3byitfswV1s4v84ho1_1280" ] } ] },
+        { versions: [ { scope: "major", media: [ "n3byitfswV1s4v84ho2_1280" ] } ] },
+        { versions: [ { scope: "sketchy", media: [ "n3byitfswV1s4v84ho3_500" ] } ] },
+        { versions: [
+            { scope: "sketchy", media: [ "n3byitfswV1s4v84ho6_1280" ] },
+            { scope: "sketchy", media: [ "50563768_p0" ] },
+            { scope: "decorative", media: [ "np0omtvFfH1s4v84ho2_1280" ] },
+            { scope: "major", media: [ "CW_CaWvUwAAdkAX" ] },
+        ] },
+        { versions: [ { scope: "top", media: [ "n3bytcH7in1s4v84ho1_640", "45737425_p7" ] } ] },
+        { versions: [ { scope: "major", media: [ "n3bytcH7in1s4v84ho2_400" ] } ] },
+        { versions: [ { scope: "sketchy", media: [ "n3bytcH7in1s4v84ho3_1280" ] } ] },
+        { versions: [ { scope: "top", media: [ "n3bytcH7in1s4v84ho4_500" ] } ] },
+        { versions: [ { scope: "major", media: [ "n3bytcH7in1s4v84ho5_1280" ] } ] },
+        { versions: [
+            { scope: "sketchy", media: [ "n3bytcH7in1s4v84ho6_400" ] },
+            { scope: "top", media: [ "42995412_p0" ] },
+        ] },
+        { versions: [ { scope: "top", media: [ "n3bzihZRif1s4v84ho1_400" ] } ] },
+        { versions: [
+            { scope: "top", media: [ "n3bzihZRif1s4v84ho2_400" ] },
+            { scope: "major", media: [ "CaMwKl2UUAARlvq" ] }
+        ] },
+        { versions: [ { scope: "major", media: [ "n3bzihZRif1s4v84ho3_1280" ] } ] },
+        { versions: [
+            { scope: "top", media: [ "n5esbhepR11s4v84ho9_400", "45737425_p2" ] },
+            { scope: "major", media: [ "09e3501cc219226e773c2a01328978200885f29d2a8e-gHmXvK_fw1200" ] },
+        ] },
+
+        { versions: [ { scope: "decorative", media: [ "n5esbhepR11s4v84ho1_400" ] } ] },
+        { versions: [ { scope: "decorative", media: [ "n5esbhepR11s4v84ho2_400" ] }, { scope: "decorative", media: [ "n5esbhepR11s4v84ho2_r1_400" ] } ] },
+        { versions: [ { scope: "decorative", media: [ "n5esbhepR11s4v84ho3_400" ] } ] },
+        { versions: [ { scope: "decorative", media: [ "n5esbhepR11s4v84ho4_400" ] }, { scope: "decorative", media: [ "n5esbhepR11s4v84ho4_r2_400" ] }, { scope: "decorative", media: [ "n5esbhepR11s4v84ho4_r3_400" ] } ] },
+        { versions: [ { scope: "decorative", media: [ "n5esbhepR11s4v84ho5_r1_400" ] }, { scope: "decorative", media: [ "n5esbhepR11s4v84ho5_r2_400" ] } ] },
+        { versions: [ { scope: "decorative", media: [ "n5esbhepR11s4v84ho6_400" ] } ] },
+        { versions: [ { scope: "decorative", media: [ "n5esbhepR11s4v84ho7_400" ] } ] },
+        { versions: [ { scope: "decorative", media: [ "n5esbhepR11s4v84ho8_400" ] } ] },
+
+        { versions: [
+            { scope: "sketchy", media: [ "n6ee06RFsJ1s4v84ho3_400", "43473490_p0" ] },
+            { scope: "major", media: [ "nl55ocl5Qy1s4v84ho2_400", "50366222_p0" ] },
+            { scope: "decorative", media: [ "CrgqsYvUEAAbhhK" ] },
+            { scope: "decorative", media: [ "105538623_p0", "FpUgVWMaYAA43tb", "8618999a6f92255ebdabc924612f2573294f8885" ] }, // changes are minor
+            { scope: "sketchy", media: [ "5e14690f3f13ab4b7dacb48345c7471392f16a1c" ] },
+        ] },
+        { versions: [
+            { scope: "top", media: [ "n6ee06RFsJ1s4v84ho2_400", "43689350_p0" ] },
+            { scope: "major", media: [ "nt0ld5znZ21s4v84ho6_400", "CG4itIGVIAEIXVJ" ] },
+            { scope: "major", media: [ "FAxAmMyUcAM-Lhr", "105494534_p0", "f9aa55a34610db5ace4bc8c859c8bab19e0e4d59", "218ebe5ecb4b1d4922eaa0f949305f9627ed09ba" ] }, // versions are just slightly cropped...
+            { scope: "decorative", media: [ "HBj3kfFbgAAhwof", "141421623_p2", "df1f3bddd48a471b13d4de6c09217a39883e7b97" ] }
+        ] },
+        { versions: [ { scope: "top", media: [ "n6ee06RFsJ1s4v84ho1_400" ] } ] },
+        { versions: [ { scope: "major", media: [ "n6ee06RFsJ1s4v84ho4_400" ] } ] },
+        { versions: [
+            { scope: "sketchy", media: [ "n6v19ybjjE1s4v84ho1_1280" ] },
+            { scope: "sketchy", media: [ "45737425_p10" ] },
+            { scope: "major", media: [ "CVEJr2QUwAAbqTk" ] },
+        ] },
+        { versions: [
+            { scope: "top", media: [ "44214320_p0", "n7hv7vbEhF1s4v84ho1_500" ] }, // tumblr is just slightly cropped...
+            { scope: "decorative", media: [ "nqazruJfbd1s4v84ho1_1280" ] },
+            { scope: "decorative", media: [ "nqazruJfbd1s4v84ho1_r1_1280" ] },
+            { scope: "decorative", media: [ "nqazruJfbd1s4v84ho1_r2_1280", "52383833_p0" ] },
+            { scope: "major", media: [ "CKV8LDKUsAAEazq" ] },
+            { scope: "decorative", media: [ "Crgqr0jUsAALvYu" ] },
+        ] },
+        { versions: [
+            { scope: "decorative", media: [ "n9pnoy5yWF1s4v84ho1_1280", "45737425_p0" ] },
+            { scope: "top", media: [ "n9pnoy5yWF1s4v84ho2_1280" ] },
+            { scope: "sketchy", media: [ "45737425_p11" ] },
+            { scope: "major", media: [ "CViFEaWUAAAe5hj" ] },
+        ] },
+        { versions: [ { scope: "major", media: [ "naji065Ic11s4v84ho2_400", "45220270_p0" ] } ] },
+        { versions: [
+            { scope: "sketchy", media: [ "45342986_p0", "naji065Ic11s4v84ho1_1280", "nl55ocl5Qy1s4v84ho3_1280" ] }, // naji065Ic11s4v84ho1_1280 is just slightly cropped...
+            { scope: "top", media: [ "CKV8LDSUwAAtud4" ] },
+        ] },
+        { versions: [ { scope: "top", media: [ "naji065Ic11s4v84ho5_640" ] } ] },
+        { versions: [
+            { scope: "sketchy", media: [ "naji065Ic11s4v84ho6_640" ] },
+            { scope: "major", media: [ "COJhPv9UsAAvk7w" ] },
+        ] },
+        { versions: [
+            { scope: "decorative", media: [ "naji065Ic11s4v84ho7_640" ] },
+            { scope: "major", media: [ "56793430-7" ] },
+        ] },
+        { versions: [ { scope: "top", media: [ "naji065Ic11s4v84ho8_540" ] } ] },
+        { versions: [ { scope: "sketchy", media: [ "sENMiFJpci" ] } ] },
+        { versions: [ { scope: "top", media: [ "45663109_p0", "ncz33nRI5f1s4v84ho2_1280", "nl55ocl5Qy1s4v84ho4_1280" ] } ] },
+        { versions: [ { scope: "top", media: [ "45737425_p1" ] } ] },
+        { versions: [ { scope: "top", media: [ "45737425_p3", "ncz33nRI5f1s4v84ho3_500" ] } ] },
+        { versions: [ { scope: "major", media: [ "45737425_p8" ] } ] },
+        { versions: [
+            { scope: "sketchy", media: [ "45789819_p0" ] },
+            { scope: "major", media: [ "ncz33nRI5f1s4v84ho6_640" ] },
+            { scope: "sketchy", media: [ "CBmatzXUEAAHQ60" ] },
+        ] },
+        { versions: [
+            { scope: "top", media: [ "ncz33nRI5f1s4v84ho5_500", "46358406_p0" ] },
+            { scope: "sketchy", media: [ "DRUe0rsVQAAqo1W" ] },
+        ] },
+        { versions: [
+            { scope: "top", media: [ "ncz33nRI5f1s4v84ho1_640" ] },
+            { scope: "major", media: [ "2a3f3d3aef60b6a6dea6953e98893507" ] }
+        ] },
+        { versions: [ { scope: "major", media: [ "ncz33nRI5f1s4v84ho4_400" ] } ] },
+        { versions: [ { scope: "major", media: [ "ncz33nRI5f1s4v84ho7_1280", "52383833-3" ] } ] },
+        { versions: [ { scope: "major", media: [ "ndzf80Ljry1s4v84ho1_500", "48695004_p1" ] } ] },
+        { versions: [
+            { scope: "sketchy", media: [ "nemmvkNP4U1s4v84ho1_640" ] },
+            { scope: "top", media: [ "nemmvkNP4U1s4v84ho1_r1_640" ] },
+            { scope: "top", media: [ "nemmvkNP4U1s4v84ho2_540" ] },
+            { scope: "sketchy", media: [ "46952854_p0", "DuSkgiMUYAA2dHW" ] },
+            { scope: "major", media: [ "CW_CaEkUoAAkSwq" ] },
+            { scope: "decorative", media: [ "Crgqs4UVYAE49FD" ] },
+        ] },
+        { versions: [
+            { scope: "sketchy", media: [ "new8j9Y1sz1s4v84ho1_400" ] },
+            { scope: "top", media: [ "48695004_p4", "CTAhXJBUsAAU_2m" ] },
+        ] },
+        { versions: [ { scope: "top", media: [ "new8j9Y1sz1s4v84ho2_500", "CTAhXKIUEAAmGsZ", "48695004_p5" ] } ] },
+        { versions: [ { scope: "top", media: [ "new8j9Y1sz1s4v84ho3_400", "CTAhXKJVAAAoVeH", "48695004_p6" ] } ] },
+        { versions: [ { scope: "top", media: [ "47304887_p0", "nfwvayXN6j1s4v84ho3_400" ] } ] },
+        { versions: [
+            { scope: "sketchy", media: [ "nfwvayXN6j1s4v84ho1_400" ] },
+            { scope: "major", media: [ "nfwvayXN6j1s4v84ho1_r1_400" ] },
+            { scope: "decorative", media: [ "DRUezh5VwAA_mGw" ] },
+        ] },
+        { versions: [
+            { scope: "sketchy", media: [ "nfwvayXN6j1s4v84ho2_r1_640", "nfwvayXN6j1s4v84ho6_640" ] },
+            { scope: "top", media: [ "49831165_p0" ] },
+            { scope: "decorative", media: [ "DRUe1tqUEAAW51r" ] },
+        ] },
+        { versions: [
+            { scope: "top", media: [ "47612067_p0", "DuSkgFBVsAEdUG5" ] },
+            { scope: "sketchy", media: [ "ngt18cJgLo1s4v84ho1_500" ] },
+            { scope: "sketchy", media: [ "CKV8LDSUMAAjMUb" ] },
+            { scope: "sketchy", media: [ "63f683436052aab6cd751586885aeada460fa6bb3727-kYR2jX_fw1200" ], time: new Date("2016-02-22").getTime() },
+        ] },
+        { versions: [ { scope: "major", media: [ "48695004_p3", "ngt1778l1t1s4v84ho2_400", "nxlokzvRUm1s4v84ho4_400" ] } ] },
+        { versions: [
+            { scope: "major", media: [ "ngt1778l1t1s4v84ho1_400" ] },
+            { scope: "major", media: [ "ngt1778l1t1s4v84ho4_400" ] },
+            { scope: "major", media: [ "ngt1778l1t1s4v84ho5_400" ] },
+            { scope: "major", media: [ "ngt1778l1t1s4v84ho6_400" ] },
+            { scope: "major", media: [ "ngt1778l1t1s4v84ho7_400" ] },
+        ] },
+        { versions: [
+            { scope: "sketchy", media: [ "48695004_p2" ] },
+            { scope: "major", media: [ "nxlokzvRUm1s4v84ho2_400" ] },
+        ] },
+        { versions: [
+            { scope: "sketchy", media: [ "njx4jo5WdP1s4v84ho1_500" ] },
+            { scope: "sketchy", media: [ "njx4jo5WdP1s4v84ho1_r1_500" ] },
+            { scope: "sketchy", media: [ "48819292_p0" ] },
+            { scope: "top", media: [ "njx4jo5WdP1s4v84ho1_r2_400" ] },
+            { scope: "sketchy", media: [ "68ec2d7efeb3506c345fb1df33fd90d98eb3628e27f1-kPI47l_fw1200" ] },
+            { scope: "top", media: [ "a5791bae7ad326a04828bebc809b16a57e2ecb7023ce-CMDi3g_fw1200" ] },
+        ] },
+        { versions: [
+            { scope: "sketchy", media: [ "nl55ocl5Qy1s4v84ho1_640" ] },
+            { scope: "sketchy", media: [ "49576288_p0" ] },
+            { scope: "top", media: [ "CW_CaAvU0AUtkCk" ] },
+        ] },
+        { versions: [ { scope: "top", media: [ "50319824_p0" ] } ] },
+        { versions: [ { scope: "major", media: [ "CHyJFpdWsAAuuUb" ] } ] },
+        { versions: [ { scope: "top", media: [ "nq60s9ZMTu1s4v84ho1_1280" ] } ] },
+        { versions: [ { scope: "major", media: [ "CIrbW9KUkAAeEt7", "nrbwo4i9SL1s4v84ho1_1280" ] } ] },
+        { versions: [
+            { scope: "sketchy", media: [ "2cd46940ec8ce6ae8bd9a8df661237706babd85f39c0-LqnTXh_fw1200" ] },
+            { scope: "top", media: [ "nt0ld5znZ21s4v84ho1_400", "51368414_p0" ] },
+            { scope: "major", media: [ "nrbwo4i9SL1s4v84ho2_1280" ] },
+        ] },
+        { versions: [ { scope: "major", media: [ "nrbwo4i9SL1s4v84ho3_500" ] } ] },
+        { versions: [ { scope: "sketchy", media: [ "CKrgW2EUwAAOc31" ] } ] },
+        { versions: [ { scope: "top", media: [ "nt0ld5znZ21s4v84ho3_500", "51941560_p0" ] } ] },
+        { versions: [ { scope: "sketchy", media: [ "nt0ld5znZ21s4v84ho2_1280" ] } ] },
+        { versions: [ { scope: "sketchy", media: [ "nt0ld5znZ21s4v84ho4_1280" ] } ] },
+        { versions: [
+            { scope: "sketchy", media: [ "nt0ld5znZ21s4v84ho5_1280" ] },
+            { scope: "major", media: [ "52383833-1" ] },
+        ] },
+        { versions: [
+            { scope: "sketchy", media: [ "nt26ail0dJ1s4v84ho1_1280" ] },
+            { scope: "top", media: [ "nt26ail0dJ1s4v84ho1_r1_1280" ] },
+            { scope: "sketchy", media: [ "56793430-9" ] },
+        ] },
+        { versions: [
+            { scope: "sketchy", media: [ "CMbCpv5U8AALV5O" ] },
+            { scope: "sketchy", media: [ "52039307_p0" ] },
+            { scope: "major", media: [ "nt8hb2v0dp1s4v84ho1_r1_500", "nt8hb2v0dp1s4v84ho1_1280" ] }, // nt8hb2v0dp1s4v84ho1_1280 is just slightly cropped...
+        ] },
+        { versions: [
+            { scope: "decorative", media: [ "52283276_p0" ] },
+            { scope: "top", media: [ "ntybbmm0to1s4v84ho3_400" ] },
+        ] },
+        { versions: [
+            { scope: "sketchy", media: [ "ntybbmm0to1s4v84ho1_500" ] },
+            { scope: "top", media: [ "52383833-5" ] },
+        ] },
+        { versions: [
+            { scope: "sketchy", media: [ "52383833-2", "numinsZ7sX1s4v84ho3_500" ] },
+            { scope: "top", media: [ "CW_CaGJU0AEVb9W" ] },
+        ] },
+        { versions: [ { scope: "top", media: [ "52383833-4", "numinsZ7sX1s4v84ho4_400" ] } ] },
+        { versions: [ // racing miku
+            { scope: "sketchy", media: [ "COwEBZxUsAAYJCe" ] },
+            { scope: "major", media: [ "numinsZ7sX1s4v84ho1_500" ] },
+        ] },
+        { versions: [
+            { scope: "sketchy", media: [ "01a974ea665037d5034ef4c0962ad7896943b8903d2c-8uKN8F_fw1200" ] },
+            { scope: "sketchy", media: [ "numinsZ7sX1s4v84ho2_500" ] },
+            { scope: "major", media: [ "numinsZ7sX1s4v84ho2_r1_500" ] },
+        ] },
+        { versions: [ { scope: "sketchy", media: [ "CQX6ughUEAAFeTZ" ] } ] },
+        { versions: [
+            { scope: "sketchy", media: [ "CTAhXIzUsAA8SiB", "nxlokzvRUm1s4v84ho1_400" ] },
+            { scope: "top", media: [ "53557244_p0" ] },
+        ] },
+        { versions: [ { scope: "major", media: [ "53920815_p0", "o0wdkodYUz1s4v84ho1_1280" ] } ] },
+        { versions: [
+            { scope: "decorative", media: [ "BAE8QEnppWX" ] },
+            { scope: "major", media: [ "a614c04a81e1b8ad9e1c7a4f56068aae89a542c564ff1-fESV5t_fw1200" ] },
+        ] },
+        { versions: [
+            { scope: "sketchy", media: [ "CX9wUN7UAAALU7y", "o13zdtDHPu1s4v84ho2_500" ] },
+            { scope: "top", media: [ "55958136_p0" ] },
+        ] },
+        { versions: [ { scope: "major", media: [ "CYRthS1UEAEWMnJ", "o13zdtDHPu1s4v84ho4_500", "54980568_p0" ] } ] },
+        { versions: [ { scope: "sketchy", media: [ "687855074966507521", "o0zaz0TGD61s4v84ho1_1280" ] } ] },
+        { versions: [ { scope: "major", media: [ "o0zaz0TGD61s4v84ho2_1280" ] } ] },
+        { versions: [ { scope: "major", media: [ "o12zknaoJl1s4v84ho1_400", "56793430-6" ] } ] },
+        { versions: [ { scope: "major", media: [ "CY5i7DiUQAAYWl2" ] } ] },
+        { versions: [ { scope: "sketchy", media: [ "o13z6zKNaH1s4v84ho4_400" ] } ] },
+        { versions: [ { scope: "sketchy", media: [ "o13z6zKNaH1s4v84ho5_400" ] } ] },
+        { versions: [ { scope: "sketchy", media: [ "o13z6zKNaH1s4v84ho6_400" ] } ] },
+        { versions: [ { scope: "top", media: [ "CZaqluxUAAA6fGB", "56793430-10" ] } ] },
+        { versions: [
+            { scope: "major", media: [ "CZzWypNUcAAy2UH" ] },
+            { scope: "sketchy", media: [ "55038245_p0", "o2flp2BTKg1s4v84ho1_500" ] },
+            { scope: "sketchy", media: [ "56793430-1" ] },
+            { scope: "sketchy", media: [ "C02mV6hUoAEYuuC" ] },
+            { scope: "sketchy", media: [ "DRUeyyiVAAAoO86" ] },
+        ] },
+        { versions: [ { scope: "major", media: [ "CbqG4ruUUAArDUg" ] } ] },
+        { versions: [ { scope: "sketchy", media: [ "CcJME8uVAAAFXMP" ] } ] },
+        { versions: [ { scope: "sketchy", media: [ "CcJMG7dVIAAJu40" ] } ] },
+        { versions: [ { scope: "sketchy", media: [ "CceJ9umUYAM2puX" ] } ] },
+        { versions: [
+            { scope: "top", media: [ "o6dg5xA0UN1s4v84ho1_400", "56793430_p0" ] },
+            { scope: "sketchy", media: [ "C02mULWUAAUQFVM" ] },
+        ] },
+        { versions: [ { scope: "sketchy", media: [ "56793430-2" ] } ] },
+        { versions: [ { scope: "major", media: [ "56793430-3" ] } ] },
+        { versions: [ { scope: "sketchy", media: [ "56793430-5" ] } ] },
+        { versions: [ { scope: "major", media: [ "56793430-8" ] } ] },
+        { versions: [ { scope: "sketchy", media: [ "Ci_BYQIUoAAsjZj" ] } ] },
+        { versions: [
+            { scope: "top", media: [ "CkBs1T5UkAUizg5", "oafv398Nmi1s4v84ho1_500" ] },
+            { scope: "sketchy", media: [ "C02mUyRUUAAToST" ] },
+        ] },
+        { versions: [ { scope: "top", media: [ "CndM3oXVUAAo5Fc", "oafv398Nmi1s4v84ho2_500" ] } ] },
+        { versions: [
+            { scope: "sketchy", media: [ "58165714_p0", "oafv398Nmi1s4v84ho3_r1_500" ] },
+            { scope: "top", media: [ "C02mVVWUAAAlZCc", "oafv398Nmi1s4v84ho3_500" ] },
+        ] },
+        { versions: [ { scope: "major", media: [ "CoTH7CmUMAEw-bm" ] } ] },
+        { versions: [ { scope: "major", media: [ "CuPJhyaVMAA31f9" ] } ] },
+        { versions: [ { scope: "major", media: [ "Cuxpvc4VYAA6LrK" ] } ] },
+        { versions: [
+            { scope: "sketchy", media: [ "Cu9ouuIUMAAlHkG" ] },
+            { scope: "sketchy", media: [ "C5a9id6U0AARcvt" ] },
+            { scope: "sketchy", media: [ "C5a9hwvUYAA072w" ] },
+            { scope: "sketchy", media: [ "CvbXbE1VMAA_vL3", "BL22lBzFl4s" ] },
+            { scope: "sketchy", media: [ "CvbXYCxUIAACYXc", "BL23kSdlQJX" ] },
+        ] },
+        { versions: [ { scope: "major", media: [ "CxdrJ_UVQAAAgBQ", "ogsjsny8GO1s4v84ho1_1280", "59993262_p0" ] } ] },
+        { versions: [ { scope: "top", media: [ "C-A9XNYUIAA2dG1", "ooyxdqeecD1s4v84ho1_r1_1280" ] } ] },
+        { versions: [
+            { scope: "sketchy", media: [ "DRVYXFkU8AARzg-" ] },
+            { scope: "top", media: [ "66348336_p0", "p447zttIEl1s4v84ho1_500" ] },
+        ] },
+        { versions: [
+            { scope: "major", media: [ "p52azxI4Js1s4v84ho1_1280" ] },
+            { scope: "decorative", media: [ "pjlp03hDEQ1s4v84ho1_1280" ] },
+        ] },
+        { versions: [
+            { scope: "major", media: [ "NK1806281-1_通常ver." ] },
+            { scope: "sketchy", media: [ "NK1806281-2_ドットver." ] },
+            { scope: "decorative", media: [ "NK1806281-3" ] },
+            { scope: "sketchy", media: [ "NK1806281-4" ] },
+            { scope: "decorative", media: [ "NK1806281-5" ] },
+            { scope: "decorative", media: [ "NK1807031-1" ] },
+            { scope: "sketchy", media: [ "NK1807031-6" ] },
+            { scope: "major", media: [ "DhK-YbdV4AA9Srl" ] },
+            { scope: "decorative", media: [ "DhK-ak4UwAACuxk" ] },
+            { scope: "decorative", media: [ "DhK-ak1VAAAhl-f" ] },
+        ] },
+        { versions: [
+            { scope: "top", media: [ "Dt5QLQlVAAA_81r" ] },
+            { scope: "decorative", media: [ "pjlp03hDEQ1s4v84ho1_1280" ] },
+        ] },
+        { versions: [ { scope: "decorative", media: [ "Dw7LiXYUwAAJ9nd" ] } ] },
+        { versions: [
+            { scope: "top", media: [ "FAr2aoNVcAYMIkb", "105494744_p0", "81746b7d17edaffe02348c705a697cf095085ec2" ] },
+            { scope: "decorative", media: [ "72dd5e4d2c94f6ddfad2f263e669bf2c8cacf5fe" ] },
+            { scope: "decorative", media: [ "HBj3jSXbcAAWMkS", "141421623_p0", "f123fa39bc5859d51246feec21a10ed8ff061f0b" ] },
+        ] },
+        { versions: [
+            { scope: "sketchy", media: [ "FAw2CdzVcAEXlnl" ] },
+            { scope: "sketchy", media: [ "FAw2B5MVkAAacYd" ] },
+            { scope: "major", media: [ "FB45GDaUYAMk9_8" ] },
+            { scope: "decorative", media: [ "75e70c1a9bef63bac9600e61f30336aaebd121fc" ] },
+        ] },
+        { versions: [
+            { scope: "decorative", media: [ "b10f98f6664e80864a5602a7b06162594b364381" ] },
+            { scope: "top", media: [ "FpPDdhAaMAETO1A", "105494821_p0" ] },
+        ] },
+        { versions: [ { scope: "top", media: [ "Fpm6PpjaYAAyo9z", "6f59784573dcbc4d99165444c6c5e0d5bbd7fc8f", "105724983_p0" ] } ] },
+        { versions: [
+            { scope: "top", media: [ "Gf4Q4bCacAAm-w7", "126228727_p0", "f530012f1a05ea2c0a4910406e4c5015e6476553" ] },
+            { scope: "sketchy", media: [ "cfm_snowmiku_skytown_st10th_message.html_post1869918372462506421" ] },
+        ] },
+        { versions: [ { scope: "top", media: [ "cb8cdd33be3747b560fb797aa41ad2b143f70391", "GqLHebsacAAiVln" ] } ] }, // GqLHebsacAAiVln (1746435500717) is approximated for 1919315718937416068 (1746435501213)
+        { versions: [
+            { scope: "sketchy", media: [ "GqRQtbsacAAiVln", "130163321_p0" ] },
+            { scope: "top", media: [ "c80cbadd53414c8c836985a3167fb70273c46965" ] },
+        ] },
+        { versions: [ { scope: "top", media: [ "G-yTSa8bEAEK45M", "140032321_p0", "f6007e0a87aa29b59b3df10a2c06dd3e6fb542cf" ] } ] },
+        { versions: [ { scope: "top", media: [ "G_9gbmjbUAALMDi", "140700255_p0", "79aa541c0e519d42f10d60c47eb1de4753d3a87c" ] } ] },
+        { versions: [ { scope: "top", media: [ "HAECtS1bwAEIxZJ", "140653012_p0", "7870f2fb92df6a246af0d8849980c86b6dea640f" ] } ] },
+        { versions: [ { scope: "top", media: [ "HBG7HEPakAEvg8Z", "141188113_p0", "5db54f603f6be9e305c9fab93bc04b5781a5e22b" ] } ] },
+        { versions: [ { scope: "top", media: [ "f5607a34393467fb0588e5997a06e516c0ca712d" ] } ] },
+
+        { versions: [ { scope: "major", media: [ "2956_1342f157f4e93b330a1ae5a63a4d0a9ff5d51e6e23f57-krhb78_fw1200" ] } ] },
+
+        { versions: [ { scope: "major", media: [ "HNf71eZbgAAUtI2", "147357899_p0" ] } ] },
+    ];
+    for (const post of posts) {
+        // calculate twitter dates
+        if (post.platform === "twitter") {
+            const twitterEpoch = 1288834974657n;
+            post.time = Number((BigInt(post.post) >> 22n) + twitterEpoch);
+        }
+        if (post.time > 2147483647) post.time /= 1000;
+    }
+    
+    const basePath = "stairs2line";
+    function getTwitterMediaTime(mediaId) {
+        const twitterEpoch = 1288834974657n;
+
+        // Convert base64url -> base64
+        let b64 = mediaId.replace(/-/g, "+").replace(/_/g, "/");
+
+        // Pad to multiple of 4
+        while (b64.length % 4 !== 0) {
+            b64 += "=";
+        }
+
+        // Decode to bytes
+        const raw = atob(b64);
+        const bytes = Uint8Array.from(raw, c => c.charCodeAt(0));
+
+        if (bytes.length < 8) {
+            throw new Error(`Media ID decoded to fewer than 8 bytes: ${mediaId}`);
+        }
+
+        // Twitter media IDs store the useful snowflake value in the first 8 bytes
+        let snowflake = 0n;
+        for (let i = 0; i < 8; i++) {
+            snowflake = (snowflake << 8n) | BigInt(bytes[i]);
+        }
+
+        const unixMs = (snowflake >> 22n) + twitterEpoch;
+        return Number(unixMs);
+    }
+
+    function getMediaInfo(f) {
+        const platform = f.substring(0, f.lastIndexOf('/'));
+        let filename = f.substring(f.lastIndexOf('/') + 1);
+        const filepath = basePath + "/" + platform + "/" + filename;
+        if (filename.length > 11 && filename[4] == '-' && filename[7] == '-' && filename[10] == '_') {
+            filename = filename.substring(11);
+        }
+        const post = posts.find(p => (platform === "other" || p.platform == platform) && filename.startsWith(p.post));
+        let mediaId = filename.substring(0, filename.lastIndexOf('.'));
+        if (platform === "twitter" && '0' <= mediaId[0] && mediaId[0] <= '9' || platform === "tumblr") {
+            // 437560548058599425_BhKHAAsCEAAV9B4
+            // 611514892709855232_CHyJFpdWsAAuuUb_hatrangam
+            mediaId = mediaId.substring(mediaId.indexOf('_') + 1);
+            if (platform === "tumblr") {
+                // 111275517544_tumblr_njx4jo5WdP1s4v84ho1_r2_400
+                // 806000851033456640_eba8736e9dacf17be929d57f0371f94a19737731
+                mediaId = mediaId.substring(mediaId.indexOf('_') + 1);
+            }
+        }
+        let mediaTime = post ? post.time : (platform === "twitter" ? getTwitterMediaTime(mediaId) : null);
+        return {
+            filepath: filepath,
+            mediaId: mediaId,
+            post: post,
+            attrGroup: "",
+            attrMedia: mediaTime ? `${mediaTime}_${mediaId}` : ""
+        };
+    }
+    
+    const filenames = [`@Html.Raw(filesStr)`];
+    const medias = filenames.map(f => getMediaInfo(f));
+
+    const mediaIdsGroups = {};
+    for (const group of mediaGroups) {
+        for (const version of group.versions) {
+            for (const mediaId of version.media) {
+                mediaIdsGroups[mediaId] = { group: group, version: version };
+            }
+        }
+    }
+    console.log(mediaIdsGroups)
+    // calculate group version dates and choose single media to display
+    for (const mediaId of Object.keys(mediaIdsGroups)) {
+        const groupInfo = mediaIdsGroups[mediaId];
+        if (groupInfo.version.time > 2147483647) groupInfo.version.time /= 1000;
+        if (groupInfo.group.time > 2147483647) groupInfo.group.time /= 1000;
+
+        let post = undefined;
+        let media = medias.find(x => x.mediaId === mediaId);
+        if (media) {
+            post = media.post;
+        }
+        else {
+            // all tumblr media files must exist
+            if ('0' <= mediaId[0] && mediaId[0] <= '9') {
+                // assume pixiv
+                const postId = getInt(mediaId, 0);
+                post = posts.find(p => p.platform === "pixiv" && p.post === postId);
+                if (!post) console.log(`Could not find post for ${mediaId} to provide platform link! post id = ${postId}`);
+            }
+            else {
+                // assume twitter, search in 12 hours window (images are uploading before the post)
+                let time = getTwitterMediaTime(mediaId);
+                if (time > 2147483647) time /= 1000;
+                post = posts.find(p => p.platform === "twitter" && time <= p.time && p.time <= time + 60 * 60 * 12);
+                if (!post) console.log(`Could not find post for ${mediaId} to provide platform link! ${time} <= time <= ${time + 60 * 60 * 3}`);
+            }
+        }
+        if (!groupInfo.version.medias) groupInfo.version.medias = [];
+        if (!post || !groupInfo.version.medias.some(x => x.post && x.post.post === post.post)) {
+            groupInfo.version.medias.push(media ? media : { post: post, mediaId: mediaId });
+        }
+
+        let mediaTime = post && post.time ? post.time : null;
+        if (!mediaTime && mediaId.length === 15 && 'A' <= mediaId[0] && mediaId[0] <= 'Z') {
+            // all tumblr posts must exist and specify time
+            mediaTime = getTwitterMediaTime(mediaId);
+            if (mediaTime > 2147483647) mediaTime /= 1000;
+        } 
+        if (!mediaTime) {
+            console.log("Media version is not dated! " + mediaId);
+            continue;
+        }
+        
+        if (!groupInfo.version.time) groupInfo.version.time = mediaTime;
+        else groupInfo.version.time = Math.min(groupInfo.version.time, mediaTime);
+        if (groupInfo.version.time === mediaTime) groupInfo.version.timeSource = media;
+        
+        if (!groupInfo.group.time) groupInfo.group.time = groupInfo.version.time;
+        else groupInfo.group.time = Math.min(groupInfo.group.time, groupInfo.version.time);
+        if (groupInfo.group.time === mediaTime) groupInfo.group.timeSource = media;
+    }
+    for (const media of medias) {
+        const groupInfo = mediaIdsGroups[media.mediaId];
+        if (!groupInfo) {
+            console.log("Media has not group! " + media.filepath);
+            continue;
+        }
+        if (!groupInfo.version.time) {
+            console.log("Media version is not dated! " + media.filepath);
+        }
+        else {
+            media.attrMedia = `${groupInfo.version.time}_${media.mediaId}`;
+        }
+        if (!groupInfo.group.time) {
+            console.log("Media group is not dated! " + media.filepath);
+            continue;
+        }
+        const groupMediaId = groupInfo.group.timeSource ? groupInfo.group.timeSource.mediaId : "";
+        const attrMedia = media.attrMedia ? media.attrMedia : "|" + media.mediaId;
+        media.attrGroup = `${groupInfo.group.time}_${groupMediaId}_${attrMedia}`;
+    }
+
+    const leadVersions = [];
+    for (const media of medias) {
+        const groupInfo = mediaIdsGroups[media.mediaId];
+        const leadVersion = !groupInfo ? null : groupInfo.version.medias.find(mediaId => medias.some(m => m === mediaId)) ;
+        if (leadVersion && leadVersion.mediaId !== media.mediaId) {
+            //console.log("Duplicate of " + leadVersion.mediaId + ": " + media.filepath);
+            continue;
+        }
+
+        const versionMedias = groupInfo && groupInfo.version.medias ? groupInfo.version.medias : [media];
+        leadVersions.push({ leadMedia: media, versionMedias: versionMedias, scope: groupInfo ? groupInfo.version.scope : "major" });
+    }
+
+    function getPlatformsInfo(versionMedias) {
+        const result = [];
+        for (const versionMedia of versionMedias) {
+            const mediaId = versionMedia.mediaId;
+            let post = versionMedia.post;
+            let alive = post ? post.alive : false;
+            let href = ``;
+            let favicon = ``;
+            if (!post && mediaId.length === 15 || post && post.platform === "twitter") {
+                favicon = `/media/stairs2line/misc/twitter-icon-free-png.webp`;
+                if (post) {
+                    href = `https://twitter.com/${post.user ? post.user : "stairs2line"}/status/${post.post}`;
+                }
+                else {
+                    href = `https://pbs.twimg.com/media/${mediaId}?format=png&name=large`;
+                }
+            }
+            if (!post) { post = {}; }
+            if (post.platform === "pixiv") {
+                favicon = `/media/stairs2line/misc/pixiv_favicon20250122.ico`;
+                href = `https://www.pixiv.net/en/artworks/${post.post}`;
+            }
+            if (post.platform === "tumblr") {
+                favicon = `/media/stairs2line/misc/tumblr_favicon.ico`;
+                href = `https://michinoku800.tumblr.com/post/${post.post}`;
+            }
+            if (post.platform === "piapro") {
+                favicon = `/media/stairs2line/misc/blog-piapro_favicon.ico`;
+                href = post.href;
+            }
+            if (post.platform === "snowmiku.com") {
+                favicon = `/media/stairs2line/misc/snowmiku_favicon.ico`;
+                href = post.href;
+            }
+            if (post.platform === "instagram") {
+                favicon = `/media/stairs2line/misc/instagram_favicon.png`;
+                href = `https://www.instagram.com/p/${post.post}/`; // https://www.instagram.com/stairs2line/
+            }
+            if (post.platform === "pixivFANBOX") {
+                favicon = `/media/stairs2line/misc/Pixiv_FANBOX_(Icon).svg`;
+                href = post.href;
+            }
+            
+            let mediaTime = post ? post.time : null;
+            if (!mediaTime && versionMedias.length === 1) {
+                let groupInfo = mediaIdsGroups[mediaId];
+                mediaTime = groupInfo && groupInfo.version.time ? groupInfo.version.time : null;
+            }
+            result.push({ platform: post.platform, favicon: favicon, alive: alive, href: href, media: versionMedia, time: mediaTime });
+        }
+        result.sort(function (a, b) { return !b.time ? -1 : !a.time ? 1 : a.time - b.time; });
+        return result;
+    }
+
+    for (const t of leadVersions) {
+        const leadMedia = t.leadMedia;
+        const versionMedias = t.versionMedias;
+        const scope = t.scope;
+        let attr = `fullname="${leadMedia.mediaId}" version-type="${scope}"`;
+        if (leadMedia.attrGroup) attr += ` group="${leadMedia.attrGroup}"`;
+        if (leadMedia.attrMedia) attr += ` piece="${leadMedia.attrMedia}"`;
+
+        const $media = createMedia(leadMedia.filepath, `onclick="mediaViewer.show(this, mediaProvider)"`);
+        const $card = $(`<div class="media-card align-items-center hidden" ${attr}></div>`);
+        const $wrapper = $(`<div class="media-with-links"></div>`);
+        const $platforms = $(`<div class="platforms"></div>`);
+        for (const platformInfo of getPlatformsInfo(versionMedias)) {
+            if (!platformInfo.favicon) continue;
+
+            $platforms.append(`<a href="${platformInfo.href}" target="_blank" rel="noreferrer" class="fit-media ${platformInfo.alive ? "": "inactive-platform"}">
+                <img src="${platformInfo.favicon}" />
+            </a>`);
+        }
+        $wrapper.append($media);
+        $wrapper.append($platforms);
+        $card.append(`<div></div>`).append($wrapper).append(`<div></div>`);
+        $container.append($card);
+    }
+    var postTimestamps = posts.map(p => p.time).filter(t => t);
+    var dateRange = { min: Math.min(...postTimestamps), max: Math.max(...postTimestamps) };
+    for (let year = new Date(dateRange.min * 1000).getUTCFullYear(); year <= new Date(dateRange.max * 1000).getUTCFullYear(); year++) {
+        let startYearTime = new Date(`${year}-01-01 00:00:00 +0000`).getTime() / 1000;
+        let endYearTime = new Date(`${year}-12-31 23:59:59 +0000`).getTime() / 1000;
+        $container.append(`<h4 class="year-label year-start" version-type="major" group="${startYearTime}" piece="${startYearTime}">${year}</h4>`);
+        $container.append(`<h4 class="year-label year-end" version-type="major" group="${endYearTime}" piece="${endYearTime}">${year}</h4>`);
+    }
+
+    function resort(sortAttr, order) {
+        updateSortIcons(sortAttr, order);
+        $container.find(`.year-start`).toggleClass("hidden", sortAttr === "group" || order !== "asc");
+        $container.find(`.year-end`).toggleClass("hidden", sortAttr === "group" || order === "asc");
+
+        let $children = $container.children().get();
+        let orderSign = order === "asc" ? 1 : -1;
+        $children.sort(function(a, b) {
+            let an = $(a).attr(sortAttr), bn = $(b).attr(sortAttr);
+            if (!bn && an) return -1;
+            if (!an && bn) return 1;
+            if (an > bn) return orderSign;
+            if (an < bn) return -orderSign;
+
+            an = $(a).attr("fullname");
+            bn = $(b).attr("fullname");
+            if (!bn && an) return -1;
+            if (!an && bn) return 1;
+            if (an > bn) return 1;
+            if (an < bn) return -1;
+
+            return 0;
+        });
+
+        $.each($children, function(idx, item) {
+            $container.append(item);
+        });
+
+        updateHeaders();
+    }
+
+    function updateHeaders() {
+        $(`#undatedMediaHeader`).toggleClass("hidden", $(`#undatedMediaHeader`).nextAll(`div:not(.hidden)`).length === 0);
+    }
+
+    function updateSortIcons(sortAttr, order) {
+        const orderIcon = order === "desc" ? `🢁` : `🡻`;
+        $(`.sort-option`).find(`span`).text(orderIcon);
+        const isChecked = sortAttr === "group";
+        $(`.sort-group`).find(`span`).text(isChecked ? "▣" : "☐");
+        $(`.sort-group`).toggleClass("selected", isChecked);
+    }
+    function updateFilterIcons(filter) {
+        $(`.filter-option`).each(function (_, element) {
+            const option = $(element);
+            const selected = filter === option.attr("filter-option");
+            if (selected) {
+                option.toggleClass("selected", true);
+                const s = option.find(`span`);
+                s.text(`▣`);
+            } else {
+                option.toggleClass("selected", false);
+            }
+        });
+        let text = $(`.filter-option.selected`).text();
+        text = text.substring(0, text.length - 2);
+        $(`.filter-dropdown button`).text(text);
+    }
+
+    function refilter(filter) {
+        updateFilterIcons(filter);
+
+        $(`.media-card[version-type="top"]`).toggleClass("hidden", false);
+        $(`.media-card[version-type="major"]`).toggleClass("hidden", filter === "top");
+        $(`.media-card[version-type="sketchy"]`).toggleClass("hidden", filter === "top" || filter === "major");
+        $(`.media-card[version-type="decorative"]`).toggleClass("hidden", filter !== "decorative");
+
+        updateHeaders();
+    }
+
+    function onSortClick(el) {
+        const $el = $(el);
+        let order = $el.find(`span`).text() === `🢁` ? "asc" : "desc";
+        let attr = $(".sort-group").hasClass("selected") ? "group" : "piece";
+        resort(attr, order);
+    }
+    function onSortGroupClick(el) {
+        const $el = $(el);
+        const isChecked = $el.hasClass("selected");
+        let attr = !isChecked ? "group" : "piece";
+        let order = $(".sort-option").find(`span`).text() === `🢁` ? "desc" : "asc";
+        resort(attr, order);
+    }
+
+    function onFilterClick(el) {
+        const $el = $(el);
+        refilter($el.attr("filter-option"));
+    }
+
+    function getInt(s, indexFrom) {
+        let i = indexFrom;
+        while (i < s.length && '0' <= s[i] && s[i] <= '9') i++;
+        return s.substring(indexFrom, i);
+    }
+
+    resort("group", "asc");
+    refilter("top");
+
+    class LocalMediaProvider {
+        constructor(elementSelector, mediaSelector) {
+            this.elementSelector = elementSelector;
+            this.mediaSelector = mediaSelector;
+        }
+
+        getNext(el, callback) {
+            const $el = $(el);
+            callback($el.closest(this.elementSelector).nextAll(this.elementSelector).first().find(this.mediaSelector)[0]);
+        }
+
+        getPrev(el, callback) {
+            const $el = $(el);
+            callback($el.closest(this.elementSelector).prevAll(this.elementSelector).first().find(this.mediaSelector)[0]);
+        }
+    }
+
+    function updateModalFooter(el) {
+        const $el = $(el);
+        const src = $el.attr("src");
+        const displayMedia = medias.find(x => src.endsWith(x.filepath));
+        const groupInfo = mediaIdsGroups[displayMedia.mediaId];
+        $(`.modal-subtext`).empty();
+        let versionMedias = groupInfo ? groupInfo.version.medias : [displayMedia];
+        for (const platformInfo of getPlatformsInfo(versionMedias)) {
+            let dateStr = "Unknown date";
+            if (platformInfo.time) {
+                const date = new Date(platformInfo.time * 1000);
+                function p(n) { return n < 10 ? '0' + n : n; }
+                dateStr = p(date.getFullYear()) + "-" + p(date.getMonth() + 1) + "-" + p(date.getDate()) + " "
+                    + p(date.getHours()) + ":" + p(date.getMinutes()) + ":" + p(date.getSeconds());
+            }
+            let postStr = `unknown source`;
+            if (platformInfo.href) postStr =
+                `<a href="${platformInfo.href}" target="_blank" rel="noreferrer" class="modal-mini-button ${platformInfo.alive ? "": "inactive-platform"}">
+                    <img class="favicon-mini" src="${platformInfo.favicon}"/>
+                </a>`;
+            else if (platformInfo.time) dateStr = "Before " + dateStr;
+            $(`.modal-subtext`).append(`<div>${dateStr} at ${postStr}</div>`);
+        }
+    }
+    
+    let mediaProvider = null;
+    let mediaViewer = null;
+    $(document).ready(function() {
+        mediaProvider = new LocalMediaProvider(`.media-card:not(.hidden)`, `.media-with-links > img, .media-with-links > video`);
+        mediaViewer = new MediaViewer(`#mediaModal`, (el) => { showFullSizeCopy(el); updateModalFooter(el); });
+    });
+</script>

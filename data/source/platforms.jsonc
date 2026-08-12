@@ -1,0 +1,62 @@
+// Platform URL templates and icons.
+{
+  "platforms": [
+    {
+      "id": "twitter",
+      "label": {
+        "default": "Twitter / X"
+      },
+      "defaultAccount": "stairs2line",
+      "postUrlTemplate": "https://twitter.com/{account}/status/{id}",
+      "icon": "misc/twitter-icon-free-png.webp"
+    },
+    {
+      "id": "pixiv",
+      "label": {
+        "default": "pixiv"
+      },
+      "defaultAccount": "1593221",
+      "postUrlTemplate": "https://www.pixiv.net/en/artworks/{id}",
+      "icon": "misc/pixiv_favicon20250122.ico"
+    },
+    {
+      "id": "tumblr",
+      "label": {
+        "default": "Tumblr"
+      },
+      "defaultAccount": "michinoku800",
+      "postUrlTemplate": "https://michinoku800.tumblr.com/post/{id}",
+      "icon": "misc/tumblr_favicon.ico"
+    },
+    {
+      "id": "instagram",
+      "label": {
+        "default": "Instagram"
+      },
+      "defaultAccount": "stairs2line",
+      "postUrlTemplate": "https://www.instagram.com/p/{id}/",
+      "icon": "misc/instagram_favicon.png"
+    },
+    {
+      "id": "piapro",
+      "label": {
+        "default": "Piapro Blog"
+      },
+      "icon": "misc/blog-piapro_favicon.ico"
+    },
+    {
+      "id": "snowmiku.com",
+      "label": {
+        "default": "Snow Miku"
+      },
+      "icon": "misc/snowmiku_favicon.ico"
+    },
+    {
+      "id": "pixivFANBOX",
+      "label": {
+        "default": "pixivFANBOX"
+      },
+      "icon": "misc/Pixiv_FANBOX_(Icon).svg"
+    }
+  ]
+}

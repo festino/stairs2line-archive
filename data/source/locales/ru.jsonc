@@ -1,0 +1,50 @@
+// User interface strings for ru.
+{
+  "nav": {
+    "artworks": "Работы",
+    "posts": "Посты",
+    "platforms": "Площадки",
+    "admin": "Редактор"
+  },
+  "common": {
+    "newest": "Сначала новые",
+    "oldest": "Сначала старые",
+    "feed": "Лента",
+    "pages": "Страницы",
+    "previous": "Предыдущая",
+    "next": "Следующая",
+    "page": "Страница {page}",
+    "unknownDate": "Дата неизвестна",
+    "deleted": "Удалён",
+    "alive": "Доступен",
+    "source": "Источник",
+    "posts": "Публикации",
+    "versions": "Версии",
+    "files": "Файлы",
+    "open": "Открыть",
+    "noItems": "Нет элементов."
+  },
+  "artworks": {
+    "popular": "Популярные",
+    "major": "Основные",
+    "versions": "Все версии",
+    "all": "Все найденные",
+    "pageTitle": "Работы stairs2line",
+    "created": "Создано {date}",
+    "knownNotAfter": "Известно не позднее {date}",
+    "firstPost": "Первая известная публикация: {date}",
+    "genericDescription": "Artwork stairs2line: {versions} версий, {media} медиафайлов."
+  },
+  "posts": {
+    "pageTitle": "Посты stairs2line",
+    "all": "Все посты",
+    "grouped": "По площадкам",
+    "platformTitle": "Посты на {platform}",
+    "genericDescription": "Архивная публикация stairs2line на {platform}."
+  },
+  "validation": {
+    "title": "Проверка архива",
+    "errors": "Ошибок: {count}",
+    "warnings": "Предупреждений: {count}"
+  }
+}

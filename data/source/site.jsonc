@@ -1,0 +1,35 @@
+// Human-editable archive configuration. Code comments must remain in English.
+{
+  "schemaVersion": 1,
+  "id": "stairs2line",
+  "basePath": "/",
+  "mediaBasePath": "media/stairs2line/",
+  "imagePreview": "tumblr/143559403624_tumblr_o6dg5xA0UN1s4v84ho1_400.png",
+  "defaultLanguage": "ru",
+  "languages": [
+    "ru",
+    "en",
+    "ja"
+  ],
+  "mediaDirectories": [
+    "twitter",
+    "tumblr",
+    "pixiv",
+    "other"
+  ],
+  "pageSize": {
+    "artworks": 36,
+    "versions": 48,
+    "posts": 20
+  },
+  "title": {
+    "ru": "Архив stairs2line",
+    "en": "stairs2line archive",
+    "ja": "stairs2line アーカイブ"
+  },
+  "description": {
+    "ru": "Все найденные версии рисунков, анимаций и публикаций stairs2line.",
+    "en": "An archive of discovered stairs2line artwork versions, animations, and posts.",
+    "ja": "stairs2line の見つかった作品バージョン、アニメーション、投稿のアーカイブ。"
+  }
+}

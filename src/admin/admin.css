@@ -1,0 +1,158 @@
+:root {
+  color-scheme: light dark;
+  font-family: system-ui, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+header,
+main,
+.tabs {
+  width: min(1400px, calc(100% - 2rem));
+  margin-inline: auto;
+}
+
+header {
+  padding-block: 1.5rem 0.5rem;
+}
+
+.tabs {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  padding-block: 0.5rem 1rem;
+  border-bottom: 1px solid color-mix(in srgb, currentColor 22%, transparent);
+}
+
+.tabs button,
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+.tabs button,
+button {
+  padding: 0.55rem 0.8rem;
+  border: 1px solid color-mix(in srgb, currentColor 24%, transparent);
+  border-radius: 0.55rem;
+  background: Canvas;
+  color: CanvasText;
+  cursor: pointer;
+}
+
+.tabs button.active {
+  background: #6b5cff;
+  color: white;
+}
+
+main {
+  padding-block: 1.5rem 4rem;
+}
+
+section[data-panel] {
+  display: none;
+}
+
+section[data-panel].active {
+  display: block;
+}
+
+.columns {
+  display: grid;
+  grid-template-columns: minmax(300px, 520px) 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.columns.narrow {
+  grid-template-columns: minmax(280px, 420px) minmax(280px, 600px);
+}
+
+form,
+pre,
+.issue,
+.media-row {
+  border: 1px solid color-mix(in srgb, currentColor 22%, transparent);
+  border-radius: 0.8rem;
+  padding: 1rem;
+}
+
+label,
+fieldset {
+  display: grid;
+  gap: 0.35rem;
+  margin-bottom: 0.8rem;
+}
+
+fieldset {
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+
+fieldset legend {
+  grid-column: 1 / -1;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  padding: 0.55rem;
+  border: 1px solid color-mix(in srgb, currentColor 25%, transparent);
+  border-radius: 0.45rem;
+  background: Canvas;
+  color: CanvasText;
+}
+
+textarea,
+pre {
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+}
+
+pre {
+  min-height: 12rem;
+  overflow: auto;
+  white-space: pre-wrap;
+}
+
+.actions {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.issue {
+  margin-block: 0.6rem;
+}
+
+.issue-error {
+  border-color: #b44;
+}
+
+.issue-warning {
+  border-color: #c88a00;
+}
+
+.media-list {
+  display: grid;
+  gap: 0.8rem;
+  margin-top: 1rem;
+}
+
+.media-row code {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 850px) {
+  .columns,
+  .columns.narrow {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,363 @@
+:root {
+  color-scheme: light dark;
+  --page-width: 1320px;
+  --gap: 1rem;
+  --border: color-mix(in srgb, currentColor 20%, transparent);
+  --muted: color-mix(in srgb, currentColor 62%, transparent);
+  --surface: color-mix(in srgb, Canvas 94%, currentColor 6%);
+  --accent: #6b5cff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  line-height: 1.55;
+  background: Canvas;
+  color: CanvasText;
+}
+
+a {
+  color: inherit;
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.16em;
+}
+
+img,
+video {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.8rem max(1rem, calc((100vw - var(--page-width)) / 2));
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(16px);
+  background: color-mix(in srgb, Canvas 88%, transparent);
+}
+
+.site-title {
+  font-weight: 760;
+  text-decoration: none;
+}
+
+.site-nav,
+.language-nav,
+.tab-list,
+.listing-actions,
+.pagination,
+.post-footer,
+.post-header,
+.platform-links {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+}
+
+.site-nav a,
+.language-nav a,
+.tab-list a,
+.listing-actions a,
+.listing-actions button,
+.pagination a {
+  padding: 0.42rem 0.68rem;
+  border-radius: 999px;
+  text-decoration: none;
+}
+
+.language-nav a.active,
+.tab-list a.active,
+.pagination a.active {
+  background: var(--accent);
+  color: white;
+}
+
+main {
+  width: min(var(--page-width), calc(100% - 2rem));
+  margin: 0 auto;
+  padding: 1.5rem 0 4rem;
+}
+
+h1,
+h2,
+p {
+  overflow-wrap: anywhere;
+}
+
+h1 {
+  margin-top: 0;
+  font-size: clamp(2rem, 4vw, 4rem);
+  line-height: 1.05;
+}
+
+h2 {
+  line-height: 1.2;
+}
+
+.lead {
+  max-width: 76ch;
+  font-size: 1.1rem;
+}
+
+.listing-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin: 1rem 0 1.5rem;
+}
+
+.listing-actions button {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: inherit;
+  cursor: pointer;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
+  gap: var(--gap);
+  align-items: start;
+}
+
+.card,
+.post-card,
+.platform-card,
+.artwork-media {
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  background: var(--surface);
+}
+
+.card-media,
+.post-media-item,
+.artwork-media {
+  position: relative;
+}
+
+.card-media .media-link img,
+.card-media .media-link video,
+.post-media-item .media-link img,
+.post-media-item .media-link video,
+.artwork-media > .media-link img,
+.artwork-media > .media-link video {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: contain;
+  background: color-mix(in srgb, Canvas 90%, currentColor 10%);
+}
+
+.card-body,
+.post-body,
+.platform-card,
+.artwork-media details,
+.linked-posts {
+  padding: 0.9rem;
+}
+
+.card-body h2,
+.post-body h2,
+.platform-card h2 {
+  margin: 0 0 0.45rem;
+  font-size: 1.05rem;
+}
+
+.card-body p,
+.post-body p {
+  margin: 0.35rem 0;
+}
+
+.metadata {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.platform-links {
+  position: absolute;
+  top: 0.55rem;
+  right: 0.55rem;
+  padding: 0.35rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, Canvas 82%, transparent);
+  opacity: 0;
+  transition: opacity 120ms ease;
+}
+
+.card-media:hover .platform-links,
+.artwork-media:hover > .platform-links,
+.platform-links:focus-within {
+  opacity: 1;
+}
+
+.platform-link img,
+.post-platform img,
+.platform-card h2 img {
+  width: 1.25rem;
+  height: 1.25rem;
+  object-fit: contain;
+}
+
+.platform-link.is-deleted {
+  opacity: 0.35;
+}
+
+.post-list {
+  display: grid;
+  gap: 1.25rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.post-card {
+  content-visibility: auto;
+  contain-intrinsic-size: 650px;
+}
+
+.post-header,
+.post-footer {
+  justify-content: space-between;
+  padding: 0.75rem 0.9rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.post-footer {
+  border-top: 1px solid var(--border);
+  border-bottom: 0;
+  justify-content: flex-start;
+}
+
+.post-platform {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.post-date {
+  color: var(--muted);
+}
+
+.status {
+  padding: 0.18rem 0.48rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 0.78rem;
+}
+
+.status-deleted {
+  opacity: 0.55;
+}
+
+.post-text {
+  white-space: normal;
+  margin: 0.7rem 0;
+}
+
+.post-media-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+  gap: 0.65rem;
+  margin-top: 1rem;
+}
+
+.pagination {
+  justify-content: space-between;
+  margin-top: 2rem;
+}
+
+.pagination-pages {
+  display: flex;
+  gap: 0.3rem;
+}
+
+.platform-list {
+  display: grid;
+  gap: 2rem;
+}
+
+.platform-card h2 a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.platform-preview {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: 0.8rem;
+}
+
+.platform-preview .post-card {
+  font-size: 0.88rem;
+}
+
+.artwork-version {
+  margin-top: 3rem;
+  scroll-margin-top: 5rem;
+}
+
+.artwork-media {
+  padding-bottom: 0.2rem;
+}
+
+.artwork-media > .platform-links {
+  top: 0.55rem;
+  right: 0.55rem;
+}
+
+#archive-validation-alert {
+  width: min(var(--page-width), calc(100% - 2rem));
+  margin: 1rem auto 0;
+  padding: 0.8rem 1rem;
+  border: 1px solid #b44;
+  border-radius: 0.7rem;
+  background: color-mix(in srgb, #b44 15%, Canvas);
+}
+
+.feed-loading {
+  padding: 1rem;
+  text-align: center;
+  color: var(--muted);
+}
+
+@media (max-width: 760px) {
+  .site-header {
+    position: static;
+    grid-template-columns: 1fr;
+  }
+
+  .listing-toolbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .platform-links {
+    opacity: 1;
+  }
+}

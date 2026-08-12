@@ -1,0 +1,50 @@
+// User interface strings for en.
+{
+  "nav": {
+    "artworks": "Artworks",
+    "posts": "Posts",
+    "platforms": "Platforms",
+    "admin": "Editor"
+  },
+  "common": {
+    "newest": "Newest first",
+    "oldest": "Oldest first",
+    "feed": "Feed",
+    "pages": "Pages",
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page {page}",
+    "unknownDate": "Unknown date",
+    "deleted": "Deleted",
+    "alive": "Available",
+    "source": "Source",
+    "posts": "Posts",
+    "versions": "Versions",
+    "files": "Files",
+    "open": "Open",
+    "noItems": "No items."
+  },
+  "artworks": {
+    "popular": "Popular",
+    "major": "Major",
+    "versions": "All versions",
+    "all": "All found",
+    "pageTitle": "stairs2line artworks",
+    "created": "Created {date}",
+    "knownNotAfter": "Known no later than {date}",
+    "firstPost": "First known post: {date}",
+    "genericDescription": "A stairs2line artwork with {versions} versions and {media} media items."
+  },
+  "posts": {
+    "pageTitle": "stairs2line posts",
+    "all": "All posts",
+    "grouped": "By platform",
+    "platformTitle": "Posts on {platform}",
+    "genericDescription": "An archived stairs2line post on {platform}."
+  },
+  "validation": {
+    "title": "Archive validation",
+    "errors": "Errors: {count}",
+    "warnings": "Warnings: {count}"
+  }
+}

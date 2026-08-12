@@ -2015,7 +2015,7 @@
     {
       "id": "artwork-0240",
       "title": {
-        "ja": "ふわり"
+        "ja": ""
       },
       "versions": [
         {
@@ -2044,6 +2044,41 @@
         "legacyGroupIndex": 240,
         "inferredPostIds": [
           "twitter:772048970210086913"
+        ]
+      }
+    },
+    {
+      "id": "artwork-0241",
+      "title": {
+        "ja": ""
+      },
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "decorative",
+          "media": [
+            {
+              "id": "artwork-0241/v01/m01",
+              "legacyIds": [
+                "C02pmy9UAAA9uEP"
+              ],
+              "files": [
+                "twitter/814496337655758850_C02pmy9UAAA9uEP.jpeg"
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1,
+            "inferredPostIds": [
+              "twitter:814496337655758850"
+            ]
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 241,
+        "inferredPostIds": [
+          "twitter:814496337655758850"
         ]
       }
     }

@@ -1790,6 +1790,38 @@
           "pixiv:147357899"
         ]
       }
+    },
+    {
+      "id": "artwork-0240",
+      "title": {
+        "ja": "ふわり"
+      },
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "sketchy",
+          "media": [
+            {
+              "id": "artwork-0240/v01/m01",
+              "legacyIds": [
+                "CrbebU9VUAAGu1s",
+              ]
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 1,
+            "inferredPostIds": [
+              "twitter:772048970210086913"
+            ]
+          }
+        }
+      ],
+      "migration": {
+        "legacyGroupIndex": 240,
+        "inferredPostIds": [
+          "twitter:772048970210086913"
+        ]
+      }
     }
   ]
 }

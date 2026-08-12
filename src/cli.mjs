@@ -114,6 +114,10 @@ async function buildCommand(args) {
   const mediaRoot = args['media-root'] ? path.resolve(args['media-root']) : null;
   const compilation = await compileArchive(source, { mediaRoot, previewPlaceholders });
   if (compilation.manifest.summary.errorCount > 0 && !previewPlaceholders && !asBoolean(args['allow-errors'])) {
+    for (const issue of compilation.issues) {
+      console.error(`${issue.severity.toUpperCase()} ${issue.code} ${issue.entityType}:${issue.entityId}`);
+    }
+
     throw new Error(`Build stopped because validation found ${compilation.manifest.summary.errorCount} errors.`);
   }
   await buildStaticSite(compilation, source, path.resolve(args.output), {

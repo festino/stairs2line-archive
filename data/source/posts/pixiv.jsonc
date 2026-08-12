@@ -1,4 +1,4 @@
-// Migrated pixiv posts. Status is stored on every post.
+// Resolved physical file paths and explicit media relationships.
 {
   "posts": [
     {

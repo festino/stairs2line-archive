@@ -1,4 +1,4 @@
-// Migrated artwork groups. Legacy media IDs are resolved to physical files during the resolve step.
+// Resolved physical file paths and explicit media relationships.
 {
   "artworks": [
     {
@@ -12,6 +12,9 @@
               "id": "artwork-0041/v01/m01",
               "legacyIds": [
                 "msaxwpnFbr1s4v84ho5_400"
+              ],
+              "files": [
+                "tumblr/59690538540_tumblr_msaxwpnFbr1s4v84ho5_400.png"
               ]
             }
           ],
@@ -27,6 +30,9 @@
               "id": "artwork-0041/v02/m01",
               "legacyIds": [
                 "msaxwpnFbr1s4v84ho5_r1_400"
+              ],
+              "files": [
+                "tumblr/59690538540_tumblr_msaxwpnFbr1s4v84ho5_r1_400.png"
               ]
             }
           ],
@@ -54,6 +60,10 @@
               "legacyIds": [
                 "msaxwpnFbr1s4v84ho6_400",
                 "36243734_p0"
+              ],
+              "files": [
+                "tumblr/59690538540_tumblr_msaxwpnFbr1s4v84ho6_400.png",
+                "pixiv/36243734_p0.png"
               ]
             }
           ],
@@ -72,6 +82,9 @@
               "id": "artwork-0042/v02/m01",
               "legacyIds": [
                 "n1ygvurXbo1s4v84ho4_250"
+              ],
+              "files": [
+                "tumblr/78635095373_tumblr_n1ygvurXbo1s4v84ho4_250.png"
               ]
             }
           ],
@@ -87,6 +100,9 @@
               "id": "artwork-0042/v03/m01",
               "legacyIds": [
                 "n1ygvurXbo1s4v84ho5_250"
+              ],
+              "files": [
+                "tumblr/78635095373_tumblr_n1ygvurXbo1s4v84ho5_250.png"
               ]
             }
           ],
@@ -113,6 +129,9 @@
               "id": "artwork-0043/v01/m01",
               "legacyIds": [
                 "msujkjn8Kb1s4v84ho2_400"
+              ],
+              "files": [
+                "tumblr/60735916600_tumblr_msujkjn8Kb1s4v84ho2_400.png"
               ]
             }
           ],
@@ -136,6 +155,9 @@
               "id": "artwork-0044/v01/m01",
               "legacyIds": [
                 "msujkjn8Kb1s4v84ho4_400"
+              ],
+              "files": [
+                "tumblr/60735916600_tumblr_msujkjn8Kb1s4v84ho4_400.png"
               ]
             }
           ],
@@ -159,6 +181,9 @@
               "id": "artwork-0045/v01/m01",
               "legacyIds": [
                 "msujkjn8Kb1s4v84ho5_400"
+              ],
+              "files": [
+                "tumblr/60735916600_tumblr_msujkjn8Kb1s4v84ho5_400.png"
               ]
             }
           ],
@@ -182,6 +207,9 @@
               "id": "artwork-0046/v01/m01",
               "legacyIds": [
                 "msujkjn8Kb1s4v84ho6_400"
+              ],
+              "files": [
+                "tumblr/60735916600_tumblr_msujkjn8Kb1s4v84ho6_400.png"
               ]
             }
           ],
@@ -197,6 +225,9 @@
               "id": "artwork-0046/v02/m01",
               "legacyIds": [
                 "n1ygvurXbo1s4v84ho2_250"
+              ],
+              "files": [
+                "tumblr/78635095373_tumblr_n1ygvurXbo1s4v84ho2_250.png"
               ]
             }
           ],
@@ -220,6 +251,9 @@
               "id": "artwork-0047/v01/m01",
               "legacyIds": [
                 "msujkjn8Kb1s4v84ho1_500"
+              ],
+              "files": [
+                "tumblr/60735916600_tumblr_msujkjn8Kb1s4v84ho1_500.png"
               ]
             }
           ],
@@ -235,6 +269,9 @@
               "id": "artwork-0047/v02/m01",
               "legacyIds": [
                 "nuxdexjnEQ1s4v84ho1_r1_500"
+              ],
+              "files": [
+                "tumblr/129414719209_tumblr_nuxdexjnEQ1s4v84ho1_r1_500.png"
               ]
             }
           ],
@@ -263,6 +300,10 @@
               "legacyIds": [
                 "msujkjn8Kb1s4v84ho3_500",
                 "n8x7q9MNVH1s4v84ho2_500"
+              ],
+              "files": [
+                "tumblr/60735916600_tumblr_msujkjn8Kb1s4v84ho3_500.png",
+                "tumblr/92164287224_tumblr_n8x7q9MNVH1s4v84ho2_500.png"
               ]
             }
           ],
@@ -278,6 +319,9 @@
               "id": "artwork-0048/v02/m01",
               "legacyIds": [
                 "n8x7q9MNVH1s4v84ho1_540"
+              ],
+              "files": [
+                "tumblr/92164287224_tumblr_n8x7q9MNVH1s4v84ho1_540.png"
               ]
             }
           ],
@@ -293,6 +337,9 @@
               "id": "artwork-0048/v03/m01",
               "legacyIds": [
                 "CKV8LBnUAAA57nu"
+              ],
+              "files": [
+                "twitter/623040653585321984_CKV8LBnUAAA57nu.png"
               ]
             }
           ],
@@ -311,6 +358,9 @@
               "id": "artwork-0048/v04/m01",
               "legacyIds": [
                 "44930075_p0"
+              ],
+              "files": [
+                "pixiv/44930075_p0.jpg"
               ]
             }
           ],
@@ -331,6 +381,9 @@
                 "G-2vtGRXEAAxsGa",
                 "140060128_p0",
                 "eba8736e9dacf17be929d57f0371f94a19737731"
+              ],
+              "files": [
+                "tumblr/806000851033456640_eba8736e9dacf17be929d57f0371f94a19737731.png"
               ]
             }
           ],
@@ -352,6 +405,9 @@
                 "HBj3j79bUAAsLCb",
                 "141421623_p1",
                 "29674e06cd848a6954e54e43bfecfa4458997cf6"
+              ],
+              "files": [
+                "tumblr/809079143597768704_29674e06cd848a6954e54e43bfecfa4458997cf6.png"
               ]
             }
           ],
@@ -387,6 +443,9 @@
               "id": "artwork-0049/v01/m01",
               "legacyIds": [
                 "mt7ck0rkmp1s4v84ho1_400"
+              ],
+              "files": [
+                "tumblr/61383879024_tumblr_mt7ck0rkmp1s4v84ho1_400.png"
               ]
             }
           ],
@@ -402,6 +461,9 @@
               "id": "artwork-0049/v02/m01",
               "legacyIds": [
                 "mt7ck0rkmp1s4v84ho2_400"
+              ],
+              "files": [
+                "tumblr/61383879024_tumblr_mt7ck0rkmp1s4v84ho2_400.png"
               ]
             }
           ],
@@ -418,6 +480,10 @@
               "legacyIds": [
                 "mt7ck0rkmp1s4v84ho3_400",
                 "mtb6hobl8x1s4v84ho2_400"
+              ],
+              "files": [
+                "tumblr/61383879024_tumblr_mt7ck0rkmp1s4v84ho3_400.png",
+                "tumblr/61571325816_tumblr_mtb6hobl8x1s4v84ho2_400.png"
               ]
             }
           ],
@@ -433,6 +499,9 @@
               "id": "artwork-0049/v04/m01",
               "legacyIds": [
                 "mt7ck0rkmp1s4v84ho4_400"
+              ],
+              "files": [
+                "tumblr/61383879024_tumblr_mt7ck0rkmp1s4v84ho4_400.png"
               ]
             }
           ],
@@ -456,6 +525,9 @@
               "id": "artwork-0050/v01/m01",
               "legacyIds": [
                 "mtb6hobl8x1s4v84ho1_400"
+              ],
+              "files": [
+                "tumblr/61571325816_tumblr_mtb6hobl8x1s4v84ho1_400.png"
               ]
             }
           ],
@@ -471,6 +543,9 @@
               "id": "artwork-0050/v02/m01",
               "legacyIds": [
                 "n1ygvurXbo1s4v84ho7_250"
+              ],
+              "files": [
+                "tumblr/78635095373_tumblr_n1ygvurXbo1s4v84ho7_250.png"
               ]
             }
           ],
@@ -494,6 +569,9 @@
               "id": "artwork-0051/v01/m01",
               "legacyIds": [
                 "mtb6hobl8x1s4v84ho3_r1_400"
+              ],
+              "files": [
+                "tumblr/61571325816_tumblr_mtb6hobl8x1s4v84ho3_r1_400.png"
               ]
             }
           ],
@@ -517,6 +595,9 @@
               "id": "artwork-0052/v01/m01",
               "legacyIds": [
                 "mtb6hobl8x1s4v84ho4_400"
+              ],
+              "files": [
+                "tumblr/61571325816_tumblr_mtb6hobl8x1s4v84ho4_400.png"
               ]
             }
           ],
@@ -540,6 +621,9 @@
               "id": "artwork-0053/v01/m01",
               "legacyIds": [
                 "mte8v2HxWN1s4v84ho1_1280"
+              ],
+              "files": [
+                "tumblr/61704687471_tumblr_mte8v2HxWN1s4v84ho1_1280.png"
               ]
             }
           ],
@@ -563,6 +647,9 @@
               "id": "artwork-0054/v01/m01",
               "legacyIds": [
                 "mte8v2HxWN1s4v84ho2_1280"
+              ],
+              "files": [
+                "tumblr/61704687471_tumblr_mte8v2HxWN1s4v84ho2_1280.png"
               ]
             }
           ],
@@ -586,6 +673,9 @@
               "id": "artwork-0055/v01/m01",
               "legacyIds": [
                 "mte8v2HxWN1s4v84ho3_640"
+              ],
+              "files": [
+                "tumblr/61704687471_tumblr_mte8v2HxWN1s4v84ho3_640.png"
               ]
             }
           ],
@@ -609,6 +699,9 @@
               "id": "artwork-0056/v01/m01",
               "legacyIds": [
                 "mte8v2HxWN1s4v84ho4_1280"
+              ],
+              "files": [
+                "tumblr/61704687471_tumblr_mte8v2HxWN1s4v84ho4_1280.png"
               ]
             }
           ],
@@ -632,6 +725,9 @@
               "id": "artwork-0057/v01/m01",
               "legacyIds": [
                 "mte8v2HxWN1s4v84ho5_400"
+              ],
+              "files": [
+                "tumblr/61704687471_tumblr_mte8v2HxWN1s4v84ho5_400.png"
               ]
             }
           ],
@@ -647,6 +743,9 @@
               "id": "artwork-0057/v02/m01",
               "legacyIds": [
                 "mte8v2HxWN1s4v84ho6_400"
+              ],
+              "files": [
+                "tumblr/61704687471_tumblr_mte8v2HxWN1s4v84ho6_400.png"
               ]
             }
           ],
@@ -670,6 +769,9 @@
               "id": "artwork-0058/v01/m01",
               "legacyIds": [
                 "mte8v2HxWN1s4v84ho7_1280"
+              ],
+              "files": [
+                "tumblr/61704687471_tumblr_mte8v2HxWN1s4v84ho7_1280.png"
               ]
             }
           ],
@@ -693,6 +795,9 @@
               "id": "artwork-0059/v01/m01",
               "legacyIds": [
                 "muve5w0d8I1s4v84ho1_400"
+              ],
+              "files": [
+                "tumblr/64390483901_tumblr_muve5w0d8I1s4v84ho1_400.png"
               ]
             }
           ],
@@ -708,6 +813,9 @@
               "id": "artwork-0059/v02/m01",
               "legacyIds": [
                 "muve5w0d8I1s4v84ho2_400"
+              ],
+              "files": [
+                "tumblr/64390483901_tumblr_muve5w0d8I1s4v84ho2_400.gif"
               ]
             }
           ],
@@ -723,6 +831,9 @@
               "id": "artwork-0059/v03/m01",
               "legacyIds": [
                 "n1ygvurXbo1s4v84ho6_250"
+              ],
+              "files": [
+                "tumblr/78635095373_tumblr_n1ygvurXbo1s4v84ho6_250.png"
               ]
             }
           ],
@@ -746,6 +857,9 @@
               "id": "artwork-0060/v01/m01",
               "legacyIds": [
                 "muve5w0d8I1s4v84ho3_400"
+              ],
+              "files": [
+                "tumblr/64390483901_tumblr_muve5w0d8I1s4v84ho3_400.png"
               ]
             }
           ],
@@ -761,6 +875,9 @@
               "id": "artwork-0060/v02/m01",
               "legacyIds": [
                 "muve5w0d8I1s4v84ho4_400"
+              ],
+              "files": [
+                "tumblr/64390483901_tumblr_muve5w0d8I1s4v84ho4_400.png"
               ]
             }
           ],
@@ -784,6 +901,9 @@
               "id": "artwork-0061/v01/m01",
               "legacyIds": [
                 "39798495-1"
+              ],
+              "files": [
+                "pixiv/39798495-1.png"
               ]
             }
           ],
@@ -802,6 +922,9 @@
               "id": "artwork-0061/v02/m01",
               "legacyIds": [
                 "mvaav1veKf1s4v84ho1_1280"
+              ],
+              "files": [
+                "tumblr/65144069024_tumblr_mvaav1veKf1s4v84ho1_1280.png"
               ]
             }
           ],
@@ -828,6 +951,9 @@
               "id": "artwork-0062/v01/m01",
               "legacyIds": [
                 "mvn2znNxA31s4v84ho10_1280"
+              ],
+              "files": [
+                "tumblr/65785166959_tumblr_mvn2znNxA31s4v84ho10_1280.png"
               ]
             }
           ],
@@ -851,6 +977,9 @@
               "id": "artwork-0063/v01/m01",
               "legacyIds": [
                 "mvn2znNxA31s4v84ho2_1280"
+              ],
+              "files": [
+                "tumblr/65785166959_tumblr_mvn2znNxA31s4v84ho2_1280.png"
               ]
             }
           ],
@@ -874,6 +1003,9 @@
               "id": "artwork-0064/v01/m01",
               "legacyIds": [
                 "mvn2znNxA31s4v84ho3_540"
+              ],
+              "files": [
+                "tumblr/65785166959_tumblr_mvn2znNxA31s4v84ho3_540.png"
               ]
             }
           ],
@@ -897,6 +1029,9 @@
               "id": "artwork-0065/v01/m01",
               "legacyIds": [
                 "mvn2znNxA31s4v84ho4_1280"
+              ],
+              "files": [
+                "tumblr/65785166959_tumblr_mvn2znNxA31s4v84ho4_1280.png"
               ]
             }
           ],
@@ -920,6 +1055,9 @@
               "id": "artwork-0066/v01/m01",
               "legacyIds": [
                 "mvn2znNxA31s4v84ho5_1280"
+              ],
+              "files": [
+                "tumblr/65785166959_tumblr_mvn2znNxA31s4v84ho5_1280.png"
               ]
             }
           ],
@@ -943,6 +1081,9 @@
               "id": "artwork-0067/v01/m01",
               "legacyIds": [
                 "mvn2znNxA31s4v84ho6_500"
+              ],
+              "files": [
+                "tumblr/65785166959_tumblr_mvn2znNxA31s4v84ho6_500.png"
               ]
             }
           ],
@@ -966,6 +1107,9 @@
               "id": "artwork-0068/v01/m01",
               "legacyIds": [
                 "mvn2znNxA31s4v84ho7_1280"
+              ],
+              "files": [
+                "tumblr/65785166959_tumblr_mvn2znNxA31s4v84ho7_1280.png"
               ]
             }
           ],
@@ -989,6 +1133,9 @@
               "id": "artwork-0069/v01/m01",
               "legacyIds": [
                 "mvn2znNxA31s4v84ho8_640"
+              ],
+              "files": [
+                "tumblr/65785166959_tumblr_mvn2znNxA31s4v84ho8_640.png"
               ]
             }
           ],
@@ -1012,6 +1159,9 @@
               "id": "artwork-0070/v01/m01",
               "legacyIds": [
                 "mvn2znNxA31s4v84ho9_500"
+              ],
+              "files": [
+                "tumblr/65785166959_tumblr_mvn2znNxA31s4v84ho9_500.png"
               ]
             }
           ],
@@ -1041,6 +1191,9 @@
               "id": "artwork-0071/v01/m01",
               "legacyIds": [
                 "mvqvpc3qkK1s4v84ho1_540"
+              ],
+              "files": [
+                "tumblr/65998519870_tumblr_mvqvpc3qkK1s4v84ho1_540.png"
               ]
             }
           ],
@@ -1056,6 +1209,9 @@
               "id": "artwork-0071/v02/m01",
               "legacyIds": [
                 "CXikkdzU0AAvnXJ"
+              ],
+              "files": [
+                "twitter/682476291841327104_CXikkdzU0AAvnXJ.jpeg"
               ]
             }
           ],
@@ -1075,6 +1231,9 @@
               "legacyIds": [
                 "n3byitfswV1s4v84ho4_500",
                 "45737425_p9"
+              ],
+              "files": [
+                "tumblr/81351166350_tumblr_n3byitfswV1s4v84ho4_500.png"
               ]
             }
           ],
@@ -1108,6 +1267,9 @@
               "id": "artwork-0072/v01/m01",
               "legacyIds": [
                 "mvqvpc3qkK1s4v84ho2_1280"
+              ],
+              "files": [
+                "tumblr/65998519870_tumblr_mvqvpc3qkK1s4v84ho2_1280.png"
               ]
             }
           ],
@@ -1124,6 +1286,9 @@
               "legacyIds": [
                 "o13zdtDHPu1s4v84ho1_500",
                 "56793430-4"
+              ],
+              "files": [
+                "tumblr/137491300699_tumblr_o13zdtDHPu1s4v84ho1_500.png"
               ]
             }
           ],
@@ -1142,6 +1307,9 @@
               "id": "artwork-0072/v03/m01",
               "legacyIds": [
                 "CXikju8UMAAIRNR"
+              ],
+              "files": [
+                "twitter/682476291841327104_CXikju8UMAAIRNR.jpeg"
               ]
             }
           ],
@@ -1172,6 +1340,9 @@
               "id": "artwork-0073/v01/m01",
               "legacyIds": [
                 "mwc3cr62SS1s4v84ho1_1280"
+              ],
+              "files": [
+                "tumblr/67110559418_tumblr_mwc3cr62SS1s4v84ho1_1280.png"
               ]
             }
           ],
@@ -1195,6 +1366,9 @@
               "id": "artwork-0074/v01/m01",
               "legacyIds": [
                 "mwc3cr62SS1s4v84ho2_1280"
+              ],
+              "files": [
+                "tumblr/67110559418_tumblr_mwc3cr62SS1s4v84ho2_1280.png"
               ]
             }
           ],
@@ -1222,6 +1396,9 @@
               "legacyIds": [
                 "mwc3cr62SS1s4v84ho3_400",
                 "40147983_p4"
+              ],
+              "files": [
+                "tumblr/67110559418_tumblr_mwc3cr62SS1s4v84ho3_400.png"
               ]
             }
           ],
@@ -1251,6 +1428,9 @@
               "id": "artwork-0076/v01/m01",
               "legacyIds": [
                 "mwc3cr62SS1s4v84ho4_400"
+              ],
+              "files": [
+                "tumblr/67110559418_tumblr_mwc3cr62SS1s4v84ho4_400.png"
               ]
             }
           ],
@@ -1266,6 +1446,9 @@
               "id": "artwork-0076/v02/m01",
               "legacyIds": [
                 "n1ygvurXbo1s4v84ho1_250"
+              ],
+              "files": [
+                "tumblr/78635095373_tumblr_n1ygvurXbo1s4v84ho1_250.png"
               ]
             }
           ],
@@ -1289,6 +1472,9 @@
               "id": "artwork-0077/v01/m01",
               "legacyIds": [
                 "mwc3cr62SS1s4v84ho5_400"
+              ],
+              "files": [
+                "tumblr/67110559418_tumblr_mwc3cr62SS1s4v84ho5_400.png"
               ]
             }
           ],
@@ -1312,6 +1498,9 @@
               "id": "artwork-0078/v01/m01",
               "legacyIds": [
                 "mwc3cr62SS1s4v84ho6_400"
+              ],
+              "files": [
+                "tumblr/67110559418_tumblr_mwc3cr62SS1s4v84ho6_400.gif"
               ]
             }
           ],
@@ -1335,6 +1524,9 @@
               "id": "artwork-0079/v01/m01",
               "legacyIds": [
                 "mwpkjiTFBH1s4v84ho1_400"
+              ],
+              "files": [
+                "tumblr/67832137305_tumblr_mwpkjiTFBH1s4v84ho1_400.png"
               ]
             }
           ],
@@ -1358,6 +1550,9 @@
               "id": "artwork-0080/v01/m01",
               "legacyIds": [
                 "mwpkjiTFBH1s4v84ho2_400"
+              ],
+              "files": [
+                "tumblr/67832137305_tumblr_mwpkjiTFBH1s4v84ho2_400.png"
               ]
             }
           ],

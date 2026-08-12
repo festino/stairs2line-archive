@@ -1,5 +1,6 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { formatDate, localeText, localizedValue } from './localization.mjs';
 import { compareNullableDates, copyDirectory, ensureDirectory, escapeAttribute, escapeHtml, stableHash } from './util.mjs';
 
@@ -670,9 +671,9 @@ export async function buildStaticSite(compilation, source, outputRoot, options =
   await fs.rm(outputRoot, { recursive: true, force: true });
   await ensureDirectory(outputRoot);
 
-  const siteAssets = path.resolve(path.dirname(new URL(import.meta.url).pathname), '../site');
+  const siteAssets = fileURLToPath(new URL('../site/', import.meta.url));
   await copyDirectory(siteAssets, path.join(outputRoot, 'assets'));
-  const adminAssets = path.resolve(path.dirname(new URL(import.meta.url).pathname), '../admin');
+  const adminAssets = fileURLToPath(new URL('../admin/', import.meta.url));
   await copyDirectory(adminAssets, path.join(outputRoot, 'admin'));
 
   await ensureDirectory(path.join(outputRoot, 'data'));

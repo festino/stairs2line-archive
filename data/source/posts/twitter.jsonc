@@ -1,4 +1,4 @@
-// Migrated twitter posts. Status is stored on every post.
+// Resolved physical file paths and explicit media relationships.
 {
   "posts": [
     {
@@ -823,7 +823,8 @@
         "artwork-0216/v01/m01",
         "artwork-0212/v02/m01",
         "artwork-0214/v02/m01",
-        "artwork-0201/v04/m01"
+        "artwork-0201/v04/m01",
+        "artwork-0206/v02/m01"
       ]
     },
     {

@@ -322,14 +322,6 @@ h2 {
   font-size: 0.88rem;
 }
 
-.artwork-version {
-  margin-top: 3rem;
-  scroll-margin-top: 5rem;
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-}
-
 .artwork-media {
   padding-bottom: 0.2rem;
 }
@@ -337,6 +329,17 @@ h2 {
 .artwork-media > .platform-links {
   top: 0.55rem;
   right: 0.55rem;
+}
+
+.artwork-posts a {
+  display: flex;
+  gap: 0.5em;
+}
+
+.artwork-posts .platform-link img {
+  width: 1.5rem;
+  height: 1.5rem;
+  object-fit: contain;
 }
 
 #archive-validation-alert {

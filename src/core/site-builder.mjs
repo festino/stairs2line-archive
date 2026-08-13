@@ -263,7 +263,6 @@ function layout(manifest, language, relative, options) {
       <a href="${escapeAttribute(routeUrl(manifest, language, 'artworks/'))}">${escapeHtml(localeText(manifest.locales, language, 'nav.artworks'))}</a>
       <a href="${escapeAttribute(routeUrl(manifest, language, 'posts/'))}">${escapeHtml(localeText(manifest.locales, language, 'nav.posts'))}</a>
       <a href="${escapeAttribute(routeUrl(manifest, language, 'posts/by-platform/'))}">${escapeHtml(localeText(manifest.locales, language, 'nav.platforms'))}</a>
-      <a href="${escapeAttribute(joinUrl(manifest.site.basePath, 'admin/'))}">${escapeHtml(localeText(manifest.locales, language, 'nav.admin'))}</a>
     </nav>
     <nav class="language-nav">${languageNav.map((item) => `<a class="${item.language === language ? 'active' : ''}" href="${escapeAttribute(item.href)}">${escapeHtml(item.language.toUpperCase())}</a>`).join('')}</nav>
   </header>

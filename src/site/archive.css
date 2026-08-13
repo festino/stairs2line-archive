@@ -424,8 +424,7 @@ h2 {
     overflow: hidden;
 }
 
-/* Hidden state used by the vanilla modal implementation */
-#mediaModal.hidden {
+#mediaModal:not(.show) {
     display: none;
 }
 

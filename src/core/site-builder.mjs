@@ -328,7 +328,7 @@ async function buildArtworkListings(outputRoot, manifest, language) {
       const baseRelative = oldest ? `${baseSegment}/oldest` : baseSegment;
       const tabs = artworkTabs(manifest, language, filterKey, oldest);
       const sortHref = routeUrl(manifest, language, oldest ? `${baseSegment}/` : `${baseSegment}/oldest/`);
-      const sortLabel = localeText(manifest.locales, language, oldest ? 'common.newest' : 'common.oldest');
+      const sortLabel = localeText(manifest.locales, language, oldest ? 'common.oldest' : 'common.newest');
 
       if (filterKey === 'versions' || filterKey === 'all') {
         const versions = manifest.artworks.flatMap((artwork) => artwork.versions
@@ -475,7 +475,7 @@ async function buildPostListings(outputRoot, manifest, language) {
         toolbar: {
           tabs: postsTabs(manifest, language, 'all'),
           sortHref: routeUrl(manifest, language, oldest ? 'posts/' : 'posts/oldest/'),
-          sortLabel: localeText(manifest.locales, language, oldest ? 'common.newest' : 'common.oldest')
+          sortLabel: localeText(manifest.locales, language, oldest ? 'common.oldest' : 'common.newest')
         }
       }
     );
@@ -507,7 +507,7 @@ async function buildPostListings(outputRoot, manifest, language) {
           toolbar: {
             tabs: postsTabs(manifest, language, 'grouped'),
             sortHref: routeUrl(manifest, language, oldest ? `${baseSegment}/` : `${baseSegment}/oldest/`),
-            sortLabel: localeText(manifest.locales, language, oldest ? 'common.newest' : 'common.oldest')
+            sortLabel: localeText(manifest.locales, language, oldest ? 'common.oldest' : 'common.newest')
           }
         }
       );

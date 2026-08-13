@@ -18,7 +18,7 @@
   }
 
   function setButton(mode) {
-    toggle.textContent = mode === 'feed' ? toggle.dataset.pagesLabel : toggle.dataset.feedLabel;
+    toggle.textContent = mode === 'feed' ? toggle.dataset.feedLabel : toggle.dataset.pagesLabel;
     toggle.setAttribute('aria-pressed', String(mode === 'feed'));
   }
 

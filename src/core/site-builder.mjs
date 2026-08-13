@@ -212,16 +212,19 @@ function renderToolbar(manifest, language, options) {
 
 function renderPagination(manifest, language, baseRelative, page, pageCount) {
   if (pageCount <= 1) return '';
+  const pageWindow = 2;
   const previous = page > 1 ? routeUrl(manifest, language, `${pageRelative(baseRelative, page - 1)}/`) : null;
   const next = page < pageCount ? routeUrl(manifest, language, `${pageRelative(baseRelative, page + 1)}/`) : null;
   const pages = [];
   for (let number = 1; number <= pageCount; number += 1) {
-    if (number !== 1 && number !== pageCount && Math.abs(number - page) > 2) continue;
+    if (number !== 1 && number !== pageCount && Math.abs(number - page) > pageWindow) continue;
     pages.push(`<a class="${number === page ? 'active' : ''}" href="${escapeAttribute(routeUrl(manifest, language, `${pageRelative(baseRelative, number)}/`))}">${number}</a>`);
   }
+  const leftSkipped = page - pageWindow > 2 ? `<span class="pagination-pages">·</span>` : ``;
+  const rightSkipped = page + pageWindow < pageCount - 1 ? `<span class="pagination-pages">·</span>` : ``;
   return `<nav class="pagination" data-pagination aria-label="Pagination">
     ${previous ? `<a rel="prev" href="${escapeAttribute(previous)}">${escapeHtml(localeText(manifest.locales, language, 'common.previous'))}</a>` : '<span></span>'}
-    <span class="pagination-pages">${pages.join('')}</span>
+    ${leftSkipped}<span class="pagination-pages">${pages.join('')}</span>${rightSkipped}
     ${next ? `<a rel="next" href="${escapeAttribute(next)}">${escapeHtml(localeText(manifest.locales, language, 'common.next'))}</a>` : '<span></span>'}
   </nav><div data-feed-sentinel></div>`;
 }

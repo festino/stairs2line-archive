@@ -82,7 +82,8 @@ textarea {
 .tab-list a,
 .listing-actions a,
 .listing-actions button,
-.pagination a {
+.pagination a,
+.pagination span {
   padding: 0.42rem 0.68rem;
   border-radius: 999px;
   text-decoration: none;
@@ -93,6 +94,10 @@ textarea {
 .pagination a.active {
   background: var(--accent);
   color: white;
+}
+
+.pagination span {
+    user-select: none;
 }
 
 main {

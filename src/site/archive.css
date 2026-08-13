@@ -398,7 +398,7 @@ h2 {
     text-align: right;
 }
 
-.hidden {
+.hidden, [hidden] {
     display: none !important;
 }
 
@@ -423,10 +423,6 @@ h2 {
 
     background: rgba(0, 0, 0, 0.85);
     overflow: hidden;
-}
-
-.modal:not(.show) {
-    display: none !important;
 }
 
 #mediaModal .modal-dialog {

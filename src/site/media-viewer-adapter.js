@@ -159,13 +159,12 @@
     }
 
     onWheel(event) {
+      event.preventDefault();
       if (!this.canSwitch()) return;
 
       if (event.deltaY > 0 && this.next) {
-        event.preventDefault();
         this.show(this.next, this.mediaProvider);
       } else if (event.deltaY < 0 && this.prev) {
-        event.preventDefault();
         this.show(this.prev, this.mediaProvider);
       }
     }
@@ -209,7 +208,7 @@
       const media = index.media[element.dataset.mediaId];
       if (!media) return;
 
-      const language = document.documentElement.lang || 'ru';
+      const language = document.documentElement.lang || 'en';
       const contextType = element.dataset.contextType;
       const contextId = element.dataset.contextId;
 

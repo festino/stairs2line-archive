@@ -118,7 +118,7 @@ function placeholderFile(mediaId) {
 export async function compileArchive(source, options = {}) {
   const issues = new IssueCollector();
   const languages = source.site.languages ?? ['ru', 'en', 'ja'];
-  const defaultLanguage = source.site.defaultLanguage ?? languages[0] ?? 'ru';
+  const defaultLanguage = source.site.defaultLanguage ?? languages[0] ?? 'en';
   const platforms = Array.isArray(source.platforms) ? source.platforms : source.platforms.platforms ?? [];
   const platformsById = new Map(platforms.map((platform) => [platform.id, platform]));
   const knownPostIds = source.posts.map((post) => ({

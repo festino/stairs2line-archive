@@ -4,7 +4,7 @@ export const DEFAULT_SITE = {
   basePath: '/',
   mediaBasePath: 'media/stairs2line/',
   imagePreview: 'tumblr/143559403624_tumblr_o6dg5xA0UN1s4v84ho1_400.png',
-  defaultLanguage: 'ru',
+  defaultLanguage: 'en',
   languages: ['ru', 'en', 'ja'],
   mediaDirectories: ['twitter', 'tumblr', 'pixiv', 'other'],
   pageSize: {

@@ -23,7 +23,7 @@ function fixtureSource() {
       id: 'test',
       basePath: '/repo/',
       mediaBasePath: 'media/stairs2line/',
-      defaultLanguage: 'ru',
+      defaultLanguage: 'en',
       languages: ['ru', 'en', 'ja'],
       mediaDirectories: ['twitter', 'pixiv'],
       pageSize: { artworks: 10, versions: 10, posts: 10 },
@@ -187,9 +187,9 @@ test('static pages contain media in HTML and expose paged/feed controls', async 
   const output = await fs.mkdtemp(path.join(os.tmpdir(), 'stairs2line-site-'));
   await buildStaticSite(compilation, source, output, { mediaRoot, copyMedia: true });
 
-  const html = await fs.readFile(path.join(output, 'ru', 'artworks', 'index.html'), 'utf8');
+  const html = await fs.readFile(path.join(output, 'en', 'artworks', 'index.html'), 'utf8');
   assert.match(html, /<img[^>]+src="\/repo\/media\/stairs2line\/pixiv\/999_p0\.png"/);
   assert.match(html, /data-feed-toggle/);
   assert.match(html, /data-paged-list/);
-  assert.match(html, /href="\/repo\/ru\/artworks\/oldest\/"/);
+  assert.match(html, /href="\/repo\/en\/artworks\/oldest\/"/);
 });

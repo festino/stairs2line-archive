@@ -411,7 +411,7 @@ h2 {
 }
 
 /* Full-screen overlay */
-#mediaModal {
+.modal {
     position: fixed;
     inset: 0;
     z-index: 1000;
@@ -424,8 +424,8 @@ h2 {
     overflow: hidden;
 }
 
-#mediaModal:not(.show) {
-    display: none;
+.modal:not(.show) {
+    display: none !important;
 }
 
 #mediaModal .modal-dialog {

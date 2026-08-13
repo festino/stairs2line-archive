@@ -86,10 +86,8 @@
 
     open() {
       this.modal.hidden = false;
-      this.modal.style.display = 'block';
       this.modal.setAttribute('aria-hidden', 'false');
       this.modal.classList.add('show');
-      document.body.classList.add('modal-open');
       this.modal.focus({ preventScroll: true });
     }
 
@@ -97,10 +95,8 @@
       if (!this.modal || this.modal.getAttribute('aria-hidden') === 'true') return;
 
       this.modal.classList.remove('show');
-      this.modal.style.display = 'none';
       this.modal.hidden = true;
       this.modal.setAttribute('aria-hidden', 'true');
-      document.body.classList.remove('modal-open');
 
       this.unsubscribe();
       this.isSubscribed = false;

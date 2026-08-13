@@ -132,9 +132,7 @@ function renderArtworkCard(manifest, artwork, version, language, index) {
       ${media ? renderPlatformLinks(manifest, media, language) : ''}
     </div>
     <div class="card-body">
-      <h2><a href="${escapeAttribute(href)}">${escapeHtml(title)}</a></h2>
-      ${description ? `<p>${escapeHtml(description)}</p>` : ''}
-      <p class="metadata">${date ? escapeHtml(date) : escapeHtml(localeText(manifest.locales, language, 'common.unknownDate'))} · ${escapeHtml(version.scope)}</p>
+      <p class="metadata"><a href="${escapeAttribute(href)}">${date ? escapeHtml(date) : escapeHtml(localeText(manifest.locales, language, 'common.unknownDate'))}}</a></p>
     </div>
   </article>`;
 }
@@ -151,8 +149,7 @@ function renderVersionCard(manifest, artwork, version, language, index) {
       ${media ? renderPlatformLinks(manifest, media, language) : ''}
     </div>
     <div class="card-body">
-      <h2><a href="${escapeAttribute(href)}">${escapeHtml(versionTitle)}</a></h2>
-      <p class="metadata">${date ? escapeHtml(date) : escapeHtml(localeText(manifest.locales, language, 'common.unknownDate'))} · ${escapeHtml(version.scope)}</p>
+      <p class="metadata"><a href="${escapeAttribute(href)}">${date ? escapeHtml(date) : escapeHtml(localeText(manifest.locales, language, 'common.unknownDate'))}}</a></p>
     </div>
   </article>`;
 }
@@ -409,24 +406,24 @@ async function buildArtworkPages(outputRoot, manifest, language) {
         const linkedPosts = (media?.postIds ?? []).map((postId) => postsById.get(postId)).filter(Boolean);
         return `<article class="artwork-media" data-list-item>
           ${mediaElement(manifest, media, language, title, 'artworkVersion', version.key)}
-          ${media ? renderPlatformLinks(manifest, media, language) : ''}
+          <!--${media ? renderPlatformLinks(manifest, media, language) : ''}
           <details>
             <summary>${escapeHtml(localeText(manifest.locales, language, 'common.files'))}: ${media?.existingFiles.length ?? 0}</summary>
             <ul>${(media?.existingFiles ?? []).map((filePath) => `<li><a href="${escapeAttribute(mediaUrl(manifest, filePath))}">${escapeHtml(filePath)}</a> (${manifest.files[filePath]?.byteLength ?? 0} B)</li>`).join('')}</ul>
-          </details>
-          ${linkedPosts.length > 0 ? `<div class="linked-posts"><strong>${escapeHtml(localeText(manifest.locales, language, 'common.posts'))}</strong><ul>${linkedPosts.map((post) => `<li><a href="${escapeAttribute(routeUrl(manifest, language, `posts/${encodeURIComponent(post.platform)}/${encodeURIComponent(post.id)}/`))}">${escapeHtml(post.key)}</a></li>`).join('')}</ul></div>` : ''}
+          </details>-->
+          ${linkedPosts.length > 0 ? `
+          <ul>
+            ${linkedPosts.map((post) => `<li><a href="${escapeAttribute(routeUrl(manifest, language, `posts/${encodeURIComponent(post.platform)}/${encodeURIComponent(post.id)}/`))}"><img src="${platformIconUrl(manifest, post.platform)}" alt="">${formatDate(post.publishedAt, language, { includeTime: true }) }</a></li>`).join('')}
+          </ul>
+          </div>` : ''}
         </article>`;
       }).join('');
       return `<section class="artwork-version" id="${escapeAttribute(version.id)}">
-        <h2>${escapeHtml(version.id)}</h2>
-        <p class="metadata">${escapeHtml(artworkDateText(manifest, version, language))} · ${escapeHtml(version.scope)}</p>
         <div class="card-grid" data-paged-list>${mediaHtml}</div>
       </section>`;
     }).join('');
 
     const body = `<article class="artwork-page">
-      <h1>${escapeHtml(title)}</h1>
-      <p class="lead">${escapeHtml(description)}</p>
       ${versionHtml}
     </article>`;
     const artworkImage = artwork.versions

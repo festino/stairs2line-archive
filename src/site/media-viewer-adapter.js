@@ -100,9 +100,20 @@
 
   function install() {
     if (typeof window.MediaViewer !== 'function' || typeof window.jQuery !== 'function') return;
-    const modal = document.querySelector('#mediaModal');
-    if (!modal) return;
-
+    let modal = document.querySelector('#mediaModal');
+    if (!modal) {
+      $('body').append(`
+            <div class="modal" id="mediaModal" tabindex="-1" aria-hidden="true" style="align-content: center;">
+                <div class="modal-dialog" style="max-width: unset; margin: auto;">
+                    <div id="mediaModalContent" class="fullsize-media fit-media fit-media-copyable">
+                    </div>
+                </div>
+                <div class="modal-subtext"></div>
+                <div class="media-viewer-switcher media-viewer-switcher-left hidden"><span>&lt;</span></div>
+                <div class="media-viewer-switcher media-viewer-switcher-right hidden"><span>&gt;</span></div>
+            </div>`);
+      modal = document.querySelector('#mediaModal');
+    }
     const provider = new PageMediaProvider('[data-paged-list]');
     const viewer = new window.MediaViewer('#mediaModal', (element) => {
       if (typeof window.showFullSizeCopy === 'function') window.showFullSizeCopy(element);

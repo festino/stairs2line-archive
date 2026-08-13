@@ -361,3 +361,43 @@ h2 {
     opacity: 1;
   }
 }
+
+.media-viewer-switcher {
+    position: absolute;
+    width: min(30vw, 30vh);
+    height: 50vh;
+    top: 25vh;
+    cursor: pointer;
+    user-select: none;
+    align-content: center;
+    font-size: 8em;
+    color: white;
+    font-weight: 100;
+    opacity: 0.3;
+    -webkit-text-stroke: 2px #0000007f;
+}
+
+    .media-viewer-switcher:hover {
+        font-weight: 400;
+        opacity: 0.8;
+        -webkit-text-stroke: 2px #000000ff;
+    }
+
+.modal.editing .media-viewer-switcher {
+    pointer-events: none;
+    opacity: 0.1;
+}
+
+.media-viewer-switcher-left {
+    left: 0;
+    text-align: left;
+}
+
+.media-viewer-switcher-right {
+    right: 0;
+    text-align: right;
+}
+
+.hidden {
+    display: none !important;
+}

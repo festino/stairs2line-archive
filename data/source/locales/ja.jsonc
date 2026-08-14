@@ -33,6 +33,7 @@
     "created": "{date}に制作",
     "knownNotAfter": "{date}以前に存在",
     "firstPost": "最初に確認された投稿: {date}",
+    "artworkVersions": "作品バージョン",
     "genericDescription": "stairs2line の作品。{versions}バージョン、{media}メディア。"
   },
   "posts": {

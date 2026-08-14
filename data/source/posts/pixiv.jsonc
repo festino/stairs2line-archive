@@ -344,7 +344,7 @@
         "ja": "てん死"
       },
       "description": {
-        "ja": "てらさん(user/2764844 https://www.pixiv.net/en/users/2764844)ちの子です"
+        "ja": "てらさん({user/2764844|https://www.pixiv.net/en/users/2764844})ちの子です"
       },
       "legacyAutoLink": true,
       "media": [

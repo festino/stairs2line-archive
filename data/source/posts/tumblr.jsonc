@@ -622,7 +622,7 @@
       "publishedAt": "2026-01-17T15:05:10.000Z",
       "originalLanguage": "ja",
       "description": {
-        "ja": "寝続ける\nhttps://www.tumblr.com/michinoku800/92164287224"
+        "ja": "寝続ける\n{https://www.tumblr.com/michinoku800/92164287224|https://www.tumblr.com/michinoku800/92164287224}"
       },
       "legacyAutoLink": true,
       "media": [
@@ -1566,8 +1566,7 @@
       "originalLanguage": "ja",
       "legacyAutoLink": true,
       "media": [
-        "artwork-0222/v02/m01",
-        "artwork-0224/v02/m01"
+        "artwork-0222/v02/m01"
       ]
     },
     {

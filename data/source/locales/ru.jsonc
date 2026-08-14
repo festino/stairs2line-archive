@@ -33,6 +33,7 @@
     "created": "Создано {date}",
     "knownNotAfter": "Известно не позднее {date}",
     "firstPost": "Первая известная публикация: {date}",
+    "artworkVersions": "Версии работы",
     "genericDescription": "Artwork stairs2line: {versions} версий, {media} медиафайлов."
   },
   "posts": {

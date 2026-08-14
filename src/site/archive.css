@@ -266,6 +266,13 @@ h2 {
 
 .post-date {
   color: var(--muted);
+  display: flex;
+  gap: 0.5em;
+  text-decoration: none;
+}
+
+.post-date time {
+  text-decoration: underline;
 }
 
 .status {

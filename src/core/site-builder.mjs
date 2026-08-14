@@ -11,6 +11,38 @@ const SCOPE_FILTERS = {
   all: ['top', 'major', 'sketchy', 'decorative']
 };
 
+function linkify(input) {
+  if (typeof input != "string") return input;
+
+  const re = /\{([^{}|]+)\|(https:\/\/[^{}\s]+)\}/g;
+
+  let result = "";
+  let lastIndex = 0;
+  let match;
+
+  while ((match = re.exec(input)) !== null) {
+    const [whole, label, url] = match;
+
+    result += escapeHtml(input.slice(lastIndex, match.index));
+
+    result += '<a href="' + escapeAttribute(url) + '" target="_blank" rel="noreferrer">' + escapeHtml(label) + "</a>";
+
+    lastIndex = match.index + whole.length;
+  }
+
+  result += escapeHtml(input.slice(lastIndex));
+
+  return result;
+}
+
+function stripLinks(input) {
+    if (typeof input != "string") return input;
+
+    const re = /\{([^{}|]+)\|(https:\/\/[^{}\s]+)\}/g;
+
+    return input.replace(re, (_, label) => label);
+}
+
 function normalizeBasePath(value) {
   const trimmed = String(value ?? '/').trim();
   if (!trimmed || trimmed === '/') return '/';
@@ -68,7 +100,7 @@ function platformLabel(platform, language, fallbackLanguage) {
 }
 
 function displayTitle(entity, language, fallbackLanguage) {
-  return localizedValue(entity.title, language, fallbackLanguage) ?? entity.id ?? entity.key;
+  return localizedValue(entity.title, language, fallbackLanguage);
 }
 
 function displayDescription(entity, language, fallbackLanguage) {
@@ -178,18 +210,21 @@ function renderPostCard(manifest, post, language, index) {
       <a class="post-platform" href="${escapeAttribute(routeUrl(manifest, language, `posts/platform/${encodeURIComponent(post.platform)}/`))}">
         ${icon ? `<img src="${escapeAttribute(icon)}" alt="">` : ''}<span>${escapeHtml(label)}</span>
       </a>
-      <a class="post-date" href="${escapeAttribute(href)}"><time${post.publishedAt ? ` datetime="${escapeAttribute(post.publishedAt)}"` : ''}>${escapeHtml(date)}</time></a>
-      <span class="status status-${escapeAttribute(post.status)}">${escapeHtml(localeText(manifest.locales, language, `common.${post.status}`))}</span>
+      <a class="post-date" href="${escapeAttribute(post.href)}" target="_blank" rel="noreferrer">
+        <time${post.publishedAt ? ` datetime="${escapeAttribute(post.publishedAt)}"` : ''}>${escapeHtml(date)}</time>
+        <span class="status status-${escapeAttribute(post.status)}">${escapeHtml(localeText(manifest.locales, language, `common.${post.status}`))}</span>
+      </a>
+      <a href="${escapeAttribute(href)}">1 ${escapeHtml(localeText(manifest.locales, language, `common.versions`))}</a>
     </header>
     <div class="post-body">
-      ${title ? `<h2><a href="${escapeAttribute(href)}">${escapeHtml(title)}</a></h2>` : ''}
-      ${description ? `<div class="post-text" lang="${escapeAttribute(post.originalLanguage)}">${escapeHtml(description).replaceAll('\n', '<br>')}</div>` : ''}
+      ${title ? `<h2>${escapeHtml(title)}</h2>` : ''}
+      ${description ? `<div class="post-text" lang="${escapeAttribute(post.originalLanguage)}">${linkify(description).replaceAll('\n', '<br>')}</div>` : ''}
       ${renderPostMedia(manifest, post, language, index)}
     </div>
-    <footer class="post-footer">
+    <!--<footer class="post-footer">
       <a href="${escapeAttribute(href)}">${escapeHtml(localeText(manifest.locales, language, 'common.open'))}</a>
       ${post.href ? `<a href="${escapeAttribute(post.href)}" target="_blank" rel="noreferrer">${escapeHtml(localeText(manifest.locales, language, 'common.source'))}</a>` : ''}
-    </footer>
+    </footer>-->
   </article>`;
 }
 
@@ -420,16 +455,17 @@ async function buildArtworkPages(outputRoot, manifest, language) {
       return mediaHtml;
     }).join('');
 
-    const body = `<div class="card-grid" data-paged-list>
-      ${versionHtml}
-    </div>`;
+    const body = `<article class="artwork-page">
+      <h1>${escapeHtml(localeText(manifest.locales, language, 'artworks.artworkVersions'))}</h1>
+      <div class="card-grid" data-paged-list>${versionHtml}</div>
+    </article>`;
     const artworkImage = artwork.versions
       .flatMap((version) => version.mediaIds)
       .map((mediaId) => manifest.media[mediaId]?.displayFile)
       .find(Boolean);
     await writePage(outputRoot, manifest, language, `artworks/${artwork.slug}`, layout(manifest, language, `artworks/${artwork.slug}/`, {
       title: `${title} · stairs2line`,
-      description,
+      description: stripLinks(description),
       image: artworkImage,
       body
     }));
@@ -552,7 +588,7 @@ async function buildPostPages(outputRoot, manifest, language) {
       .find(Boolean);
     await writePage(outputRoot, manifest, language, `posts/${encodeURIComponent(post.platform)}/${encodeURIComponent(post.id)}`, layout(manifest, language, `posts/${encodeURIComponent(post.platform)}/${encodeURIComponent(post.id)}/`, {
       title: `${title} · stairs2line`,
-      description,
+      description: stripLinks(description),
       image: postImage,
       body
     }));

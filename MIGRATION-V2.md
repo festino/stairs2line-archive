@@ -2,17 +2,21 @@
 
 ## Versioned posts and filename media references
 
-Post data keeps only stable identity/date fields on the post itself. Everything that can change is stored in ordered `versions`; the last entry is the current version used by listings.
+Post data keeps stable identity and publication date on the post object itself, together with the current known availability of the original post. Editable content is stored in ordered `versions`; the last entry is the current version used by listings. `status` describes only whether the original post is still available. It is not a property of an edited version.
 
 ```json
 {
   "key": "tumblr:61704687471",
   "platform": "tumblr",
   "id": "61704687471",
+  "status": "deleted",
   "publishedAt": "2013-09-20T00:00:00.000Z",
   "versions": [
     {
-      "status": "deleted",
+      "firstRebloggedAt": "2013-09-20T01:42:17.000Z",
+      "reblogs": [
+        { "blog": "example-reblogger", "id": "61705200123" }
+      ],
       "title": { "ja": "..." },
       "description": { "ja": "..." },
       "media": [
@@ -36,6 +40,10 @@ Post data keeps only stable identity/date fields on the post itself. Everything 
 `versions[].media` contains physical file paths relative to the archive media root, not artwork/media IDs. These paths are lookup keys: each one identifies the logical media item by naming one of its declared physical files, but it does not force the generated page to serve that exact file. Rendering resolves the logical media and then uses its lightest existing equivalent file.
 
 `layout[].display[].blocks` contains zero-based indexes into that post version's `media` array. Tumblr uses this field. Twitter/X derives its 1-4-image layout from media count and does not need a `layout` field.
+
+Tumblr versions may additionally carry reblog evidence. `firstRebloggedAt` is the earliest known timestamp of a **reblog** preserving that exact content/layout version; the original/root post itself is deliberately ignored when calculating it because its `publishedAt` already lives on the outer post. `reblogs` is the list of known live reblogs preserving the version and stores only `{ blog, id }`; generated pages reconstruct the Tumblr URL. The Tumblr import helper always emits `reblogs`, including an empty array, and emits `firstRebloggedAt: null` when a version has no reblog observation.
+
+The source schema still accepts legacy `versions[].status` during the v2.3 transition, but `upgrade` moves the effective value to `post.status` and removes it from version objects. New data should only use the top-level status.
 
 ## Versioned platform profiles
 
@@ -75,9 +83,16 @@ String avatar/banner paths are validated against the media root. Missing referen
 node src/cli.mjs upgrade --source data/source-v1 --output data/source-v2
 ```
 
-The command converts flat posts into `versions`, replaces legacy media IDs with the best matching declared physical filename to use as the lookup key, injects known Tumblr row layout data where available, and converts legacy flat platform profile fields to `platforms[].versions`. The migration report includes post and platform version counts. Review `ambiguousMediaReferences` when one media entity had several equally plausible files. `unresolvedMediaReferences` should be empty before treating the migration as complete.
+The command converts flat posts into `versions`, moves original-post availability to top-level `post.status`, removes legacy per-version status, replaces legacy media IDs with the best matching declared physical filename to use as the lookup key, injects known Tumblr row layout data where available, and converts legacy flat platform profile fields to `platforms[].versions`. The migration report includes post and platform version counts. Review `ambiguousMediaReferences` when one media entity had several equally plausible files. `unresolvedMediaReferences` should be empty before treating the migration as complete.
 
 The legacy `migrate` command remains an intermediate schema-v1 import because it runs before a physical media directory is known. Run `resolve` afterwards; `resolve` fills artwork file paths and upgrades posts and platform profiles to schema v2 automatically.
+
+
+### Tumblr snapshot/reblog importer
+
+`tools/tumblr_posts_to_v2.py <directory> -o data/source/posts/tumblr.jsonc` groups Tumblr API JSON files by root post, fingerprints the complete `description + media + layout`, and emits every unique version. Versions are ordered by the earliest reblog that preserves them. A direct JSON snapshot of the original/root post participates in content deduplication but never supplies `firstRebloggedAt`; a root-only version with no reblog evidence sorts after dated reblog versions. `--status alive|deleted` sets only the outer original-post availability.
+
+For each version the importer always writes a chronologically ordered `reblogs` list of Tumblr blog nickname + reblog id pairs. Duplicate input snapshots of the same reblog are collapsed. The earliest timestamp among those reblogs is written as `firstRebloggedAt`.
 
 ## Build and page behavior
 
@@ -120,11 +135,11 @@ Artwork media may optionally define a two-point registration for comparing versi
 }
 ```
 
-`viewerAnchor.points` contains exactly two distinct points in **pixel coordinates of that image**, and fractional coordinates are allowed. `viewerAnchor.file` names the declared physical file whose pixel coordinate system the numbers refer to. The field is optional; when it is omitted, the first declared existing image with known dimensions is used as the reference. The compiler rescales the coordinates to the lightest `displayFile`, so choosing a smaller equivalent file for the generated site does not change the intended registration.
+`viewerAnchor.points` contains exactly two distinct coordinates in the **pixel coordinate system of that image**, and fractional coordinates are allowed. The coordinates are not required to lie inside the image rectangle: negative values or values beyond width/height are valid and are useful when two versions are non-overlapping crops of the same larger source. `viewerAnchor.file` names the declared physical file whose pixel coordinate system is used. The field is optional; when it is omitted, the first declared existing image with known dimensions is used as the reference. The compiler rescales the coordinates to the lightest `displayFile`, so choosing a smaller equivalent file for the generated site does not change the intended registration.
 
 The pair represents translation and scale. Its midpoint is the stable position of the matched area and the distance between the two points defines the scale. Point order does **not** imply mirroring or rotation. For orientation changes, `viewerAnchor.flipX` and `viewerAnchor.rotation` are optional: omitted `flipX` means `false`, and omitted `rotation` means `0`. `flipX: true` mirrors left/right first; `rotation` then rotates clockwise by the given number of degrees. Thus `flipX: true` together with `rotation: 180` is equivalent to a vertical flip. Arbitrary finite rotation values are accepted rather than only multiples of 90 degrees.
 
-When corresponding pairs are supplied for cropped/resized/reoriented versions, the common source pixels remain at the same screen coordinates while moving between them. The viewer transforms all four image corners before computing the bounds of **all** media in the artwork group, then fits the union of those bounds into the available stage. Consequently an uncropped or rotated version may occupy a larger rectangle than the current version, but no version can run outside the viewport and the registered common area does not jump or change screen scale. The visual orientation is applied to the regular `<img>`/`<video>` element with a CSS transform; the underlying downloadable file is not rewritten.
+When corresponding coordinate frames are supplied for cropped/resized/reoriented versions, the same source locations remain at the same screen coordinates while moving between them, even when some of those reference locations lie outside a particular crop. The viewer transforms all four image corners before computing the bounds of **all** media in the artwork group, then fits the union of those bounds into the available stage. Consequently an uncropped or rotated version may occupy a larger rectangle than the current version, but no version can run outside the viewport and the registered common area does not jump or change screen scale. The visual orientation is applied to the regular `<img>`/`<video>` element with a CSS transform; the underlying downloadable file is not rewritten.
 
 When `viewerAnchor` is absent, MediaViewer behaves as though the two points were the horizontal center of the top and bottom image edges: `(width / 2, 0)` and `(width / 2, height)`. Thus unregistered versions are aligned by height and centered horizontally. Explicit registration is recommended whenever cropping or resizing changed the relationship between the outer image bounds and the unchanged content.
 
@@ -133,3 +148,20 @@ These coordinates are used only on an individual artwork page while moving among
 MediaViewer reserves a separate scrollable row for metadata, so a tall portrait can no longer push the text below the viewport. Dates in the post-reference row are formatted through the browser locale rather than exposing raw ISO timestamps. The current post is kept in that row as a disabled `aria-current` item instead of being emitted a second time as a link.
 
 The entire empty side area directly to the left of the displayed full-size media is the previous-media hit target when one exists, and the entire corresponding area on the right is the next-media target. Hovering anywhere in either hit target highlights that whole side zone and brightens its larger dimmed thumbnail, so the visual affordance matches the clickable area instead of existing only around the thumbnail. Other empty backdrop space closes the viewer. The side targets end above the metadata row and automatically follow the rendered media bounds, so they do not cover the image. Touch devices can also move between media with a horizontal swipe; gestures beginning within 28 CSS pixels of a screen edge are deliberately ignored to avoid competing with browser/system back-forward gestures. Keyboard arrows and wheel navigation remain supported.
+
+## Admin artwork alignment editor
+
+The generated `/admin/` has an **Align versions** tab for preparing `viewerAnchor` values visually. The artwork selector intentionally includes only artworks with at least two versions. Choose one and the editor overlays the first declared `files[]` image from every usable media item in its versions. The selected layer can be dragged on the canvas or moved with the arrow keys, scaled, rotated, horizontally flipped, and given an independent preview opacity. Opacity is never written to source data. Alignment images use nearest-neighbour (`image-rendering: pixelated`) rendering so individual source pixels remain crisp when the editor is magnified.
+
+Layer **Pixel scale ×** is an absolute scale relative to the selected source image, not a scale relative to whatever size happened to fit the canvas. A value of `1` means one pixel in that source image has the same alignment-world size as one pixel in another layer at `1`; an unanchored layer therefore starts at `1`. For a pixel-art image that is itself a 2× nearest-neighbour upscale, entering `0.5` makes its original logical pixels match a non-upscaled version without guessing a viewport-dependent ratio. When valid existing `viewerAnchor` pairs are present, the editor restores their relative scale with one anchored layer as the `1` reference; unanchored layers still start at `1`.
+
+The alignment canvas has a separate **view camera** that never changes generated anchors. Initial layer geometry is kept in source-pixel units and the camera performs the initial fit instead of baking viewport fit into layer scale. The mouse wheel zooms around the pointer; the `+`/`-` keys and toolbar buttons zoom around the canvas center; `0` restores 100% view; and **Fit** (or `F`) fits the current transformed bounds of all layers without altering their alignment. Pan with the middle mouse button or hold Space while dragging. Camera zoom is applied when calculating each `<img>` element's final CSS size instead of scaling one already-rasterized parent element; this keeps nearest-neighbour rendering stable. Layer position is then applied on a separate wrapper with `translate3d(...)` rather than fractional CSS `left`/`top`, so fractional offsets are preserved for compositing and become visibly finer as the camera is zoomed. Selecting a layer raises that layer above the others, which is useful while matching details; per-layer opacity still controls the comparison blend.
+
+Movement is expressed in **alignment-world pixels**, independent of camera zoom. With **Snap 1 px** enabled (the default), dragging snaps to that grid and arrow keys move exactly 1 alignment pixel; `Shift` moves 10 and `Alt` allows 0.25-pixel subpixel adjustment. At Pixel scale `1`, one alignment pixel is one source pixel. Disabling Snap permits free fractional dragging, and the numeric X/Y fields accept arbitrary fractional values. For unanchored layers at Pixel scale `1`, initial placement also snaps the top-left source-pixel lattice to integer alignment coordinates, avoiding the old half-pixel phase difference between odd- and even-sized images. View zoom and pan are editor-only state and are neither emitted in generated JSON nor written to the artwork source file.
+
+The editor deliberately uses `media.files[0]` as the coordinate image. Anchors generated by this tool therefore omit `viewerAnchor.file`; after rebuilding, the compiler interprets the points in that first usable declared image's pixel coordinate system. If the first declared file is missing, is not an image, or has no known dimensions in the build catalog, that media item is not offered as an alignment layer.
+
+The two generated points are derived from the current overlay rather than requiring the user to click matching landmarks manually. They define a shared coordinate frame: the editor takes the first usable layer's vertical centre line as two stable world-space reference locations and maps those same locations back into every source image. This reproduces the relative translation and scale established visually, while `flipX` and `rotation` record orientation explicitly. A mapped point may be outside a cropped image (including negative coordinates), so no geometric overlap between every version is required. This is important for adjacent or near-adjacent crops of the same larger source. All point coordinates may be fractional pixels.
+
+The **Write anchors to source file** button generates the anchors and, in browsers that support the File System Access API, asks for local read/write access on first use. Select `data/source`, `data/source/artworks`, or the repository root; the admin data identifies the exact `artworks/*.jsonc` file containing the selected artwork. The editor updates only that artwork's media `viewerAnchor` values and writes the source document back. Existing leading line comments and all parsed data are retained, though the JSON body is normalized to two-space formatting. Rebuild the site afterwards so normal compiler validation checks the generated coordinates. Browsers without direct local-file access still show the generated anchor JSON for manual use.
+

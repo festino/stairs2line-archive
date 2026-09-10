@@ -144,7 +144,7 @@ function normalizeViewerAnchor(value, declaredFiles, displayFile, filesByPath, i
     ? value.points.map((point) => ({ x: Number(point?.x), y: Number(point?.y) }))
     : [];
   const validPointShape = points.length === 2 && points.every((point) =>
-    Number.isFinite(point.x) && Number.isFinite(point.y) && point.x >= 0 && point.y >= 0
+    Number.isFinite(point.x) && Number.isFinite(point.y)
   );
   const span = validPointShape
     ? Math.hypot(points[1].x - points[0].x, points[1].y - points[0].y)
@@ -169,19 +169,15 @@ function normalizeViewerAnchor(value, declaredFiles, displayFile, filesByPath, i
   const referenceDeclared = !requestedReference || declaredFiles.includes(requestedReference);
   const referenceUsable = reference?.width > 0 && reference?.height > 0 && reference.mimeType?.startsWith('image/');
   const displayUsable = displayFile?.width > 0 && displayFile?.height > 0 && displayFile.mimeType?.startsWith('image/');
-  const pointsInBounds = validPointShape && referenceUsable && points.every((point) =>
-    point.x <= reference.width && point.y <= reference.height
-  );
 
-  if (!validPointShape || span <= 1e-9 || !validFlipX || !validRotation || !referenceDeclared || !referenceUsable || !displayUsable || !pointsInBounds) {
+  if (!validPointShape || span <= 1e-9 || !validFlipX || !validRotation || !referenceDeclared || !referenceUsable || !displayUsable) {
     const details = [];
-    if (!validPointShape) details.push('viewerAnchor.points must contain exactly two finite non-negative {x, y} pixel coordinates');
+    if (!validPointShape) details.push('viewerAnchor.points must contain exactly two finite {x, y} coordinates in the reference image pixel coordinate system');
     else if (span <= 1e-9) details.push('viewerAnchor.points must be two distinct points');
     if (!validFlipX) details.push('viewerAnchor.flipX must be a boolean when present');
     if (!validRotation) details.push('viewerAnchor.rotation must be a finite number of degrees when present');
     if (!referenceDeclared) details.push("viewerAnchor.file must name one of this media item's declared files");
     if (!referenceUsable) details.push('viewerAnchor requires a declared image file with known pixel dimensions');
-    if (referenceUsable && !pointsInBounds) details.push(`viewerAnchor points must fit inside ${reference.width}x${reference.height} reference pixels`);
     if (!displayUsable) details.push('viewerAnchor requires the selected display file to be an image with known pixel dimensions');
     issues.add({
       severity: 'error',
@@ -198,7 +194,7 @@ function normalizeViewerAnchor(value, declaredFiles, displayFile, filesByPath, i
   const scaleY = displayFile.height / reference.height;
   return {
     viewerAnchor: {
-      file: referenceFile,
+      ...(requestedReference ? { file: referenceFile } : {}),
       points,
       ...(hasFlipX ? { flipX } : {}),
       ...(hasRotation ? { rotation } : {})
@@ -278,6 +274,7 @@ function sourcePostVersions(post) {
     key,
     platform,
     id,
+    status,
     publishedAt,
     __source,
     ...legacyVersion
@@ -406,6 +403,67 @@ function placeholderFile(mediaId) {
     postKey: null,
     placeholder: true
   };
+}
+
+function normalizePostReblogs(issues, postKey, source, sourceVersion, versionIndex) {
+  const entityId = `${postKey}#${versionIndex + 1}`;
+  const raw = sourceVersion.reblogs;
+  if (raw == null) return [];
+  if (!Array.isArray(raw)) {
+    issues.add({
+      severity: 'error',
+      code: 'post.reblogs-invalid',
+      entityType: 'postVersion',
+      entityId,
+      source,
+      details: 'reblogs must be an array'
+    });
+    return [];
+  }
+
+  const result = [];
+  const seen = new Set();
+  for (const item of raw) {
+    const blog = typeof item?.blog === 'string' ? item.blog.trim() : '';
+    const id = item?.id == null ? '' : String(item.id).trim();
+    if (!blog || !id) {
+      issues.add({
+        severity: 'error',
+        code: 'post.reblog-invalid',
+        entityType: 'postVersion',
+        entityId,
+        source,
+        details: JSON.stringify(item)
+      });
+      continue;
+    }
+    const key = `${blog}|${id}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    result.push({
+      blog,
+      id,
+      href: `https://www.tumblr.com/${encodeURIComponent(blog)}/${encodeURIComponent(id)}`
+    });
+  }
+  return result;
+}
+
+function normalizeFirstRebloggedAt(issues, postKey, source, sourceVersion, versionIndex) {
+  if (sourceVersion.firstRebloggedAt == null) return null;
+  const value = String(sourceVersion.firstRebloggedAt);
+  if (Number.isNaN(Date.parse(value))) {
+    issues.add({
+      severity: 'error',
+      code: 'post.first-reblogged-at-invalid',
+      entityType: 'postVersion',
+      entityId: `${postKey}#${versionIndex + 1}`,
+      source,
+      details: value
+    });
+    return null;
+  }
+  return value;
 }
 
 function inferTwitterMediaUpload(filePath) {
@@ -815,17 +873,46 @@ export async function compileArchive(source, options = {}) {
       });
     }
 
+    // Availability belongs to the original post, not to individual edited
+    // snapshots. Keep accepting legacy versions[].status so existing v2.3
+    // source trees remain buildable, but prefer the canonical post.status.
+    const legacyStatuses = rawVersions
+      .map((version) => version?.status)
+      .filter((status) => ['alive', 'deleted'].includes(status));
+    const declaredPostStatus = sourcePost.status ?? legacyStatuses.at(-1) ?? null;
+    if (!['alive', 'deleted'].includes(declaredPostStatus)) {
+      issues.add({
+        severity: 'error',
+        code: 'post.invalid-status',
+        entityType: 'post',
+        entityId: key,
+        source,
+        details: String(declaredPostStatus)
+      });
+    }
+    const effectivePostStatus = sourcePost.publishedAt && ['alive', 'deleted'].includes(declaredPostStatus)
+      ? declaredPostStatus
+      : 'deleted';
+    if (!sourcePost.publishedAt && declaredPostStatus === 'alive') {
+      issues.add({
+        severity: 'warning',
+        code: 'post.date-missing-treated-deleted',
+        entityType: 'post',
+        entityId: key,
+        source
+      });
+    }
+
     for (const [versionIndex, sourceVersion] of rawVersions.entries()) {
       const versionEntityId = `${key}#${versionIndex + 1}`;
-      const declaredStatus = sourceVersion.status;
-      if (!['alive', 'deleted'].includes(declaredStatus)) {
+      if (sourceVersion.status != null && !['alive', 'deleted'].includes(sourceVersion.status)) {
         issues.add({
           severity: 'error',
           code: 'post.invalid-status',
           entityType: 'postVersion',
           entityId: versionEntityId,
           source,
-          details: String(declaredStatus)
+          details: String(sourceVersion.status)
         });
       }
 
@@ -834,17 +921,6 @@ export async function compileArchive(source, options = {}) {
       }
       if (sourceVersion.description) {
         validateLocalizedField(issues, 'postVersion', versionEntityId, source, 'description', sourceVersion.description, languages, false);
-      }
-
-      const effectiveStatus = sourcePost.publishedAt ? declaredStatus : 'deleted';
-      if (!sourcePost.publishedAt && declaredStatus === 'alive') {
-        issues.add({
-          severity: 'warning',
-          code: 'post.date-missing-treated-deleted',
-          entityType: 'postVersion',
-          entityId: versionEntityId,
-          source
-        });
       }
 
       const rawMedia = [...(sourceVersion.media ?? [])];
@@ -943,12 +1019,20 @@ export async function compileArchive(source, options = {}) {
       }
 
       validatePostLayout(issues, key, source, sourceVersion.layout, mediaRefs.length, versionIndex);
+      const reblogEvidenceDefined = hasOwn(sourceVersion, 'firstRebloggedAt') || hasOwn(sourceVersion, 'reblogs');
+      const firstRebloggedAt = normalizeFirstRebloggedAt(issues, key, source, sourceVersion, versionIndex);
+      const reblogs = normalizePostReblogs(issues, key, source, sourceVersion, versionIndex);
 
       const version = {
         index: versionIndex,
         account: sourceVersion.account ?? platform?.defaultAccount ?? null,
-        status: effectiveStatus,
-        declaredStatus,
+        // Retained on the compiled version for viewer/UI compatibility; this
+        // is inherited from the original post and is not version metadata.
+        status: effectivePostStatus,
+        declaredStatus: declaredPostStatus,
+        firstRebloggedAt,
+        reblogs,
+        reblogEvidenceDefined,
         originalLanguage: sourceVersion.originalLanguage ?? defaultLanguage,
         title: sourceVersion.title ?? {},
         description: sourceVersion.description ?? {},
@@ -964,8 +1048,11 @@ export async function compileArchive(source, options = {}) {
 
     const currentVersion = versions.at(-1) ?? {
       account: platform?.defaultAccount ?? null,
-      status: sourcePost.publishedAt ? 'deleted' : 'deleted',
-      declaredStatus: 'deleted',
+      status: effectivePostStatus,
+      declaredStatus: declaredPostStatus,
+      firstRebloggedAt: null,
+      reblogs: [],
+      reblogEvidenceDefined: false,
       originalLanguage: defaultLanguage,
       title: {},
       description: {},
@@ -984,8 +1071,8 @@ export async function compileArchive(source, options = {}) {
       versionCount: versions.length,
       currentVersionIndex: Math.max(0, versions.length - 1),
       account: currentVersion.account,
-      status: currentVersion.status,
-      declaredStatus: currentVersion.declaredStatus,
+      status: effectivePostStatus,
+      declaredStatus: declaredPostStatus,
       originalLanguage: currentVersion.originalLanguage,
       title: currentVersion.title,
       description: currentVersion.description,

@@ -72,12 +72,10 @@
                 ],
                 "properties": {
                   "x": {
-                    "type": "number",
-                    "minimum": 0
+                    "type": "number"
                   },
                   "y": {
-                    "type": "number",
-                    "minimum": 0
+                    "type": "number"
                   }
                 },
                 "additionalProperties": false
@@ -290,16 +288,32 @@
       },
       "additionalProperties": false
     },
-    "postVersion": {
+    "postReblog": {
       "type": "object",
       "required": [
-        "status"
+        "blog",
+        "id"
       ],
+      "properties": {
+        "blog": {
+          "type": "string",
+          "minLength": 1
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "postVersion": {
+      "type": "object",
       "properties": {
         "account": {
           "type": "string"
         },
         "status": {
+          "description": "Legacy compatibility only. Canonical v2.3 source stores availability of the original post in post.status, not in individual versions.",
           "enum": [
             "alive",
             "deleted"
@@ -335,6 +349,21 @@
         },
         "migration": {
           "type": "object"
+        },
+        "firstRebloggedAt": {
+          "description": "Earliest known timestamp of a reblog preserving this version. null means no reblog observation is available.",
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "reblogs": {
+          "description": "Known live Tumblr reblogs preserving this version. Source stores only blog nickname and reblog post id; the URL is reconstructed at build time.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/postReblog"
+          }
         }
       },
       "additionalProperties": false
@@ -369,6 +398,13 @@
           "items": {
             "$ref": "#/$defs/postVersion"
           }
+        },
+        "status": {
+          "description": "Availability of the original post itself. Version snapshots do not have independent alive/deleted status.",
+          "enum": [
+            "alive",
+            "deleted"
+          ]
         }
       },
       "additionalProperties": false

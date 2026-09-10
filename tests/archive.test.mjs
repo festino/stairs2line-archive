@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
 import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
@@ -86,10 +87,10 @@ function fixtureSource() {
         key: 'twitter:123456789012345678',
         platform: 'twitter',
         id: '123456789012345678',
+        status: 'alive',
         publishedAt: '2020-01-01T00:00:00Z',
         versions: [
           {
-            status: 'alive',
             originalLanguage: 'ja',
             description: { ja: '説明' },
             media: [TWITTER_FILE]
@@ -101,9 +102,9 @@ function fixtureSource() {
         key: 'pixiv:999',
         platform: 'pixiv',
         id: '999',
+        status: 'alive',
         versions: [
           {
-            status: 'alive',
             originalLanguage: 'ja',
             media: [PIXIV_FILE]
           }
@@ -161,9 +162,9 @@ function twitterLayoutSource(counts = [1, 2, 3, 4]) {
     key: `twitter:20000000000000000${count}`,
     platform: 'twitter',
     id: `20000000000000000${count}`,
+    status: 'alive',
     publishedAt: `2024-01-0${count}T00:00:00Z`,
     versions: [{
-      status: 'alive',
       originalLanguage: 'en',
       description: { en: `${count} image layout` },
       media: TWITTER_LAYOUT_FILES.slice(0, count)
@@ -283,15 +284,14 @@ test('post versions keep mutable fields and layout independent', async () => {
       key: 'tumblr:42',
       platform: 'tumblr',
       id: '42',
+      status: 'deleted',
       publishedAt: '2020-02-01T00:00:00Z',
       versions: [
         {
-          status: 'alive',
           title: { en: 'First' },
           media: [TWITTER_FILE]
         },
         {
-          status: 'deleted',
           title: { en: 'Second' },
           media: [PIXIV_FILE],
           layout: [{ type: 'rows', display: [{ blocks: [0] }] }]
@@ -433,8 +433,9 @@ test('post index uses month activity cells with post thumbnails and no artwork/v
     key: 'twitter:123456789012345679',
     platform: 'twitter',
     id: '123456789012345679',
+    status: 'alive',
     publishedAt: '2020-01-20T00:00:00Z',
-    versions: [{ status: 'alive', originalLanguage: 'en', title: { en: 'Second January post' }, media: [TWITTER_FILE] }],
+    versions: [{ originalLanguage: 'en', title: { en: 'Second January post' }, media: [TWITTER_FILE] }],
     __source: '/source/posts/twitter.jsonc'
   });
   const compilation = await compileArchive(source, { mediaRoot });
@@ -633,8 +634,8 @@ test('artwork media may define two pixel viewer anchor points used only on the a
   assert.deepEqual(anchorSchema.required, ['points']);
   assert.equal(anchorSchema.properties.points.minItems, 2);
   assert.equal(anchorSchema.properties.points.maxItems, 2);
-  assert.equal(anchorSchema.properties.points.items.properties.x.minimum, 0);
-  assert.equal(anchorSchema.properties.points.items.properties.y.minimum, 0);
+  assert.equal(Object.hasOwn(anchorSchema.properties.points.items.properties.x, 'minimum'), false);
+  assert.equal(Object.hasOwn(anchorSchema.properties.points.items.properties.y, 'minimum'), false);
   assert.equal(anchorSchema.properties.flipX.type, 'boolean');
   assert.equal(anchorSchema.properties.rotation.type, 'number');
 });
@@ -713,6 +714,131 @@ test('viewer anchor pixels are rescaled from an explicit reference file to the l
       { x: 300, y: 300 }
     ]
   });
+});
+
+test('omitted viewerAnchor.file stays omitted and uses the first usable declared image as its coordinate reference', async () => {
+  const mediaRoot = await createMediaFixture();
+  const source = fixtureSource();
+  source.artworks[0].versions[0].media[0].files = [TWITTER_FILE, PIXIV_FILE];
+  source.artworks[0].versions[0].media[0].viewerAnchor = {
+    points: [
+      { x: 40.5, y: 80.25 },
+      { x: 320.75, y: 300.5 }
+    ]
+  };
+
+  const compilation = await compileArchive(source, { mediaRoot });
+  assert.deepEqual(compilation.manifest.media[MEDIA_ID].viewerAnchor, {
+    points: [
+      { x: 40.5, y: 80.25 },
+      { x: 320.75, y: 300.5 }
+    ]
+  });
+  assert.equal(Object.hasOwn(compilation.manifest.media[MEDIA_ID].viewerAnchor, 'file'), false);
+});
+
+
+
+test('viewer anchors may use coordinates outside a cropped image so non-overlapping crops can share one alignment frame', async () => {
+  const mediaRoot = await createMediaFixture();
+  const source = fixtureSource();
+  source.artworks[0].versions[0].media[0].viewerAnchor = {
+    file: TWITTER_FILE,
+    points: [
+      { x: -125.5, y: 80.25 },
+      { x: 620.75, y: 510.5 }
+    ]
+  };
+
+  const compilation = await compileArchive(source, { mediaRoot });
+  assert.deepEqual(compilation.manifest.media[MEDIA_ID].viewerAnchor, {
+    file: TWITTER_FILE,
+    points: [
+      { x: -125.5, y: 80.25 },
+      { x: 620.75, y: 510.5 }
+    ]
+  });
+  assert.deepEqual(compilation.manifest.media[MEDIA_ID].viewerAlignment, {
+    points: [
+      { x: -125.5, y: 80.25 },
+      { x: 620.75, y: 510.5 }
+    ]
+  });
+  assert.equal(compilation.issues.some((issue) => issue.code === 'media.viewer-anchor-invalid'), false);
+});
+test('admin exposes a visual artwork-version alignment editor and enough source metadata to write anchors back', async () => {
+  const mediaRoot = await createMediaFixture();
+  const secondFile = 'pixiv/998_p0.png';
+  await fs.writeFile(path.join(mediaRoot, secondFile), fakePng(520, 360, 50));
+
+  const source = fixtureSource();
+  source.artworks[0].versions.push({
+    id: 'v02',
+    scope: 'major',
+    media: [{
+      id: 'artwork-0001/v02/m01',
+      files: [secondFile]
+    }]
+  });
+  const compilation = await compileArchive(source, { mediaRoot });
+  const output = await fs.mkdtemp(path.join(os.tmpdir(), 'stairs2line-admin-alignment-'));
+  await buildStaticSite(compilation, source, output, { mediaRoot });
+
+  const adminData = JSON.parse(await fs.readFile(path.join(output, 'data', 'admin-data.json'), 'utf8'));
+  assert.equal(adminData.artworkSourceFiles['artwork-0001'], 'artworks/0001.jsonc');
+  assert.equal(adminData.files[TWITTER_FILE].width, 400);
+  assert.equal(adminData.files[TWITTER_FILE].height, 400);
+
+  const html = await fs.readFile(path.join(output, 'admin', 'index.html'), 'utf8');
+  const js = await fs.readFile(path.join(output, 'admin', 'admin.js'), 'utf8');
+  const css = await fs.readFile(path.join(output, 'admin', 'admin.css'), 'utf8');
+  assert.match(html, /data-tab="alignment"/);
+  assert.match(html, /id="alignment-stage"/);
+  assert.match(html, /id="alignment-write"/);
+  assert.match(html, /id="alignment-zoom-out"/);
+  assert.match(html, /id="alignment-zoom-value"/);
+  assert.match(html, /id="alignment-fit"/);
+  assert.match(js, /media\?\.declaredFiles\?\.\[0\]/);
+  assert.match(js, /function sharedAlignmentReferencePoints\(\)/);
+  assert.doesNotMatch(js, /no common overlap/);
+  assert.match(js, /function inverseLayerPoint\(layer, screenPoint\)/);
+  assert.match(js, /window\.showDirectoryPicker/);
+  assert.match(js, /media\.viewerAnchor = mediaAnchors\[media\.id\]/);
+  assert.match(js, /function setAlignmentZoom\(nextZoom, focalX, focalY\)/);
+  assert.match(js, /const width = worldWidth \* zoom/);
+  assert.match(js, /frame\.style\.zIndex = alignmentState\.activeLayerId === layer\.id \? '100'/);
+  assert.match(js, /frame\.style\.transform = `translate3d\(\$\{screenLeft\}px, \$\{screenTop\}px, 0\)`/);
+  assert.doesNotMatch(js, /image\.style\.left =/);
+  assert.doesNotMatch(js, /image\.style\.top =/);
+  assert.match(js, /panX \+ \(layer\.centerX - worldWidth \/ 2\) \* zoom/);
+  assert.doesNotMatch(js, /camera\.style\.transform = `translate\(/);
+  assert.match(js, /function alignmentMoveStep\(event\)/);
+  assert.match(js, /if \(event\?\.altKey\) return 0\.25/);
+  assert.match(js, /const amount = alignmentMoveStep\(event\)/);
+  assert.doesNotMatch(js, /const amount = \(event\.shiftKey \? 10 : 1\) \/ alignmentState\.view\.zoom/);
+  assert.match(js, /Math\.round\(layer\.centerX - layer\.width \/ 2\)/);
+  assert.match(js, /function fitAlignmentView\(\)/);
+  assert.match(js, /addEventListener\('wheel', onAlignmentWheel, \{ passive: false \}\)/);
+  assert.match(js, /event\.button === 1 \|\| \(event\.button === 0 && alignmentState\.spacePressed\)/);
+  assert.match(js, /const dx = \(event\.clientX - drag\.startX\) \/ alignmentState\.view\.zoom/);
+  assert.match(js, /layer\.centerX = drag\.centerX \+ snapAlignmentDelta\(dx, event\)/);
+  assert.match(js, /if \(\(artwork\.versions\?\.length \?\? 0\) > 1\)/);
+  assert.match(js, /layer\.scale = control\.valueAsNumber/);
+  assert.doesNotMatch(js, /layer\.initial\.scale \* control\.valueAsNumber/);
+  assert.match(js, /reference\?\.explicit && geometry\.explicit/);
+  assert.match(html, /Write anchors to source file/);
+  assert.match(html, /Mouse wheel zooms around the pointer/);
+  assert.match(html, /id="alignment-snap" checked/);
+  assert.match(html, /Movement is independent of view zoom/);
+  assert.match(html, /Pixel scale uses source-image pixels/);
+  assert.match(css, /\.alignment-camera/);
+  assert.match(css, /\.alignment-view-toolbar/);
+  assert.match(css, /\.alignment-layer-frame/);
+  assert.match(css, /\.alignment-layer-image/);
+  assert.match(css, /image-rendering:\s*crisp-edges/);
+  assert.match(css, /image-rendering:\s*pixelated/);
+  assert.doesNotMatch(css, /\.alignment-camera\s*\{[\s\S]*?will-change:\s*transform/);
+  assert.match(css, /\.alignment-control-grid/);
 });
 
 test('invalid artwork viewer anchors are reported and ignored', async () => {
@@ -932,4 +1058,62 @@ test('media already linked to a known Twitter post is not duplicated as a recove
 
   const compilation = await compileArchive(source, { mediaRoot });
   assert.equal(compilation.manifest.posts.some((post) => post.recovery?.kind === 'media-only'), false);
+});
+
+
+test('canonical post status is top-level and Tumblr versions preserve reblog evidence', async () => {
+  const mediaRoot = await createMediaFixture();
+  const source = fixtureSource();
+  source.posts = [{
+    key: 'tumblr:95168716109',
+    platform: 'tumblr',
+    id: '95168716109',
+    status: 'deleted',
+    publishedAt: '2014-08-19T06:00:15.000Z',
+    versions: [{
+      firstRebloggedAt: '2014-09-29T19:25:57.000Z',
+      reblogs: [{ blog: 'tessreblawgs', id: '98743112708' }],
+      originalLanguage: 'ja',
+      description: { ja: 'むむむ' },
+      media: [PIXIV_FILE]
+    }],
+    __source: '/source/posts/tumblr.jsonc'
+  }];
+
+  const compilation = await compileArchive(source, { mediaRoot });
+  const post = compilation.manifest.posts[0];
+  assert.equal(post.status, 'deleted');
+  assert.equal(post.versions[0].status, 'deleted');
+  assert.equal(post.versions[0].firstRebloggedAt, '2014-09-29T19:25:57.000Z');
+  assert.deepEqual(post.versions[0].reblogs, [{
+    blog: 'tessreblawgs',
+    id: '98743112708',
+    href: 'https://www.tumblr.com/tessreblawgs/98743112708'
+  }]);
+  assert.equal(post.versions[0].reblogEvidenceDefined, true);
+  assert.equal(compilation.issues.some((issue) => issue.code === 'post.invalid-status'), false);
+
+  const output = await fs.mkdtemp(path.join(os.tmpdir(), 'stairs2line-tumblr-reblogs-'));
+  await buildStaticSite(compilation, source, output, { mediaRoot });
+  const detailHtml = await fs.readFile(path.join(output, 'en', 'posts', 'tumblr', '95168716109', 'index.html'), 'utf8');
+  assert.match(detailHtml, /Earliest known reblog:/);
+  assert.match(detailHtml, /September 29, 2014/);
+  assert.match(detailHtml, /Preserved reblogs:/);
+  assert.match(detailHtml, /https:\/\/www\.tumblr\.com\/tessreblawgs\/98743112708/);
+  assert.match(detailHtml, />@tessreblawgs</);
+
+  const schema = JSON.parse(await fs.readFile(new URL('../schemas/archive-source.schema.json', import.meta.url), 'utf8'));
+  assert.equal(schema.$defs.postVersion.required, undefined);
+  assert.deepEqual(schema.$defs.post.properties.status.enum, ['alive', 'deleted']);
+  assert.deepEqual(schema.$defs.postVersion.properties.firstRebloggedAt.type, ['string', 'null']);
+  assert.equal(schema.$defs.postVersion.properties.reblogs.items.$ref, '#/$defs/postReblog');
+});
+
+test('upgrade moves legacy per-version post status to the original post', () => {
+  const source = fixtureSource();
+  const upgraded = upgradeSourcePosts(source);
+  assert.equal(upgraded.posts[0].status, 'alive');
+  assert.equal(Object.hasOwn(upgraded.posts[0].versions[0], 'status'), false);
+  assert.equal(upgraded.posts[1].status, 'alive');
+  assert.equal(Object.hasOwn(upgraded.posts[1].versions[0], 'status'), false);
 });

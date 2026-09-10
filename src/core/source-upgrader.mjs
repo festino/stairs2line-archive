@@ -164,6 +164,7 @@ function legacyVersionFromPost(post) {
     key,
     platform,
     id,
+    status,
     publishedAt,
     __source,
     ...mutable
@@ -180,6 +181,8 @@ function publicVersion(post, version, mediaById, report) {
   delete migrated.platform;
   delete migrated.id;
   delete migrated.publishedAt;
+  // Availability is a property of the original post, never an edited version.
+  delete migrated.status;
   delete migrated.legacyAutoLink;
   delete migrated.__source;
   return compactObject(migrated);
@@ -209,6 +212,10 @@ export function upgradeSourcePosts(source) {
     const sourceVersions = Array.isArray(post.versions) && post.versions.length > 0
       ? post.versions
       : [legacyVersionFromPost(post)];
+    const legacyStatus = [...sourceVersions].reverse()
+      .map((version) => version?.status)
+      .find((status) => ['alive', 'deleted'].includes(status));
+    const status = ['alive', 'deleted'].includes(post.status) ? post.status : (legacyStatus ?? 'deleted');
     const versions = sourceVersions.map((version) => publicVersion(post, version, mediaById, report));
 
     if (post.platform === 'tumblr' && KNOWN_TUMBLR_LAYOUTS.has(key) && versions.length > 0 && !versions.at(-1).layout) {
@@ -222,6 +229,7 @@ export function upgradeSourcePosts(source) {
       key,
       platform: post.platform,
       id: String(post.id),
+      status,
       ...(post.publishedAt ? { publishedAt: post.publishedAt } : {}),
       versions,
       __source: post.__source

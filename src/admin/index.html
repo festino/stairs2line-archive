@@ -9,13 +9,14 @@
 <body>
   <header>
     <h1>stairs2line archive editor</h1>
-    <p>This page generates JSON fragments and never writes to the repository directly.</p>
+    <p>Most sections generate JSON fragments. The version-alignment tool can also write <code>viewerAnchor</code> values to a local source file after you explicitly grant browser file-system access.</p>
   </header>
   <nav class="tabs" aria-label="Editor sections">
     <button type="button" data-tab="validation" class="active">Validation</button>
     <button type="button" data-tab="posts">Posts</button>
     <button type="button" data-tab="platforms">Platforms</button>
     <button type="button" data-tab="artworks">Artworks</button>
+    <button type="button" data-tab="alignment">Align versions</button>
     <button type="button" data-tab="media">Media</button>
     <button type="button" data-tab="dates">Dates</button>
   </nav>
@@ -35,9 +36,12 @@
           </label>
           <label>Platform <input id="post-platform" required></label>
           <label>External ID <input id="post-id" required></label>
+          <label>Original post status
+            <select id="post-status"><option value="alive">alive</option><option value="deleted">deleted</option></select>
+          </label>
           <label>Published at <input id="post-date" placeholder="2026-01-17T12:00:00Z"></label>
           <label>Versions JSON <textarea id="post-versions" rows="22" spellcheck="false"></textarea></label>
-          <p>Version objects contain every mutable field, including status, account, URL, localized text, physical media file paths, and Tumblr layout.</p>
+          <p>Original post availability is stored above. Version objects contain mutable content plus optional Tumblr <code>firstRebloggedAt</code> and <code>reblogs</code> evidence.</p>
           <div class="actions">
             <button type="submit">Generate</button>
             <button type="button" data-download="post-output">Download JSON</button>
@@ -90,6 +94,46 @@
         </form>
         <pre id="artwork-output"></pre>
       </div>
+    </section>
+
+    <section data-panel="alignment">
+      <div class="alignment-heading">
+        <div>
+          <h2>Artwork version alignment</h2>
+          <p>Overlay the first file of each media item, place the versions in their shared source-image coordinate system, then write matching <code>viewerAnchor</code> values back to the artwork source file. Crops do not need to overlap. Opacity is preview-only.</p>
+        </div>
+        <div class="alignment-toolbar">
+          <label>Artwork
+            <select id="alignment-artwork"><option value="">Choose artwork</option></select>
+          </label>
+          <button type="button" id="alignment-reset" disabled>Reset</button>
+          <button type="button" id="alignment-write" disabled>Write anchors to source file</button>
+        </div>
+      </div>
+      <p id="alignment-source" class="alignment-source"></p>
+      <p id="alignment-status" class="alignment-status" aria-live="polite"></p>
+      <div class="alignment-workspace">
+        <div class="alignment-stage-shell">
+          <div class="alignment-view-toolbar" aria-label="Canvas view controls">
+            <span>View</span>
+            <button type="button" id="alignment-zoom-out" title="Zoom out" aria-label="Zoom out" disabled>−</button>
+            <output id="alignment-zoom-value" aria-live="polite">100%</output>
+            <button type="button" id="alignment-zoom-in" title="Zoom in" aria-label="Zoom in" disabled>+</button>
+            <button type="button" id="alignment-zoom-reset" title="Reset view camera" disabled>100%</button>
+            <button type="button" id="alignment-fit" title="Fit all layers in the canvas" disabled>Fit</button>
+            <label class="alignment-snap"><input type="checkbox" id="alignment-snap" checked> Snap 1 px</label>
+          </div>
+          <div id="alignment-stage" class="alignment-stage" tabindex="0" aria-label="Artwork version alignment canvas">
+            <div class="alignment-empty">Choose an artwork with at least two image versions.</div>
+          </div>
+          <p class="alignment-help">Drag to move the selected layer. The selected layer is raised above the others. With Snap 1 px enabled, dragging and arrow keys move on the alignment pixel grid; Shift uses 10 px and Alt uses 0.25 px for deliberate subpixel adjustment. Movement is independent of view zoom, and numeric X/Y offsets keep fractional values. Mouse wheel zooms around the pointer; middle-button drag or Space + drag pans. +/− zoom, 0 resets the view, and F fits all layers. Images are rasterized at their final screen size with nearest-neighbour rendering. Pixel scale uses source-image pixels: layers at 1 have equally sized source pixels; 0.5 is convenient for a 2× pixel-art upscale. View zoom/pan and opacity are preview-only; pixel scale, rotation, flip, and position affect generated anchors.</p>
+        </div>
+        <aside id="alignment-layers" class="alignment-layers" aria-label="Version layers"></aside>
+      </div>
+      <details class="alignment-output-wrap">
+        <summary>Generated viewerAnchor values</summary>
+        <pre id="alignment-output"></pre>
+      </details>
     </section>
 
     <section data-panel="media">

@@ -775,7 +775,19 @@
               ],
               "files": [
                 "tumblr/57394894419_tumblr_mr1h3kMgta1s4v84ho1_1280.png"
-              ]
+              ],
+			  "viewerAnchor": {
+                "points": [
+                  {
+                    "x": 0,
+                    "y": 0
+                  },
+                  {
+                    "x": 746,
+                    "y": 891
+                  }
+                ]
+              }
             }
           ],
           "migration": {
@@ -793,7 +805,19 @@
               ],
               "files": [
                 "pixiv/37670521-1.png"
-              ]
+              ],
+			  "viewerAnchor": {
+                "points": [
+                  {
+                    "x": 0,
+                    "y": 94
+                  },
+                  {
+                    "x": 746,
+                    "y": 985
+                  }
+                ]
+              }
             }
           ],
           "migration": {

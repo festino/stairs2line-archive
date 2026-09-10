@@ -358,6 +358,29 @@ function renderPostMedia(manifest, post, version, language, index) {
   return `<div class="post-media-grid post-media-grid--${escapeAttribute(post.platform)} post-media-count-${mediaRefs.length}${platformLayoutClass}">${mediaRefs.map((mediaRef, mediaIndex) => `<div class="post-media-item">${mediaRefElement(manifest, mediaRef, language, title, 'post', post.key, { eager: index === 0 && mediaIndex === 0, versionIndex: version.index })}</div>`).join('')}</div>`;
 }
 
+function renderPostVersionEvidence(manifest, post, version, language) {
+  if (post.platform !== 'tumblr' || !version.reblogEvidenceDefined) return '';
+  const firstRebloggedAt = version.firstRebloggedAt
+    ? formatDate(version.firstRebloggedAt, language, { includeTime: true })
+    : null;
+  const firstLine = firstRebloggedAt
+    ? `<p><span>${escapeHtml(localeText(manifest.locales, language, 'posts.firstRebloggedAt'))}</span> <time datetime="${escapeAttribute(version.firstRebloggedAt)}">${escapeHtml(firstRebloggedAt)}</time></p>`
+    : `<p><span>${escapeHtml(localeText(manifest.locales, language, 'posts.firstRebloggedAt'))}</span> ${escapeHtml(localeText(manifest.locales, language, 'posts.noKnownReblogDate'))}</p>`;
+  const reblogs = (version.reblogs ?? []).map((reblog) => {
+    const label = `@${reblog.blog}`;
+    return reblog.href
+      ? `<a href="${escapeAttribute(reblog.href)}" target="_blank" rel="noreferrer" title="${escapeAttribute(`${reblog.blog}/${reblog.id}`)}">${escapeHtml(label)}${externalLinkIcon()}</a>`
+      : `<span title="${escapeAttribute(`${reblog.blog}/${reblog.id}`)}">${escapeHtml(label)}</span>`;
+  });
+  const reblogList = reblogs.length > 0
+    ? reblogs.join('<span class="post-reblog-separator"> · </span>')
+    : `<span class="post-reblog-empty">${escapeHtml(localeText(manifest.locales, language, 'posts.noSavedReblogs'))}</span>`;
+  return `<div class="post-version-evidence">
+    ${firstLine}
+    <p><span>${escapeHtml(localeText(manifest.locales, language, 'posts.savedReblogs'))}</span> ${reblogList}</p>
+  </div>`;
+}
+
 function renderPostCard(manifest, post, language, index, options = {}) {
   const version = options.version ?? latestPostVersion(post);
   const platform = manifest.platforms.find((item) => item.id === post.platform);
@@ -384,7 +407,7 @@ function renderPostCard(manifest, post, language, index, options = {}) {
       ${platformMarkup}
       <a class="post-date" href="${escapeAttribute(originalHref ?? href)}" ${originalHref ? 'target="_blank" rel="noreferrer"' : ''}>
         <time${post.publishedAt ? ` datetime="${escapeAttribute(post.publishedAt)}"` : ''}>${escapeHtml(date)}</time>
-        <span class="status status-${escapeAttribute(version.status)}">${escapeHtml(localeText(manifest.locales, language, `common.${version.status}`))}</span>
+        <span class="status status-${escapeAttribute(post.status)}">${escapeHtml(localeText(manifest.locales, language, `common.${post.status}`))}</span>
         ${externalHint}
       </a>
       <a class="post-version-count" href="${escapeAttribute(href)}">${versionCount} ${escapeHtml(localeText(manifest.locales, language, `common.versions`))}</a>
@@ -393,6 +416,7 @@ function renderPostCard(manifest, post, language, index, options = {}) {
       ${title ? `<h2>${escapeHtml(title)}</h2>` : ''}
       ${description ? `<div class="post-text" lang="${escapeAttribute(version.originalLanguage)}">${linkify(description).replaceAll('\n', '<br>')}</div>` : ''}
       ${isRecoveredMediaOnly(post) ? `<p class="lost-post-note">${escapeHtml(localeText(manifest.locales, language, 'posts.lostMediaOnly'))}</p>` : ''}
+      ${options.showVersionEvidence ? renderPostVersionEvidence(manifest, post, version, language) : ''}
       ${renderPostMedia(manifest, post, version, language, index)}
     </div>
     <!--<footer class="post-footer">
@@ -1032,7 +1056,8 @@ async function buildPostPages(outputRoot, manifest, language) {
       version,
       versionLabel: versions.length > 1
         ? localeText(manifest.locales, language, 'posts.versionLabel', { current: index + 1, total: versions.length })
-        : null
+        : null,
+      showVersionEvidence: true
     })).join('');
     const body = `${renderPlatformHero(manifest, platform, language, { compact: false, oldest: false })}
       <article class="post-page"><div class="post-version-list">${versionCards}</div></article>`;
@@ -1065,6 +1090,24 @@ async function writePlaceholders(outputRoot, manifest) {
   }
 }
 
+function adminArtworkSourceFiles(source) {
+  return Object.fromEntries((source.artworks ?? []).map((artwork) => {
+    const sourceFile = artwork.__source;
+    if (!sourceFile) return [artwork.id, null];
+
+    if (source.sourceRoot) {
+      const relative = path.relative(source.sourceRoot, sourceFile).replaceAll('\\', '/');
+      if (relative && !relative.startsWith('../') && relative !== '..') return [artwork.id, relative];
+    }
+
+    const normalized = String(sourceFile).replaceAll('\\', '/');
+    const marker = '/artworks/';
+    const markerIndex = normalized.lastIndexOf(marker);
+    if (markerIndex >= 0) return [artwork.id, `artworks/${normalized.slice(markerIndex + marker.length)}`];
+    return [artwork.id, `artworks/${path.basename(sourceFile)}`];
+  }));
+}
+
 function buildViewerIndex(manifest) {
   return {
     platforms: Object.fromEntries(manifest.platforms.map((platform) => [platform.id, {
@@ -1093,6 +1136,8 @@ function buildViewerIndex(manifest) {
       versions: post.versions.map((version) => ({
         index: version.index,
         status: version.status,
+        firstRebloggedAt: version.firstRebloggedAt ?? null,
+        reblogs: version.reblogs ?? [],
         title: version.title,
         description: version.description,
         href: version.href,
@@ -1184,7 +1229,16 @@ export async function buildStaticSite(compilation, source, outputRoot, options =
   await fs.writeFile(path.join(outputRoot, 'data', 'manifest.json'), `${JSON.stringify(manifest, null, 2)}\n`, 'utf8');
   await fs.writeFile(path.join(outputRoot, 'data', 'validation.json'), `${JSON.stringify({ summary: manifest.summary, issues: compilation.issues }, null, 2)}\n`, 'utf8');
   await fs.writeFile(path.join(outputRoot, 'data', 'viewer-index.json'), `${JSON.stringify(buildViewerIndex(manifest), null, 2)}\n`, 'utf8');
-  await fs.writeFile(path.join(outputRoot, 'data', 'admin-data.json'), `${JSON.stringify({ site: manifest.site, platforms: manifest.platforms, artworks: manifest.artworks, posts: manifest.posts, media: manifest.media, issues: compilation.issues }, null, 2)}\n`, 'utf8');
+  await fs.writeFile(path.join(outputRoot, 'data', 'admin-data.json'), `${JSON.stringify({
+    site: manifest.site,
+    platforms: manifest.platforms,
+    artworks: manifest.artworks,
+    artworkSourceFiles: adminArtworkSourceFiles(source),
+    posts: manifest.posts,
+    media: manifest.media,
+    files: manifest.files,
+    issues: compilation.issues
+  }, null, 2)}\n`, 'utf8');
 
   await writePlaceholders(outputRoot, manifest);
 

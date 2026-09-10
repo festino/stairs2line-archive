@@ -156,3 +156,291 @@ pre {
     grid-template-columns: 1fr;
   }
 }
+
+.alignment-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.alignment-heading h2,
+.alignment-heading p {
+  margin-top: 0;
+}
+
+.alignment-toolbar {
+  display: flex;
+  align-items: end;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.alignment-toolbar label {
+  min-width: min(24rem, 100%);
+  margin: 0;
+}
+
+.alignment-source,
+.alignment-status,
+.alignment-help {
+  color: color-mix(in srgb, currentColor 72%, transparent);
+}
+
+.alignment-status {
+  min-height: 1.4em;
+  margin-block: 0.4rem 0.9rem;
+}
+
+.alignment-status.is-error {
+  color: #c44;
+}
+
+.alignment-status.is-success {
+  color: #27803c;
+}
+
+.alignment-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 360px);
+  gap: 1rem;
+  align-items: start;
+}
+
+.alignment-stage-shell,
+.alignment-layers,
+.alignment-output-wrap {
+  border: 1px solid color-mix(in srgb, currentColor 22%, transparent);
+  border-radius: 0.8rem;
+}
+
+.alignment-stage-shell {
+  overflow: hidden;
+  background: color-mix(in srgb, Canvas 94%, CanvasText 6%);
+}
+
+.alignment-view-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.38rem;
+  padding: 0.48rem 0.58rem;
+  border-bottom: 1px solid color-mix(in srgb, currentColor 18%, transparent);
+  font-size: 0.82rem;
+}
+
+.alignment-view-toolbar > span {
+  margin-right: 0.15rem;
+  opacity: 0.72;
+}
+
+.alignment-view-toolbar button {
+  min-width: 2.15rem;
+  padding: 0.32rem 0.48rem;
+}
+
+.alignment-view-toolbar output {
+  min-width: 3.7rem;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.alignment-view-toolbar .alignment-snap {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0 0 0 0.35rem;
+  white-space: nowrap;
+  font-size: 0.8rem;
+}
+
+.alignment-view-toolbar .alignment-snap input {
+  width: auto;
+  margin: 0;
+}
+
+.alignment-stage {
+  position: relative;
+  min-height: clamp(420px, 66vh, 820px);
+  overflow: hidden;
+  outline: none;
+  touch-action: none;
+  cursor: grab;
+  background-color: color-mix(in srgb, Canvas 88%, CanvasText 12%);
+  background-image:
+    linear-gradient(45deg, color-mix(in srgb, CanvasText 8%, transparent) 25%, transparent 25%),
+    linear-gradient(-45deg, color-mix(in srgb, CanvasText 8%, transparent) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, color-mix(in srgb, CanvasText 8%, transparent) 75%),
+    linear-gradient(-45deg, transparent 75%, color-mix(in srgb, CanvasText 8%, transparent) 75%);
+  background-size: 24px 24px;
+  background-position: 0 0, 0 12px, 12px -12px, -12px 0;
+}
+
+.alignment-stage.is-dragging,
+.alignment-stage.is-panning {
+  cursor: grabbing;
+}
+
+.alignment-stage.is-pan-ready {
+  cursor: all-scroll;
+}
+
+.alignment-stage:focus-visible {
+  box-shadow: inset 0 0 0 2px #6b5cff;
+}
+
+.alignment-empty {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 2rem;
+  text-align: center;
+  color: color-mix(in srgb, currentColor 62%, transparent);
+}
+
+.alignment-camera {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.alignment-layer-frame {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: 0 0;
+  pointer-events: none;
+}
+
+.alignment-layer-image {
+  position: absolute;
+  inset: 0;
+  display: block;
+  max-width: none;
+  max-height: none;
+  transform-origin: center center;
+  user-select: none;
+  -webkit-user-drag: none;
+  pointer-events: none;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+  image-rendering: pixelated;
+}
+
+.alignment-layer-image.is-active {
+  outline: 2px solid color-mix(in srgb, #6b5cff 80%, white 20%);
+  outline-offset: 1px;
+}
+
+.alignment-help {
+  margin: 0;
+  padding: 0.7rem 0.9rem 0.85rem;
+  font-size: 0.9rem;
+}
+
+.alignment-layers {
+  padding: 0.7rem;
+  max-height: clamp(420px, 72vh, 900px);
+  overflow: auto;
+}
+
+.alignment-layer-control {
+  border: 1px solid color-mix(in srgb, currentColor 18%, transparent);
+  border-radius: 0.65rem;
+  padding: 0.7rem;
+  margin-bottom: 0.65rem;
+}
+
+.alignment-layer-control:last-child {
+  margin-bottom: 0;
+}
+
+.alignment-layer-control.is-active {
+  border-color: #6b5cff;
+  box-shadow: 0 0 0 1px #6b5cff inset;
+}
+
+.alignment-layer-select {
+  display: flex;
+  align-items: start;
+  gap: 0.55rem;
+  margin: 0 0 0.65rem;
+}
+
+.alignment-layer-select input {
+  width: auto;
+  margin-top: 0.2rem;
+}
+
+.alignment-layer-title {
+  display: grid;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.alignment-layer-title code {
+  overflow-wrap: anywhere;
+  font-size: 0.78rem;
+  opacity: 0.72;
+}
+
+.alignment-control-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.alignment-control-grid label {
+  margin: 0;
+  font-size: 0.82rem;
+}
+
+.alignment-control-grid .wide {
+  grid-column: 1 / -1;
+}
+
+.alignment-inline {
+  display: flex;
+  gap: 0.45rem;
+  align-items: center;
+}
+
+.alignment-inline input[type="checkbox"] {
+  width: auto;
+}
+
+.alignment-layer-actions {
+  display: flex;
+  gap: 0.4rem;
+  margin-top: 0.6rem;
+}
+
+.alignment-layer-actions button {
+  padding: 0.38rem 0.55rem;
+  font-size: 0.82rem;
+}
+
+.alignment-output-wrap {
+  margin-top: 1rem;
+  padding: 0.8rem 1rem;
+}
+
+.alignment-output-wrap pre {
+  margin-bottom: 0;
+}
+
+@media (max-width: 980px) {
+  .alignment-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .alignment-workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .alignment-layers {
+    max-height: none;
+  }
+}

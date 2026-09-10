@@ -5,10 +5,10 @@
       "key": "piapro:NK1806281",
       "platform": "piapro",
       "id": "NK1806281",
+      "status": "alive",
       "publishedAt": "2018-06-28T08:00:09.000Z",
       "versions": [
         {
-          "status": "alive",
           "href": "https://blog.piapro.net/2018/06/nk1806281-1.html",
           "originalLanguage": "ja",
           "title": {
@@ -31,10 +31,10 @@
       "key": "piapro:NK1807031",
       "platform": "piapro",
       "id": "NK1807031",
+      "status": "alive",
       "publishedAt": "2018-07-03T08:00:47.000Z",
       "versions": [
         {
-          "status": "alive",
           "href": "https://blog.piapro.net/2018/07/nk1807031-1.html",
           "originalLanguage": "ja",
           "title": {

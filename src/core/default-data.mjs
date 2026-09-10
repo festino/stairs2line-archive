@@ -135,7 +135,11 @@ export const DEFAULT_LOCALES = {
       lostTitle: 'Утерянный пост на {platform}',
       lostMediaOnly: 'Сам пост не сохранился; остались только изображения. Дата приблизительная и восстановлена по идентификатору медиа Twitter.',
       originalPost: 'Открыть оригинал поста',
-      officialPage: 'Официальная страница'
+      officialPage: 'Официальная страница',
+      firstRebloggedAt: 'Самый ранний известный репост:',
+      savedReblogs: 'Сохранившиеся репосты:',
+      noKnownReblogDate: 'дата неизвестна',
+      noSavedReblogs: 'нет'
     },
     validation: {
       title: 'Проверка архива',
@@ -198,7 +202,11 @@ export const DEFAULT_LOCALES = {
       lostTitle: 'Lost post on {platform}',
       lostMediaOnly: 'The post itself was not preserved; only its images remain. The date is approximate and inferred from the Twitter media identifier.',
       originalPost: 'Open original post',
-      officialPage: 'Official page'
+      officialPage: 'Official page',
+      firstRebloggedAt: 'Earliest known reblog:',
+      savedReblogs: 'Preserved reblogs:',
+      noKnownReblogDate: 'date unknown',
+      noSavedReblogs: 'none'
     },
     validation: {
       title: 'Archive validation',
@@ -261,7 +269,11 @@ export const DEFAULT_LOCALES = {
       lostTitle: '{platform}の消失した投稿',
       lostMediaOnly: '投稿自体は保存されておらず、画像だけが残っています。日付は Twitter のメディア識別子から推定した概算です。',
       originalPost: '元の投稿を開く',
-      officialPage: '公式ページ'
+      officialPage: '公式ページ',
+      firstRebloggedAt: '最も早く確認されたリブログ:',
+      savedReblogs: '保存されているリブログ:',
+      noKnownReblogDate: '日付不明',
+      noSavedReblogs: 'なし'
     },
     validation: {
       title: 'アーカイブ検証',

@@ -257,7 +257,8 @@
       this.updateSwitcher(this.leftSwitcher, null, 'prev');
       this.updateSwitcher(this.rightSwitcher, null, 'next');
       for (const switcher of [this.leftSwitcher, this.rightSwitcher]) {
-        switcher?.style.removeProperty('max-width');
+        switcher?.style.removeProperty('width');
+        switcher?.style.removeProperty('height');
       }
     }
 
@@ -412,17 +413,29 @@
 
     updateSwitcherPlacement() {
       for (const switcher of [this.leftSwitcher, this.rightSwitcher]) {
-        switcher?.style.removeProperty('max-width');
+        switcher?.style.removeProperty('width');
+        switcher?.style.removeProperty('height');
       }
       if (!this.renderedMedia || window.innerWidth <= 768) return;
 
       const rect = this.renderedMedia.getBoundingClientRect?.();
+      const stageRect = this.modal.querySelector('.modal-dialog')?.getBoundingClientRect?.();
       if (!rect) return;
-      const gutter = 12;
-      const leftSpace = Math.max(0, rect.left - gutter);
-      const rightSpace = Math.max(0, window.innerWidth - rect.right - gutter);
-      if (this.leftSwitcher) this.leftSwitcher.style.maxWidth = `${leftSpace}px`;
-      if (this.rightSwitcher) this.rightSwitcher.style.maxWidth = `${rightSpace}px`;
+
+      // Match the visual hover target to the actual side-click target exactly:
+      // every backdrop pixel left/right of the rendered media is the previous/
+      // next button, while the metadata row remains outside the hit zone.
+      const leftSpace = Math.max(0, rect.left);
+      const rightSpace = Math.max(0, window.innerWidth - rect.right);
+      const stageHeight = Math.max(0, stageRect?.bottom ?? window.innerHeight);
+      if (this.leftSwitcher) {
+        this.leftSwitcher.style.width = `${leftSpace}px`;
+        this.leftSwitcher.style.height = `${stageHeight}px`;
+      }
+      if (this.rightSwitcher) {
+        this.rightSwitcher.style.width = `${rightSpace}px`;
+        this.rightSwitcher.style.height = `${stageHeight}px`;
+      }
     }
 
     reflowAlignment() {

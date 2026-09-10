@@ -746,7 +746,7 @@ test('invalid viewer anchor orientation fields are reported and ignored', async 
   assert.ok(issue.details.some((detail) => detail.includes('rotation')));
 });
 
-test('MediaViewer uses large previews, side-area navigation, human dates, inactive current posts, and two-point artwork registration', async () => {
+test('MediaViewer uses full hoverable side navigation zones, human dates, inactive current posts, and two-point artwork registration', async () => {
   const mediaRoot = await createMediaFixture();
   const source = fixtureSource();
   const compilation = await compileArchive(source, { mediaRoot });
@@ -774,7 +774,12 @@ test('MediaViewer uses large previews, side-area navigation, human dates, inacti
   assert.match(js, /width \/ 2, y: height/);
   assert.match(css, /\.modal\s*\{[\s\S]*?grid-template-rows:\s*minmax\(0, 1fr\) auto/);
   assert.match(css, /\.modal-subtext\s*\{[\s\S]*?max-height:\s*min\(24dvh, 12rem\)[\s\S]*?overflow:\s*auto/);
-  assert.match(css, /\.media-viewer-switcher\s*\{[\s\S]*?width:\s*clamp\(112px, 15vw, 220px\)/);
+  assert.match(js, /const leftSpace = Math\.max\(0, rect\.left\)/);
+  assert.match(js, /const rightSpace = Math\.max\(0, window\.innerWidth - rect\.right\)/);
+  assert.match(js, /switcher\?\.style\.removeProperty\('width'\)/);
+  assert.match(css, /\.media-viewer-switcher\s*\{[\s\S]*?position:\s*fixed[\s\S]*?width:\s*0[\s\S]*?height:\s*100dvh/);
+  assert.match(css, /\.media-viewer-switcher-left:hover[\s\S]*?linear-gradient/);
+  assert.match(css, /\.media-viewer-switcher-right:hover[\s\S]*?linear-gradient/);
   assert.match(css, /\.media-viewer-switcher-preview\s*\{[\s\S]*?height:\s*clamp\(110px, 26vh, 270px\)/);
   assert.match(css, /\.media-viewer-post-link\.is-current/);
 });

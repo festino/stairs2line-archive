@@ -304,7 +304,14 @@
               "files": [
                 "tumblr/60735916600_tumblr_msujkjn8Kb1s4v84ho3_500.png",
                 "tumblr/92164287224_tumblr_n8x7q9MNVH1s4v84ho2_500.png"
-              ]
+              ],
+              "viewerAnchor": {
+                "points": [
+                  { "x": 71, "y": 254 },
+                  { "x": 480, "y": 159 }
+                ],
+				"rotation": 8.9
+              }
             }
           ],
           "migration": {
@@ -322,7 +329,13 @@
               ],
               "files": [
                 "tumblr/92164287224_tumblr_n8x7q9MNVH1s4v84ho1_540.png"
-              ]
+              ],
+              "viewerAnchor": {
+                "points": [
+                  { "x": 79, "y": 206 },
+                  { "x": 365, "y": 186 }
+                ]
+              }
             }
           ],
           "migration": {
@@ -340,7 +353,13 @@
               ],
               "files": [
                 "twitter/623040653585321984_CKV8LBnUAAA57nu.png"
-              ]
+              ],
+              "viewerAnchor": {
+                "points": [
+                  { "x": 34, "y": 248 },
+                  { "x": 320, "y": 228 }
+                ]
+              }
             }
           ],
           "migration": {
@@ -361,7 +380,13 @@
               ],
               "files": [
                 "pixiv/44930075_p0.jpg"
-              ]
+              ],
+              "viewerAnchor": {
+                "points": [
+                  { "x": 34, "y": 248 },
+                  { "x": 320, "y": 228 }
+                ]
+              }
             }
           ],
           "migration": {
@@ -384,7 +409,13 @@
               ],
               "files": [
                 "tumblr/806000851033456640_eba8736e9dacf17be929d57f0371f94a19737731.png"
-              ]
+              ],
+              "viewerAnchor": {
+                "points": [
+                  { "x": 122, "y": 448 },
+                  { "x": 694, "y": 408 }
+                ]
+              }
             }
           ],
           "migration": {
@@ -408,7 +439,14 @@
               ],
               "files": [
                 "tumblr/809079143597768704_29674e06cd848a6954e54e43bfecfa4458997cf6.png"
-              ]
+              ],
+              "viewerAnchor": {
+                "points": [
+                  { "x": 901, "y": 702 },
+                  { "x": 329, "y": 662 }
+                ],
+				"flipX": true
+              }
             }
           ],
           "migration": {

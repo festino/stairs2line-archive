@@ -151,7 +151,8 @@
         return {
           id: mediaId,
           files: media?.declaredFiles ?? media?.existingFiles ?? [],
-          legacyIds: media?.legacyIds ?? []
+          legacyIds: media?.legacyIds ?? [],
+          viewerAnchor: media?.viewerAnchor ?? undefined
         };
       })
     })) ?? [{ id: 'v01', scope: 'major', media: [{ id: '', files: [] }] }], null, 2);

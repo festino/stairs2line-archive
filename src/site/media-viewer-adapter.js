@@ -37,6 +37,40 @@
     }
   }
 
+  function mediaSource(element) {
+    if (!element) return null;
+    if (element.matches('img')) return element.currentSrc || element.src || null;
+    if (element.matches('video')) {
+      return element.currentSrc || element.src || element.querySelector('source')?.src || null;
+    }
+    return null;
+  }
+
+  function makeSwitcherPreview(element) {
+    const src = mediaSource(element);
+    if (!src) return null;
+
+    if (element.matches('video')) {
+      const video = document.createElement('video');
+      video.src = src;
+      video.muted = true;
+      video.playsInline = true;
+      video.preload = 'metadata';
+      return video;
+    }
+
+    const image = document.createElement('img');
+    image.src = src;
+    image.alt = '';
+    image.decoding = 'async';
+    return image;
+  }
+
+  function finiteNormalized(value, fallback) {
+    const number = Number.parseFloat(value ?? '');
+    return Number.isFinite(number) && number >= 0 && number <= 1 ? number : fallback;
+  }
+
   class MediaViewer {
     constructor(modalSelector, renderMedia) {
       this.modal = document.querySelector(modalSelector);
@@ -49,7 +83,15 @@
       this.mediaProvider = null;
       this.prev = null;
       this.next = null;
+      this.currentElement = null;
+      this.renderedMedia = null;
       this.isSubscribed = false;
+      this.navigationToken = 0;
+      this.alignmentTarget = null;
+      this.swipe = null;
+      this.ignoreClickUntil = 0;
+      this.wheelDelta = 0;
+      this.lastWheelSwitch = 0;
 
       this.leftSwitcher = this.modal.querySelector('.media-viewer-switcher-left');
       this.rightSwitcher = this.modal.querySelector('.media-viewer-switcher-right');
@@ -59,29 +101,62 @@
       this.onBackdropClick = this.onBackdropClick.bind(this);
       this.onLeftClick = this.onClick.bind(this, 'prev');
       this.onRightClick = this.onClick.bind(this, 'next');
+      this.onPointerDown = this.onPointerDown.bind(this);
+      this.onPointerUp = this.onPointerUp.bind(this);
+      this.onPointerCancel = this.onPointerCancel.bind(this);
+      this.onResize = this.onResize.bind(this);
     }
 
     show(element, mediaProvider) {
-      if (!this.modal) return;
+      if (!this.modal || !element || !mediaProvider) return;
 
       if (!this.isSubscribed) {
         this.subscribe();
         this.isSubscribed = true;
       }
 
+      const nextGroup = element.dataset.viewerAlignGroup || null;
+      const currentGroup = this.currentElement?.dataset.viewerAlignGroup || null;
+      if (nextGroup !== currentGroup) this.alignmentTarget = null;
+
       this.mediaProvider = mediaProvider;
-      this.renderMedia(element);
+      this.currentElement = element;
       this.open();
+      this.renderMedia(element);
+      this.updateNavigation(element, mediaProvider);
+    }
+
+    updateNavigation(element, mediaProvider) {
+      const token = ++this.navigationToken;
+      this.prev = null;
+      this.next = null;
+      this.updateSwitcher(this.leftSwitcher, null, 'prev');
+      this.updateSwitcher(this.rightSwitcher, null, 'next');
 
       mediaProvider.getPrev(element, (prev) => {
+        if (token !== this.navigationToken) return;
         this.prev = prev;
-        this.leftSwitcher?.classList.toggle('hidden', !prev);
+        this.updateSwitcher(this.leftSwitcher, prev, 'prev');
       });
 
       mediaProvider.getNext(element, (next) => {
+        if (token !== this.navigationToken) return;
         this.next = next;
-        this.rightSwitcher?.classList.toggle('hidden', !next);
+        this.updateSwitcher(this.rightSwitcher, next, 'next');
       });
+    }
+
+    updateSwitcher(switcher, target, direction) {
+      if (!switcher) return;
+      switcher.classList.toggle('hidden', !target);
+      switcher.disabled = !target;
+      const preview = switcher.querySelector('.media-viewer-switcher-preview');
+      if (preview) {
+        preview.replaceChildren();
+        const media = makeSwitcherPreview(target);
+        if (media) preview.append(media);
+      }
+      switcher.dataset.direction = direction;
     }
 
     open() {
@@ -103,9 +178,15 @@
       this.mediaProvider = null;
       this.prev = null;
       this.next = null;
+      this.currentElement = null;
+      this.renderedMedia = null;
+      this.alignmentTarget = null;
+      this.swipe = null;
+      this.wheelDelta = 0;
+      this.navigationToken += 1;
 
-      this.leftSwitcher?.classList.add('hidden');
-      this.rightSwitcher?.classList.add('hidden');
+      this.updateSwitcher(this.leftSwitcher, null, 'prev');
+      this.updateSwitcher(this.rightSwitcher, null, 'next');
     }
 
     canSwitch() {
@@ -114,24 +195,32 @@
 
     subscribe() {
       document.addEventListener('keydown', this.onKeyDown);
-      document.addEventListener('wheel', this.onWheel, { passive: false });
+      this.modal.addEventListener('wheel', this.onWheel, { passive: false });
       this.modal.addEventListener('click', this.onBackdropClick);
+      this.modal.addEventListener('pointerdown', this.onPointerDown, { passive: true });
+      this.modal.addEventListener('pointerup', this.onPointerUp, { passive: true });
+      this.modal.addEventListener('pointercancel', this.onPointerCancel, { passive: true });
+      window.addEventListener('resize', this.onResize);
       this.leftSwitcher?.addEventListener('click', this.onLeftClick);
       this.rightSwitcher?.addEventListener('click', this.onRightClick);
     }
 
     unsubscribe() {
       document.removeEventListener('keydown', this.onKeyDown);
-      document.removeEventListener('wheel', this.onWheel);
+      this.modal.removeEventListener('wheel', this.onWheel);
       this.modal.removeEventListener('click', this.onBackdropClick);
+      this.modal.removeEventListener('pointerdown', this.onPointerDown);
+      this.modal.removeEventListener('pointerup', this.onPointerUp);
+      this.modal.removeEventListener('pointercancel', this.onPointerCancel);
+      window.removeEventListener('resize', this.onResize);
       this.leftSwitcher?.removeEventListener('click', this.onLeftClick);
       this.rightSwitcher?.removeEventListener('click', this.onRightClick);
     }
 
     onBackdropClick(event) {
-      if (event.target === this.modal && this.canSwitch()) {
-        this.close();
-      }
+      if (Date.now() < this.ignoreClickUntil || !this.canSwitch()) return;
+      if (event.target.closest('.media-viewer-current, .modal-subtext, .media-viewer-switcher')) return;
+      this.close();
     }
 
     onKeyDown(event) {
@@ -159,25 +248,146 @@
     }
 
     onWheel(event) {
+      if (event.target.closest('.modal-subtext')) return;
       event.preventDefault();
       if (!this.canSwitch()) return;
 
-      if (event.deltaY > 0 && this.next) {
-        this.show(this.next, this.mediaProvider);
-      } else if (event.deltaY < 0 && this.prev) {
-        this.show(this.prev, this.mediaProvider);
-      }
+      const dominant = Math.abs(event.deltaY) >= Math.abs(event.deltaX) ? event.deltaY : event.deltaX;
+      this.wheelDelta += dominant;
+      const now = performance.now();
+      if (Math.abs(this.wheelDelta) < 52 || now - this.lastWheelSwitch < 300) return;
+
+      const direction = this.wheelDelta > 0 ? 'next' : 'prev';
+      this.wheelDelta = 0;
+      this.lastWheelSwitch = now;
+      this.switchDirection(direction);
+    }
+
+    onPointerDown(event) {
+      if (event.pointerType !== 'touch' || !this.canSwitch()) return;
+      if (event.target.closest('.modal-subtext, .media-viewer-switcher')) return;
+
+      const edgeGuard = 28;
+      if (event.clientX <= edgeGuard || event.clientX >= window.innerWidth - edgeGuard) return;
+
+      this.swipe = {
+        pointerId: event.pointerId,
+        x: event.clientX,
+        y: event.clientY,
+        startedAt: performance.now()
+      };
+    }
+
+    onPointerUp(event) {
+      if (!this.swipe || event.pointerId !== this.swipe.pointerId) return;
+      const swipe = this.swipe;
+      this.swipe = null;
+
+      const dx = event.clientX - swipe.x;
+      const dy = event.clientY - swipe.y;
+      const elapsed = performance.now() - swipe.startedAt;
+      const threshold = Math.min(110, Math.max(52, window.innerWidth * 0.11));
+      if (elapsed > 1200 || Math.abs(dx) < threshold || Math.abs(dx) <= Math.abs(dy) * 1.2) return;
+
+      this.ignoreClickUntil = Date.now() + 350;
+      this.switchDirection(dx < 0 ? 'next' : 'prev');
+    }
+
+    onPointerCancel() {
+      this.swipe = null;
+    }
+
+    onResize() {
+      requestAnimationFrame(() => this.reflowAlignment());
     }
 
     onClick(direction, event) {
       event.stopPropagation();
       if (!this.canSwitch()) return;
+      this.switchDirection(direction);
+    }
 
+    switchDirection(direction) {
       if (direction === 'next' && this.next) {
         this.show(this.next, this.mediaProvider);
       } else if (direction === 'prev' && this.prev) {
         this.show(this.prev, this.mediaProvider);
       }
+    }
+
+    setRenderedMedia(media, sourceElement) {
+      this.renderedMedia = media;
+      this.currentElement = sourceElement;
+      this.reflowAlignment();
+    }
+
+    reflowAlignment() {
+      const media = this.renderedMedia;
+      const source = this.currentElement;
+      if (!media || !source) return;
+
+      const group = source.dataset.viewerAlignGroup || null;
+      if (!group) {
+        media.classList.remove('is-artwork-aligned');
+        media.style.removeProperty('left');
+        media.style.removeProperty('top');
+        media.style.removeProperty('width');
+        media.style.removeProperty('height');
+        return;
+      }
+
+      const stage = this.modal.querySelector('#mediaModalContent');
+      const rect = stage?.getBoundingClientRect();
+      if (!rect || rect.width <= 0 || rect.height <= 0) return;
+
+      const isImage = media.matches('img');
+      const intrinsicWidth = isImage ? media.naturalWidth : media.videoWidth;
+      const intrinsicHeight = isImage ? media.naturalHeight : media.videoHeight;
+      if (!intrinsicWidth || !intrinsicHeight) {
+        const readyEvent = isImage ? 'load' : 'loadedmetadata';
+        media.addEventListener(readyEvent, () => this.reflowAlignment(), { once: true });
+        return;
+      }
+
+      const anchorX = finiteNormalized(source.dataset.viewerAnchorX, 0.5);
+      const anchorY = finiteNormalized(source.dataset.viewerAnchorY, 0.5);
+      const stageWidth = rect.width;
+      const stageHeight = rect.height;
+
+      if (!this.alignmentTarget || this.alignmentTarget.group !== group) {
+        const centeredScale = Math.min(stageWidth / intrinsicWidth, stageHeight / intrinsicHeight);
+        const centeredWidth = intrinsicWidth * centeredScale;
+        const centeredHeight = intrinsicHeight * centeredScale;
+        const centeredLeft = (stageWidth - centeredWidth) / 2;
+        const centeredTop = (stageHeight - centeredHeight) / 2;
+        this.alignmentTarget = {
+          group,
+          x: (centeredLeft + anchorX * centeredWidth) / stageWidth,
+          y: (centeredTop + anchorY * centeredHeight) / stageHeight
+        };
+      }
+
+      const targetX = this.alignmentTarget.x * stageWidth;
+      const targetY = this.alignmentTarget.y * stageHeight;
+      const limits = [stageWidth / intrinsicWidth, stageHeight / intrinsicHeight];
+      if (anchorX > 0) limits.push(targetX / (anchorX * intrinsicWidth));
+      if (anchorX < 1) limits.push((stageWidth - targetX) / ((1 - anchorX) * intrinsicWidth));
+      if (anchorY > 0) limits.push(targetY / (anchorY * intrinsicHeight));
+      if (anchorY < 1) limits.push((stageHeight - targetY) / ((1 - anchorY) * intrinsicHeight));
+      const scale = Math.max(0, Math.min(...limits.filter((value) => Number.isFinite(value) && value >= 0)));
+      if (!scale) return;
+
+      const width = intrinsicWidth * scale;
+      const height = intrinsicHeight * scale;
+      const left = targetX - anchorX * width;
+      const top = targetY - anchorY * height;
+
+      media.classList.add('is-artwork-aligned');
+      media.style.width = `${width}px`;
+      media.style.height = `${height}px`;
+      media.style.left = `${left}px`;
+      media.style.top = `${top}px`;
+      tryPixelateImage(media);
     }
   }
 
@@ -251,6 +461,7 @@
   }
 
   function tryPixelateImage(image) {
+    if (!image?.matches?.('img')) return;
     const update = () => {
       const pixelate =
         image.naturalWidth <= image.clientWidth / 2 &&
@@ -271,6 +482,7 @@
     media.removeAttribute('onclick');
     media.removeAttribute('style');
     media.classList.remove('clickable');
+    media.classList.add('media-viewer-current');
 
     const videos = media.matches('video')
       ? [media]
@@ -289,10 +501,8 @@
     container.replaceChildren(media);
 
     const image = media.matches('img') ? media : media.querySelector('img');
-    if (image) {
-      tryPixelateImage(image);
-      image.addEventListener('click', () => viewer.close(), { once: true });
-    }
+    if (image) tryPixelateImage(image);
+    viewer.setRenderedMedia(media, sourceElement);
   }
 
   function createModal() {
@@ -300,13 +510,19 @@
     if (modal) return modal;
 
     document.body.insertAdjacentHTML('beforeend', `
-      <div class="modal" id="mediaModal" tabindex="-1" aria-hidden="true" hidden style="align-content: center;">
-        <div class="modal-dialog" style="max-width: unset; margin: auto;">
+      <div class="modal" id="mediaModal" tabindex="-1" aria-hidden="true" hidden>
+        <div class="modal-dialog">
           <div id="mediaModalContent" class="fullsize-media fit-media fit-media-copyable"></div>
         </div>
         <div class="modal-subtext"></div>
-        <div class="media-viewer-switcher media-viewer-switcher-left hidden"><span>&lt;</span></div>
-        <div class="media-viewer-switcher media-viewer-switcher-right hidden"><span>&gt;</span></div>
+        <button type="button" class="media-viewer-switcher media-viewer-switcher-left hidden" aria-label="Previous media">
+          <span class="media-viewer-switcher-chevron" aria-hidden="true">‹</span>
+          <span class="media-viewer-switcher-preview" aria-hidden="true"></span>
+        </button>
+        <button type="button" class="media-viewer-switcher media-viewer-switcher-right hidden" aria-label="Next media">
+          <span class="media-viewer-switcher-preview" aria-hidden="true"></span>
+          <span class="media-viewer-switcher-chevron" aria-hidden="true">›</span>
+        </button>
       </div>
     `);
 
@@ -322,7 +538,7 @@
 
     viewer = new MediaViewer('#mediaModal', (element) => {
       showFullSizeCopy(element, viewer);
-      updateFooter(element);
+      updateFooter(element).finally(() => viewer.reflowAlignment());
     });
 
     document.addEventListener('click', (event) => {

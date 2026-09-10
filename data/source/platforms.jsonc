@@ -53,31 +53,6 @@
       ]
     },
     {
-      "id": "pixiv",
-	  "createdBefore": "2013.01.27 02:04:05",
-      "label": {
-        "default": "pixiv"
-      },
-      "defaultAccount": "1593221",
-      "postUrlTemplate": "https://www.pixiv.net/en/artworks/{id}",
-      "icon": "misc/pixiv_favicon20250122.ico",
-      "versions": [
-        {
-          "observedAt": "2026-09-10",
-          "account": "1593221",
-          "sourceUrl": "https://www.pixiv.net/en/users/1593221",
-		  "title": {
-            "ja": "せんたっき"
-          },
-		  "description": {
-            "ja": "ぐぬぬ"
-          },
-          "avatar": "profiles/pixiv/5739104_せんたっき.png",
-          "banner": null
-        }
-      ]
-    },
-    {
       "id": "tumblr",
 	  "createdAt": 1359216801,
       "label": {
@@ -99,6 +74,31 @@
           },
           "avatar": "profiles/tumblr/avatar_a40c91cb6918_512.jpg",
           "banner": "profiles/tumblr/tumblr_static_tumblr_static_filename_focused_v3.jpg"
+        }
+      ]
+    },
+    {
+      "id": "pixiv",
+	  "createdBefore": "2013.01.27 02:04:05",
+      "label": {
+        "default": "pixiv"
+      },
+      "defaultAccount": "1593221",
+      "postUrlTemplate": "https://www.pixiv.net/en/artworks/{id}",
+      "icon": "misc/pixiv_favicon20250122.ico",
+      "versions": [
+        {
+          "observedAt": "2026-09-10",
+          "account": "1593221",
+          "sourceUrl": "https://www.pixiv.net/en/users/1593221",
+		  "title": {
+            "ja": "せんたっき"
+          },
+		  "description": {
+            "ja": "ぐぬぬ"
+          },
+          "avatar": "profiles/pixiv/5739104_せんたっき.png",
+          "banner": null
         }
       ]
     },

@@ -155,7 +155,15 @@ function mediaElement(manifest, media, language, alt, contextType, contextId, op
     `data-media-id="${escapeAttribute(media.id)}"`,
     `data-file-path="${escapeAttribute(file.path)}"`,
     `data-context-type="${escapeAttribute(contextType)}"`,
-    `data-context-id="${escapeAttribute(contextId)}"`
+    `data-context-id="${escapeAttribute(contextId)}"`,
+    ...(options.viewerAlignGroup ? [
+      'data-viewer-align="artwork"',
+      `data-viewer-align-group="${escapeAttribute(options.viewerAlignGroup)}"`,
+      ...(media.viewerAnchor ? [
+        `data-viewer-anchor-x="${escapeAttribute(media.viewerAnchor.x)}"`,
+        `data-viewer-anchor-y="${escapeAttribute(media.viewerAnchor.y)}"`
+      ] : [])
+    ] : [])
   ].join(' ');
 
   if (file.mimeType?.startsWith('video/')) {
@@ -559,6 +567,12 @@ function renderCompactListing(manifest, posts, language, platform) {
   </section>`).join('')}</section>`;
 }
 
+function renderPlatformBannerImages(banner) {
+  if (!banner) return '';
+  const src = escapeAttribute(banner);
+  return `<img class="platform-banner-backdrop" src="${src}" alt="" aria-hidden="true"><img class="platform-banner-image" src="${src}" alt="">`;
+}
+
 function renderPlatformHero(manifest, platform, language, options = {}) {
   if (!platform) return '';
   const label = platformLabel(platform, language, manifest.defaultLanguage);
@@ -574,11 +588,11 @@ function renderPlatformHero(manifest, platform, language, options = {}) {
   const fullHref = routeUrl(manifest, language, `${baseSegment}/full${options.oldest ? '/oldest' : ''}/`);
   const noBanner = platformBannerKnownAbsent(platform);
   return `<section class="platform-hero platform-hero--${escapeAttribute(platform.id)}${noBanner ? ' platform-hero--no-banner' : ''}">
-    <div class="platform-hero-banner">${banner ? `<img class="platform-banner-image" src="${escapeAttribute(banner)}" alt="">` : ''}</div>
+    <div class="platform-hero-banner">${renderPlatformBannerImages(banner)}</div>
     <div class="platform-hero-profile">
       <div class="platform-hero-icon">${avatar ? `<img src="${escapeAttribute(avatar)}" alt="">` : `<span>${escapeHtml(label.slice(0, 1))}</span>`}${avatar && icon && avatar !== icon ? `<span class="platform-hero-platform-icon"><img src="${escapeAttribute(icon)}" alt=""></span>` : ''}</div>
       <div class="platform-hero-copy">
-        <strong>${escapeHtml(label)}</strong>
+        <h1 class="platform-hero-title">${escapeHtml(label)}</h1>
         ${account ? `<span>${escapeHtml(platform.id === 'twitter' ? `@${account}` : account)}</span>` : ''}
         ${bio ? `<p class="platform-hero-bio">${linkify(bio).replaceAll('\n', '<br>')}</p>` : ''}
         ${sourceUrl ? `<a class="platform-source-link" href="${escapeAttribute(sourceUrl)}" target="_blank" rel="noreferrer">${escapeHtml(localeText(manifest.locales, language, 'posts.officialPage'))}${externalLinkIcon()}</a>` : ''}
@@ -687,7 +701,7 @@ async function writePaginatedListing(outputRoot, manifest, language, baseRelativ
   for (let page = 1; page <= pageCount; page += 1) {
     const pageItems = items.slice((page - 1) * pageSize, page * pageSize);
     const relative = pageRelative(baseRelative, page);
-    const body = `${pageOptions.beforeHeading ?? ''}<h1>${escapeHtml(pageOptions.heading)}</h1>
+    const body = `${pageOptions.beforeHeading ?? ''}${pageOptions.heading ? `<h1>${escapeHtml(pageOptions.heading)}</h1>` : ''}
       ${renderToolbar(manifest, language, { ...pageOptions.toolbar, enableFeed: pageCount > 1 })}
       <section class="${escapeAttribute(pageOptions.listClass)}" data-paged-list>
         ${pageItems.length > 0 ? pageItems.map((item, index) => renderItem(item, index)).join('\n') : `<p>${escapeHtml(localeText(manifest.locales, language, 'common.noItems'))}</p>`}
@@ -804,7 +818,7 @@ async function buildArtworkPages(outputRoot, manifest, language) {
         const media = manifest.media[mediaId];
         const linkedPosts = (media?.postIds ?? []).map((postId) => postsById.get(postId)).filter(Boolean);
         return `<article class="artwork-media" data-list-item id="${escapeAttribute(version.id)}">
-          ${mediaElement(manifest, media, language, title, 'artworkVersion', version.key)}
+          ${mediaElement(manifest, media, language, title, 'artworkVersion', version.key, { viewerAlignGroup: artwork.id })}
           <!--${media ? renderPlatformLinks(manifest, media, language) : ''}
           <details>
             <summary>${escapeHtml(localeText(manifest.locales, language, 'common.files'))}: ${media?.existingFiles.length ?? 0}</summary>
@@ -885,7 +899,6 @@ async function buildPostListings(outputRoot, manifest, language) {
       const compactRelative = oldest ? `${baseSegment}/oldest` : baseSegment;
       const compactSortHref = routeUrl(manifest, language, oldest ? `${baseSegment}/` : `${baseSegment}/oldest/`);
       const compactBody = `${renderPlatformHero(manifest, platform, language, { oldest, compact: true })}
-        <h1>${escapeHtml(localeText(manifest.locales, language, 'posts.platformTitle', { platform: label }))}</h1>
         ${renderToolbar(manifest, language, {
           tabs: postsTabs(manifest, language, 'grouped'),
           sortHref: compactSortHref,
@@ -921,7 +934,7 @@ async function buildPostListings(outputRoot, manifest, language) {
         manifest.site.pageSize?.posts ?? 20,
         (post, index) => renderPostCard(manifest, post, language, index, { hidePlatform: true }),
         {
-          heading: localeText(manifest.locales, language, 'posts.platformTitle', { platform: label }),
+          heading: null,
           title: `${label} · ${localeText(manifest.locales, language, 'posts.fullView')}`,
           description: localeText(manifest.locales, language, 'posts.genericDescription', { platform: label }),
           listClass: 'post-list',
@@ -971,7 +984,7 @@ async function buildPlatformIndex(outputRoot, manifest, language) {
     const href = routeUrl(manifest, language, `posts/platform/${encodeURIComponent(platform.id)}/`);
     const noBanner = platformBannerKnownAbsent(platform);
     return `<article class="platform-card platform-card--${escapeAttribute(platform.id)}${noBanner ? ' platform-card--no-banner' : ''}" data-list-item>
-      <a class="platform-card-banner" href="${escapeAttribute(href)}" aria-label="${escapeAttribute(label)}">${banner ? `<img class="platform-banner-image" src="${escapeAttribute(banner)}" alt="">` : ''}</a>
+      <a class="platform-card-banner" href="${escapeAttribute(href)}" aria-label="${escapeAttribute(label)}">${renderPlatformBannerImages(banner)}</a>
       <div class="platform-card-profile">
         <a class="platform-card-avatar" href="${escapeAttribute(href)}">${avatar ? `<img src="${escapeAttribute(avatar)}" alt="">` : `<span>${escapeHtml(label.slice(0, 1))}</span>`}${avatar && icon && avatar !== icon ? `<span class="platform-card-platform-icon"><img src="${escapeAttribute(icon)}" alt=""></span>` : ''}</a>
         <div class="platform-card-copy">
@@ -1053,7 +1066,8 @@ function buildViewerIndex(manifest) {
       files: media.existingFiles,
       postIds: media.postIds,
       artworkId: media.artworkId,
-      versionId: media.versionId
+      versionId: media.versionId,
+      viewerAnchor: media.viewerAnchor ?? null
     }])),
     posts: Object.fromEntries(manifest.posts.map((post) => [post.key, {
       key: post.key,

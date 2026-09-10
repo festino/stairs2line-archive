@@ -5,68 +5,144 @@
   "$defs": {
     "localizedText": {
       "type": "object",
-      "additionalProperties": { "type": "string" },
+      "additionalProperties": {
+        "type": "string"
+      },
       "properties": {
-        "default": { "type": "string" }
+        "default": {
+          "type": "string"
+        }
       }
     },
     "media": {
       "type": "object",
-      "required": ["id"],
+      "required": [
+        "id"
+      ],
       "properties": {
-        "id": { "type": "string", "minLength": 1 },
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
         "files": {
           "type": "array",
-          "items": { "type": "string", "minLength": 1 },
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
           "uniqueItems": true
         },
         "legacyIds": {
           "type": "array",
-          "items": { "type": "string", "minLength": 1 },
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
           "uniqueItems": true
+        },
+        "viewerAnchor": {
+          "description": "Optional normalized alignment point used only when comparing media across versions of one artwork in MediaViewer.",
+          "type": "object",
+          "required": [
+            "x",
+            "y"
+          ],
+          "properties": {
+            "x": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "y": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            }
+          },
+          "additionalProperties": false
         }
       },
       "additionalProperties": false
     },
     "version": {
       "type": "object",
-      "required": ["id", "scope", "media"],
+      "required": [
+        "id",
+        "scope",
+        "media"
+      ],
       "properties": {
-        "id": { "type": "string", "minLength": 1 },
-        "scope": {
-          "enum": ["top", "major", "sketchy", "decorative"]
+        "id": {
+          "type": "string",
+          "minLength": 1
         },
-        "createdAt": { "type": "string", "format": "date-time" },
+        "scope": {
+          "enum": [
+            "top",
+            "major",
+            "sketchy",
+            "decorative"
+          ]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
         "knownNotAfter": {
           "type": "string",
           "oneOf": [
-            { "format": "date" },
-            { "format": "date-time" }
+            {
+              "format": "date"
+            },
+            {
+              "format": "date-time"
+            }
           ]
         },
         "media": {
           "type": "array",
           "minItems": 1,
-          "items": { "$ref": "#/$defs/media" }
+          "items": {
+            "$ref": "#/$defs/media"
+          }
         },
-        "migration": { "type": "object" }
+        "migration": {
+          "type": "object"
+        }
       },
       "additionalProperties": false
     },
     "artwork": {
       "type": "object",
-      "required": ["id", "versions"],
+      "required": [
+        "id",
+        "versions"
+      ],
       "properties": {
-        "id": { "type": "string", "minLength": 1 },
-        "slug": { "type": "string", "minLength": 1 },
-        "title": { "$ref": "#/$defs/localizedText" },
-        "description": { "$ref": "#/$defs/localizedText" },
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "slug": {
+          "type": "string",
+          "minLength": 1
+        },
+        "title": {
+          "$ref": "#/$defs/localizedText"
+        },
+        "description": {
+          "$ref": "#/$defs/localizedText"
+        },
         "versions": {
           "type": "array",
           "minItems": 1,
-          "items": { "$ref": "#/$defs/version" }
+          "items": {
+            "$ref": "#/$defs/version"
+          }
         },
-        "migration": { "type": "object" }
+        "migration": {
+          "type": "object"
+        }
       },
       "additionalProperties": false
     },
@@ -76,47 +152,94 @@
         "observedAt": {
           "type": "string",
           "oneOf": [
-            { "format": "date" },
-            { "format": "date-time" }
+            {
+              "format": "date"
+            },
+            {
+              "format": "date-time"
+            }
           ]
         },
-        "account": { "type": "string", "minLength": 1 },
-        "description": { "$ref": "#/$defs/localizedText" },
-        "sourceUrl": { "type": "string", "format": "uri", "minLength": 1 },
-        "avatar": { "type": ["string", "null"], "minLength": 1 },
-        "banner": { "type": ["string", "null"], "minLength": 1 }
+        "account": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "$ref": "#/$defs/localizedText"
+        },
+        "sourceUrl": {
+          "type": "string",
+          "format": "uri",
+          "minLength": 1
+        },
+        "avatar": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "banner": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        }
       },
       "additionalProperties": false
     },
     "platform": {
       "type": "object",
-      "required": ["id", "label", "versions"],
+      "required": [
+        "id",
+        "label",
+        "versions"
+      ],
       "properties": {
-        "id": { "type": "string", "minLength": 1 },
-        "label": { "$ref": "#/$defs/localizedText" },
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "label": {
+          "$ref": "#/$defs/localizedText"
+        },
         "defaultAccount": {
           "description": "Stable URL-template fallback. Display/profile account belongs in versions[].account.",
           "type": "string",
           "minLength": 1
         },
-        "postUrlTemplate": { "type": "string", "minLength": 1 },
-        "icon": { "type": "string", "minLength": 1 },
+        "postUrlTemplate": {
+          "type": "string",
+          "minLength": 1
+        },
+        "icon": {
+          "type": "string",
+          "minLength": 1
+        },
         "versions": {
           "type": "array",
           "minItems": 1,
-          "items": { "$ref": "#/$defs/platformVersion" }
+          "items": {
+            "$ref": "#/$defs/platformVersion"
+          }
         }
       },
       "additionalProperties": false
     },
     "postLayoutRow": {
       "type": "object",
-      "required": ["blocks"],
+      "required": [
+        "blocks"
+      ],
       "properties": {
         "blocks": {
           "type": "array",
           "minItems": 1,
-          "items": { "type": "integer", "minimum": 0 },
+          "items": {
+            "type": "integer",
+            "minimum": 0
+          },
           "uniqueItems": true
         }
       },
@@ -124,53 +247,103 @@
     },
     "postLayout": {
       "type": "object",
-      "required": ["type", "display"],
+      "required": [
+        "type",
+        "display"
+      ],
       "properties": {
-        "type": { "const": "rows" },
+        "type": {
+          "const": "rows"
+        },
         "display": {
           "type": "array",
           "minItems": 1,
-          "items": { "$ref": "#/$defs/postLayoutRow" }
+          "items": {
+            "$ref": "#/$defs/postLayoutRow"
+          }
         }
       },
       "additionalProperties": false
     },
     "postVersion": {
       "type": "object",
-      "required": ["status"],
+      "required": [
+        "status"
+      ],
       "properties": {
-        "account": { "type": "string" },
-        "status": { "enum": ["alive", "deleted"] },
-        "href": { "type": "string", "format": "uri" },
-        "originalLanguage": { "type": "string" },
-        "title": { "$ref": "#/$defs/localizedText" },
-        "description": { "$ref": "#/$defs/localizedText" },
+        "account": {
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "alive",
+            "deleted"
+          ]
+        },
+        "href": {
+          "type": "string",
+          "format": "uri"
+        },
+        "originalLanguage": {
+          "type": "string"
+        },
+        "title": {
+          "$ref": "#/$defs/localizedText"
+        },
+        "description": {
+          "$ref": "#/$defs/localizedText"
+        },
         "media": {
           "description": "Physical file-path lookup keys. Each path identifies a logical artwork media item; rendering may use a smaller equivalent file from that media item.",
           "type": "array",
-          "items": { "type": "string", "minLength": 1 },
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
           "uniqueItems": true
         },
         "layout": {
           "type": "array",
-          "items": { "$ref": "#/$defs/postLayout" }
+          "items": {
+            "$ref": "#/$defs/postLayout"
+          }
         },
-        "migration": { "type": "object" }
+        "migration": {
+          "type": "object"
+        }
       },
       "additionalProperties": false
     },
     "post": {
       "type": "object",
-      "required": ["platform", "id", "versions"],
+      "required": [
+        "platform",
+        "id",
+        "versions"
+      ],
       "properties": {
-        "key": { "type": "string", "minLength": 1 },
-        "platform": { "type": "string", "minLength": 1 },
-        "id": { "type": "string", "minLength": 1 },
-        "publishedAt": { "type": "string", "format": "date-time" },
+        "key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "platform": {
+          "type": "string",
+          "minLength": 1
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "publishedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
         "versions": {
           "type": "array",
           "minItems": 1,
-          "items": { "$ref": "#/$defs/postVersion" }
+          "items": {
+            "$ref": "#/$defs/postVersion"
+          }
         }
       },
       "additionalProperties": false
@@ -179,33 +352,45 @@
   "oneOf": [
     {
       "type": "object",
-      "required": ["artworks"],
+      "required": [
+        "artworks"
+      ],
       "properties": {
         "artworks": {
           "type": "array",
-          "items": { "$ref": "#/$defs/artwork" }
+          "items": {
+            "$ref": "#/$defs/artwork"
+          }
         }
       },
       "additionalProperties": false
     },
     {
       "type": "object",
-      "required": ["posts"],
+      "required": [
+        "posts"
+      ],
       "properties": {
         "posts": {
           "type": "array",
-          "items": { "$ref": "#/$defs/post" }
+          "items": {
+            "$ref": "#/$defs/post"
+          }
         }
       },
       "additionalProperties": false
     },
     {
       "type": "object",
-      "required": ["platforms"],
+      "required": [
+        "platforms"
+      ],
       "properties": {
         "platforms": {
           "type": "array",
-          "items": { "$ref": "#/$defs/platform" }
+          "items": {
+            "$ref": "#/$defs/platform"
+          }
         }
       },
       "additionalProperties": false

@@ -137,6 +137,24 @@ function assetDirectory(filePath) {
   return slashIndex > 0 ? normalized.slice(0, slashIndex) : null;
 }
 
+function normalizeViewerAnchor(value, issues, entityId, source) {
+  if (value == null) return null;
+  const x = Number(value?.x);
+  const y = Number(value?.y);
+  if (!Number.isFinite(x) || !Number.isFinite(y) || x < 0 || x > 1 || y < 0 || y > 1) {
+    issues.add({
+      severity: 'error',
+      code: 'media.viewer-anchor-invalid',
+      entityType: 'media',
+      entityId,
+      source,
+      details: 'viewerAnchor.x and viewerAnchor.y must be finite numbers between 0 and 1'
+    });
+    return null;
+  }
+  return { x, y };
+}
+
 function compilePlatforms(sourcePlatforms, filesByPath, issues, options) {
   return sourcePlatforms.map((sourcePlatform) => {
     const versions = sourcePlatformVersions(sourcePlatform).map((sourceVersion, index) => {
@@ -615,6 +633,7 @@ export async function compileArchive(source, options = {}) {
           id: mediaId,
           artworkId,
           versionId,
+          viewerAnchor: normalizeViewerAnchor(sourceMedia.viewerAnchor, issues, mediaId, sourceName(sourceArtwork)),
           declaredFiles,
           legacyIds,
           existingFiles: deduplicatedFiles.map((file) => file.path),

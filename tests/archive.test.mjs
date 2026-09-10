@@ -356,11 +356,15 @@ test('static pages use the logical media display file and expose paged/feed cont
   assert.match(twitterHtml, /compact-grid--twitter/);
   assert.match(twitterHtml, /<img src="\/repo\/media\/stairs2line\/pixiv\/999_p0\.png"/);
   assert.doesNotMatch(twitterHtml, /post-media-count-1 twitter-single-media--natural/);
+  assert.match(twitterHtml, /<h1 class="platform-hero-title">Twitter<\/h1>/);
+  assert.doesNotMatch(twitterHtml, /Posts on Twitter/);
 
   const twitterFullHtml = await fs.readFile(path.join(output, 'en', 'posts', 'platform', 'twitter', 'full', 'index.html'), 'utf8');
   assert.match(twitterFullHtml, /<img[^>]+data-file-path="twitter\/123456789012345678_ABCDEF123456789\.png"[^>]+src="\/repo\/media\/stairs2line\/pixiv\/999_p0\.png"/);
   assert.match(twitterFullHtml, /post-media-count-1 twitter-single-media--natural/);
   assert.doesNotMatch(twitterFullHtml, /class="post-platform"/);
+  assert.match(twitterFullHtml, /<h1 class="platform-hero-title">Twitter<\/h1>/);
+  assert.doesNotMatch(twitterFullHtml, /Posts on Twitter/);
   assert.match(twitterFullHtml, /class="post-original-link-icon"[^>]+title="Open original post"/);
 
   const twitterDetailHtml = await fs.readFile(path.join(output, 'en', 'posts', 'twitter', '123456789012345678', 'index.html'), 'utf8');
@@ -377,8 +381,8 @@ test('static pages use the logical media display file and expose paged/feed cont
   assert.doesNotMatch(postsHtml, /class="post-list"/);
 
   const archiveCss = await fs.readFile(path.join(output, 'assets', 'archive.css'), 'utf8');
-  assert.match(archiveCss, /\.platform-page \.post-card \.post-media-item \.media-link img,[\s\S]*?max-height:\s*min\(80dvh, 900px\)/);
-  assert.match(archiveCss, /\.platform-page--pixiv \.post-card--pixiv[\s\S]*?max-height:\s*min\(80dvh, 900px\)/);
+  assert.match(archiveCss, /\.platform-page \.post-card \.post-media-item \.media-link img,[\s\S]*?max-height:\s*min\(62dvh, 680px\)/);
+  assert.match(archiveCss, /\.platform-page--pixiv \.post-card--pixiv[\s\S]*?max-height:\s*min\(62dvh, 680px\)/);
   assert.doesNotMatch(archiveCss, /^\.post-card--(?:pixiv|twitter|tumblr)\s*\{/m);
 });
 
@@ -461,6 +465,9 @@ test('platform directory uses bounded two-column cards with thumbnail previews',
   assert.match(html, /class="platform-preview-post"/);
   assert.match(html, /class="platform-source-link" href="https:\/\/twitter\.com\/stairs2line"[^>]*>Official page/);
   assert.doesNotMatch(html, /<div class="platform-preview"><article class="post-card/);
+  const twitterIndex = html.indexOf('platform-card--twitter');
+  const pixivIndex = html.indexOf('platform-card--pixiv');
+  assert.ok(twitterIndex >= 0 && pixivIndex > twitterIndex, 'platform cards preserve platforms.jsonc order');
 
   const css = await fs.readFile(path.join(output, 'assets', 'archive.css'), 'utf8');
   assert.match(css, /\.platform-list\s*\{[\s\S]*?grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/);
@@ -504,15 +511,18 @@ test('platform profile snapshots are versioned and the latest snapshot drives th
   const html = await fs.readFile(path.join(output, 'en', 'posts', 'platform', 'twitter', 'index.html'), 'utf8');
   assert.match(html, /Current profile bio/);
   assert.match(html, /profiles\/twitter-avatar\.png/);
+  assert.match(html, /<img class="platform-banner-backdrop" src="\/repo\/media\/stairs2line\/profiles\/twitter-banner\.png" alt="" aria-hidden="true">/);
   assert.match(html, /<img class="platform-banner-image" src="\/repo\/media\/stairs2line\/profiles\/twitter-banner\.png" alt="">/);
   assert.match(html, /class="platform-source-link" href="https:\/\/twitter\.com\/stairs2line"[^>]*>Official page/);
   assert.match(html, /class="active" href="\/repo\/en\/posts\/platform\/twitter\/">Compact view<\/a>/);
   assert.match(html, /href="\/repo\/en\/posts\/platform\/twitter\/full\/">Full view<\/a>/);
 
   const directoryHtml = await fs.readFile(path.join(output, 'en', 'posts', 'by-platform', 'index.html'), 'utf8');
+  assert.match(directoryHtml, /<img class="platform-banner-backdrop" src="\/repo\/media\/stairs2line\/profiles\/twitter-banner\.png" alt="" aria-hidden="true">/);
   assert.match(directoryHtml, /<img class="platform-banner-image" src="\/repo\/media\/stairs2line\/profiles\/twitter-banner\.png" alt="">/);
   const css = await fs.readFile(path.join(output, 'assets', 'archive.css'), 'utf8');
   assert.match(css, /\.platform-hero-banner \.platform-banner-image,[\s\S]*?object-fit:\s*contain/);
+  assert.match(css, /\.platform-banner-backdrop\s*\{[\s\S]*?object-fit:\s*cover/);
 });
 
 test('missing versioned platform profile assets are validation errors', async () => {
@@ -575,6 +585,65 @@ test('platform profile assets distinguish explicit null from unknown omitted fie
   const twitterHtml = await fs.readFile(path.join(output, 'en', 'posts', 'platform', 'twitter', 'index.html'), 'utf8');
   assert.match(pixivHtml, /platform-hero--pixiv platform-hero--no-banner/);
   assert.doesNotMatch(twitterHtml, /platform-hero--twitter platform-hero--no-banner/);
+});
+
+
+test('artwork media may define a normalized viewer anchor used only on the artwork detail page', async () => {
+  const mediaRoot = await createMediaFixture();
+  const source = fixtureSource();
+  source.artworks[0].versions[0].media[0].viewerAnchor = { x: 0.375, y: 0.625 };
+
+  const compilation = await compileArchive(source, { mediaRoot });
+  assert.deepEqual(compilation.manifest.media[MEDIA_ID].viewerAnchor, { x: 0.375, y: 0.625 });
+  assert.equal(compilation.issues.some((issue) => issue.code === 'media.viewer-anchor-invalid'), false);
+
+  const output = await fs.mkdtemp(path.join(os.tmpdir(), 'stairs2line-viewer-anchor-'));
+  await buildStaticSite(compilation, source, output, { mediaRoot });
+  const detailHtml = await fs.readFile(path.join(output, 'en', 'artworks', 'artwork-0001', 'index.html'), 'utf8');
+  assert.match(detailHtml, /data-viewer-align="artwork"/);
+  assert.match(detailHtml, /data-viewer-align-group="artwork-0001"/);
+  assert.match(detailHtml, /data-viewer-anchor-x="0\.375"/);
+  assert.match(detailHtml, /data-viewer-anchor-y="0\.625"/);
+
+  const listingHtml = await fs.readFile(path.join(output, 'en', 'artworks', 'index.html'), 'utf8');
+  assert.doesNotMatch(listingHtml, /data-viewer-align="artwork"/);
+
+  const schema = JSON.parse(await fs.readFile(new URL('../schemas/archive-source.schema.json', import.meta.url), 'utf8'));
+  const anchorSchema = schema.$defs.media.properties.viewerAnchor;
+  assert.deepEqual(anchorSchema.required, ['x', 'y']);
+  assert.equal(anchorSchema.properties.x.minimum, 0);
+  assert.equal(anchorSchema.properties.x.maximum, 1);
+  assert.equal(anchorSchema.properties.y.minimum, 0);
+  assert.equal(anchorSchema.properties.y.maximum, 1);
+});
+
+test('invalid artwork viewer anchors are reported and ignored', async () => {
+  const mediaRoot = await createMediaFixture();
+  const source = fixtureSource();
+  source.artworks[0].versions[0].media[0].viewerAnchor = { x: 1.5, y: -0.1 };
+  const compilation = await compileArchive(source, { mediaRoot });
+  assert.equal(compilation.manifest.media[MEDIA_ID].viewerAnchor, null);
+  assert.equal(compilation.issues.some((issue) => issue.code === 'media.viewer-anchor-invalid'), true);
+});
+
+test('MediaViewer keeps metadata visible, closes on backdrop rather than image, and exposes thumbnail and swipe navigation', async () => {
+  const mediaRoot = await createMediaFixture();
+  const source = fixtureSource();
+  const compilation = await compileArchive(source, { mediaRoot });
+  const output = await fs.mkdtemp(path.join(os.tmpdir(), 'stairs2line-viewer-ui-'));
+  await buildStaticSite(compilation, source, output, { mediaRoot });
+
+  const js = await fs.readFile(path.join(output, 'assets', 'media-viewer-adapter.js'), 'utf8');
+  const css = await fs.readFile(path.join(output, 'assets', 'archive.css'), 'utf8');
+  assert.match(js, /event\.target\.closest\('\.media-viewer-current, \.modal-subtext, \.media-viewer-switcher'\)/);
+  assert.doesNotMatch(js, /image\.addEventListener\('click',[^\n]*viewer\.close/);
+  assert.match(js, /media-viewer-switcher-preview/);
+  assert.match(js, /pointerdown/);
+  assert.match(js, /pointerType !== 'touch'/);
+  assert.match(js, /edgeGuard = 28/);
+  assert.match(css, /\.modal\s*\{[\s\S]*?grid-template-rows:\s*minmax\(0, 1fr\) auto/);
+  assert.match(css, /\.modal-subtext\s*\{[\s\S]*?max-height:\s*min\(24dvh, 12rem\)[\s\S]*?overflow:\s*auto/);
+  assert.match(css, /\.media-viewer-switcher-preview img,[\s\S]*?opacity:\s*0\.72/);
 });
 
 test('orphan Twitter media with a decodable media timestamp is shown as an approximate lost post', async () => {

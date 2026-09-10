@@ -70,6 +70,44 @@
       },
       "additionalProperties": false
     },
+    "platformVersion": {
+      "type": "object",
+      "properties": {
+        "observedAt": {
+          "type": "string",
+          "oneOf": [
+            { "format": "date" },
+            { "format": "date-time" }
+          ]
+        },
+        "account": { "type": "string", "minLength": 1 },
+        "description": { "$ref": "#/$defs/localizedText" },
+        "avatar": { "type": ["string", "null"], "minLength": 1 },
+        "banner": { "type": ["string", "null"], "minLength": 1 }
+      },
+      "additionalProperties": false
+    },
+    "platform": {
+      "type": "object",
+      "required": ["id", "label", "versions"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "label": { "$ref": "#/$defs/localizedText" },
+        "defaultAccount": {
+          "description": "Stable URL-template fallback. Display/profile account belongs in versions[].account.",
+          "type": "string",
+          "minLength": 1
+        },
+        "postUrlTemplate": { "type": "string", "minLength": 1 },
+        "icon": { "type": "string", "minLength": 1 },
+        "versions": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/platformVersion" }
+        }
+      },
+      "additionalProperties": false
+    },
     "postLayoutRow": {
       "type": "object",
       "required": ["blocks"],
@@ -156,6 +194,17 @@
         "posts": {
           "type": "array",
           "items": { "$ref": "#/$defs/post" }
+        }
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": ["platforms"],
+      "properties": {
+        "platforms": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/platform" }
         }
       },
       "additionalProperties": false

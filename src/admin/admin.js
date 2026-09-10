@@ -79,6 +79,9 @@
 
   function populateEntitySelectors() {
     for (const post of data.posts) {
+      // Media-only lost Twitter posts are derived during compilation and do
+      // not have a source post object to edit.
+      if (post.recovery?.kind === 'media-only') continue;
       const option = document.createElement('option');
       option.value = post.key;
       option.textContent = post.key;
@@ -90,6 +93,28 @@
       option.textContent = artwork.id;
       byId('artwork-existing').append(option);
     }
+    for (const platform of data.platforms ?? []) {
+      const option = document.createElement('option');
+      option.value = platform.id;
+      option.textContent = platform.id;
+      byId('platform-existing').append(option);
+    }
+  }
+
+  function loadPlatform(id) {
+    const platform = data.platforms.find((item) => item.id === id);
+    byId('platform-id').value = platform?.id ?? '';
+    setLocalizedInputs('platform-label', platform?.label);
+    byId('platform-default-account').value = platform?.defaultAccount ?? '';
+    byId('platform-url-template').value = platform?.postUrlTemplate ?? '';
+    byId('platform-icon').value = platform?.icon ?? '';
+    byId('platform-versions').value = JSON.stringify(platform?.versions?.map((version) => ({
+      observedAt: version.observedAt || undefined,
+      account: version.account || undefined,
+      description: version.description && Object.keys(version.description).length > 0 ? version.description : undefined,
+      avatar: version.avatar === null ? null : (version.avatar || undefined),
+      banner: version.banner === null ? null : (version.banner || undefined)
+    })) ?? [{ account: platform?.defaultAccount || undefined }], null, 2);
   }
 
   function loadPost(key) {
@@ -129,6 +154,27 @@
         };
       })
     })) ?? [{ id: 'v01', scope: 'major', media: [{ id: '', files: [] }] }], null, 2);
+  }
+
+  function generatePlatform(event) {
+    event.preventDefault();
+    let versions;
+    try {
+      versions = JSON.parse(byId('platform-versions').value);
+      if (!Array.isArray(versions) || versions.length === 0) throw new Error('Versions must be a non-empty array.');
+    } catch (error) {
+      byId('platform-output').textContent = `Invalid versions JSON: ${error.message}`;
+      return;
+    }
+    const result = {
+      id: byId('platform-id').value.trim(),
+      label: localizedInputs('platform-label'),
+      defaultAccount: byId('platform-default-account').value.trim() || undefined,
+      postUrlTemplate: byId('platform-url-template').value.trim() || undefined,
+      icon: byId('platform-icon').value.trim() || undefined,
+      versions
+    };
+    byId('platform-output').textContent = JSON.stringify(result, null, 2);
   }
 
   function generatePost(event) {
@@ -222,8 +268,10 @@
 
     document.querySelectorAll('[data-tab]').forEach((button) => button.addEventListener('click', () => showTab(button.dataset.tab)));
     byId('post-existing').addEventListener('change', (event) => loadPost(event.target.value));
+    byId('platform-existing').addEventListener('change', (event) => loadPlatform(event.target.value));
     byId('artwork-existing').addEventListener('change', (event) => loadArtwork(event.target.value));
     byId('post-form').addEventListener('submit', generatePost);
+    byId('platform-form').addEventListener('submit', generatePlatform);
     byId('artwork-form').addEventListener('submit', generateArtwork);
     byId('date-form').addEventListener('submit', extractDates);
     byId('media-filter').addEventListener('input', (event) => renderMedia(event.target.value));

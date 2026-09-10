@@ -1,32 +1,101 @@
-// Platform URL templates and icons.
+// Platform definitions. Profile fields live in ordered versions; the last version is current.
 {
   "platforms": [
     {
       "id": "twitter",
+	  "createdAt": 1326635072,
       "label": {
         "default": "Twitter / X"
       },
       "defaultAccount": "stairs2line",
       "postUrlTemplate": "https://twitter.com/{account}/status/{id}",
-      "icon": "misc/twitter-icon-free-png.webp"
+      "icon": "misc/twitter-icon-free-png.webp",
+      "versions": [
+        {
+          "observedAt": "2024-01-01",
+          "account": "stairs2line",
+		  "title": {
+            "ja": "たるたる"
+          },
+		  "description": {
+            "ja": "ラーメンズ大好きです、絵が好きです。芸術に触れたい。"
+          },
+          "avatar": "profiles/twitter/2026-03-04_profile_400x400.png",
+          "banner": "profiles/twitter/2026-07-25_header_1500x500_1398344828.jpeg"
+        },
+        {
+          "observedAt": "2026-03-01",
+          "account": "stairs2line",
+		  "title": {
+            "ja": "たるたる"
+          },
+		  "description": {
+            "ja": "Illustrator/アイデアと断片\n{michinoku800.tumblr.com|http://michinoku800.tumblr.com/}"
+          },
+          "avatar": "profiles/twitter/2026-03-04_profile_400x400.png",
+          "banner": "profiles/twitter/2026-07-25_header_1500x500_1398344828.jpeg"
+        },
+        {
+          "observedAt": "2026-09-10",
+          "account": "stairs2line",
+		  "title": {
+            "ja": "たるたる"
+          },
+		  "description": {
+            "ja": "アイデアと断片"
+          },
+          "avatar": "profiles/twitter/2026-03-04_profile_400x400.png",
+          "banner": "profiles/twitter/2026-07-25_header_1500x500_1398344828.jpeg"
+        }
+      ]
     },
     {
       "id": "pixiv",
+	  "createdBefore": "2013.01.27 02:04:05",
       "label": {
         "default": "pixiv"
       },
       "defaultAccount": "1593221",
       "postUrlTemplate": "https://www.pixiv.net/en/artworks/{id}",
-      "icon": "misc/pixiv_favicon20250122.ico"
+      "icon": "misc/pixiv_favicon20250122.ico",
+      "versions": [
+        {
+          "observedAt": "2026-09-10",
+          "account": "1593221",
+		  "title": {
+            "ja": "せんたっき"
+          },
+		  "description": {
+            "ja": "ぐぬぬ"
+          },
+          "avatar": "profiles/pixiv/5739104_せんたっき.png",
+          "banner": null
+        }
+      ]
     },
     {
       "id": "tumblr",
+	  "createdAt": 1359216801,
       "label": {
         "default": "Tumblr"
       },
       "defaultAccount": "michinoku800",
       "postUrlTemplate": "https://michinoku800.tumblr.com/post/{id}",
-      "icon": "misc/tumblr_favicon.ico"
+      "icon": "misc/tumblr_favicon.ico",
+      "versions": [
+        {
+          "observedAt": "2026-03-01",
+          "account": "michinoku800",
+		  "title": {
+            "ja": "ツネヒゴロ"
+          },
+		  "description": {
+            "ja": "10℃を下回ると更新が途絶えます"
+          },
+          "avatar": "profiles/tumblr/avatar_a40c91cb6918_512.jpg",
+          "banner": "profiles/tumblr/tumblr_static_tumblr_static_filename_focused_v3.jpg"
+        }
+      ]
     },
     {
       "id": "instagram",
@@ -35,28 +104,42 @@
       },
       "defaultAccount": "stairs2line",
       "postUrlTemplate": "https://www.instagram.com/p/{id}/",
-      "icon": "misc/instagram_favicon.png"
+      "icon": "misc/instagram_favicon.png",
+      "versions": [
+        {
+          "account": "stairs2line"
+        }
+      ]
     },
     {
       "id": "piapro",
       "label": {
         "default": "Piapro Blog"
       },
-      "icon": "misc/blog-piapro_favicon.ico"
+      "icon": "misc/blog-piapro_favicon.ico",
+      "versions": [
+        {}
+      ]
     },
     {
       "id": "snowmiku.com",
       "label": {
         "default": "Snow Miku"
       },
-      "icon": "misc/snowmiku_favicon.ico"
+      "icon": "misc/snowmiku_favicon.ico",
+      "versions": [
+        {}
+      ]
     },
     {
       "id": "pixivFANBOX",
       "label": {
         "default": "pixivFANBOX"
       },
-      "icon": "misc/Pixiv_FANBOX_(Icon).svg"
+      "icon": "misc/Pixiv_FANBOX_(Icon).svg",
+      "versions": [
+        {}
+      ]
     }
   ]
 }

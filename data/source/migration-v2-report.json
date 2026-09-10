@@ -1,8 +1,10 @@
-// Migration diagnostics for post versions and filename-based post media references.
+// Migration diagnostics for post/media migration and versioned platform profiles.
 {
   "schemaVersion": 2,
   "postCount": 243,
   "postVersionCount": 243,
+  "platformCount": 7,
+  "platformVersionCount": 7,
   "convertedMediaReferenceCount": 484,
   "unresolvedMediaReferences": [],
   "ambiguousMediaReferences": [

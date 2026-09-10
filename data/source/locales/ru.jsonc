@@ -17,6 +17,7 @@
     "unknownDate": "Дата неизвестна",
     "deleted": "Удалён",
     "alive": "Доступен",
+    "lost": "Утерян",
     "source": "Источник",
     "posts": "Публикации",
     "versions": "Версии",
@@ -45,7 +46,14 @@
     "compactView": "Компактный вид",
     "versionLabel": "Версия {current} из {total}",
     "platformTitle": "Посты на {platform}",
-    "genericDescription": "Архивная публикация stairs2line на {platform}."
+    "genericDescription": "Архивная публикация stairs2line на {platform}.",
+    "approximateDate": "≈ {date}",
+    "lostTitle": "Утерянный пост на {platform}",
+    "lostMediaOnly": "Сам пост не сохранился; остались только изображения. Дата приблизительная и восстановлена по идентификатору медиа Twitter.",
+    "activity": "Активность",
+    "publicationCount": "Публикаций: {count}",
+    "lessActivity": "Меньше",
+    "moreActivity": "Больше"
   },
   "validation": {
     "title": "Проверка архива",

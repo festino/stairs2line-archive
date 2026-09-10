@@ -31,43 +31,50 @@ export const DEFAULT_PLATFORMS = {
       label: { default: 'Twitter / X' },
       defaultAccount: 'stairs2line',
       postUrlTemplate: 'https://twitter.com/{account}/status/{id}',
-      icon: 'misc/twitter-icon-free-png.webp'
+      icon: 'misc/twitter-icon-free-png.webp',
+      versions: [{ account: 'stairs2line' }]
     },
     {
       id: 'pixiv',
       label: { default: 'pixiv' },
       defaultAccount: '1593221',
       postUrlTemplate: 'https://www.pixiv.net/en/artworks/{id}',
-      icon: 'misc/pixiv_favicon20250122.ico'
+      icon: 'misc/pixiv_favicon20250122.ico',
+      versions: [{ account: '1593221', banner: null }]
     },
     {
       id: 'tumblr',
       label: { default: 'Tumblr' },
       defaultAccount: 'michinoku800',
       postUrlTemplate: 'https://michinoku800.tumblr.com/post/{id}',
-      icon: 'misc/tumblr_favicon.ico'
+      icon: 'misc/tumblr_favicon.ico',
+      versions: [{ account: 'michinoku800' }]
     },
     {
       id: 'instagram',
       label: { default: 'Instagram' },
       defaultAccount: 'stairs2line',
       postUrlTemplate: 'https://www.instagram.com/p/{id}/',
-      icon: 'misc/instagram_favicon.png'
+      icon: 'misc/instagram_favicon.png',
+      versions: [{ account: 'stairs2line' }]
     },
     {
       id: 'piapro',
       label: { default: 'Piapro Blog' },
-      icon: 'misc/blog-piapro_favicon.ico'
+      icon: 'misc/blog-piapro_favicon.ico',
+      versions: [{}]
     },
     {
       id: 'snowmiku.com',
       label: { default: 'Snow Miku' },
-      icon: 'misc/snowmiku_favicon.ico'
+      icon: 'misc/snowmiku_favicon.ico',
+      versions: [{}]
     },
     {
       id: 'pixivFANBOX',
       label: { default: 'pixivFANBOX' },
-      icon: 'misc/Pixiv_FANBOX_(Icon).svg'
+      icon: 'misc/Pixiv_FANBOX_(Icon).svg',
+      versions: [{}]
     }
   ]
 };
@@ -91,6 +98,7 @@ export const DEFAULT_LOCALES = {
       unknownDate: 'Дата неизвестна',
       deleted: 'Удалён',
       alive: 'Доступен',
+      lost: 'Утерян',
       source: 'Источник',
       posts: 'Публикации',
       versions: 'Версии',
@@ -112,13 +120,20 @@ export const DEFAULT_LOCALES = {
     posts: {
       pageTitle: 'Посты stairs2line',
       all: 'Все посты',
+      activity: 'Активность',
+      publicationCount: 'Публикаций: {count}',
+      lessActivity: 'Меньше',
+      moreActivity: 'Больше',
       grouped: 'По площадкам',
       view: 'Вид постов',
       fullView: 'Полный вид',
       compactView: 'Компактный вид',
       versionLabel: 'Версия {current} из {total}',
       platformTitle: 'Посты на {platform}',
-      genericDescription: 'Архивная публикация stairs2line на {platform}.'
+      genericDescription: 'Архивная публикация stairs2line на {platform}.',
+      approximateDate: '≈ {date}',
+      lostTitle: 'Утерянный пост на {platform}',
+      lostMediaOnly: 'Сам пост не сохранился; остались только изображения. Дата приблизительная и восстановлена по идентификатору медиа Twitter.'
     },
     validation: {
       title: 'Проверка архива',
@@ -144,6 +159,7 @@ export const DEFAULT_LOCALES = {
       unknownDate: 'Unknown date',
       deleted: 'Deleted',
       alive: 'Available',
+      lost: 'Lost',
       source: 'Source',
       posts: 'Posts',
       versions: 'Versions',
@@ -165,13 +181,20 @@ export const DEFAULT_LOCALES = {
     posts: {
       pageTitle: 'stairs2line posts',
       all: 'All posts',
+      activity: 'Activity',
+      publicationCount: 'Posts: {count}',
+      lessActivity: 'Less',
+      moreActivity: 'More',
       grouped: 'By platform',
       view: 'Post view',
       fullView: 'Full view',
       compactView: 'Compact view',
       versionLabel: 'Version {current} of {total}',
       platformTitle: 'Posts on {platform}',
-      genericDescription: 'An archived stairs2line post on {platform}.'
+      genericDescription: 'An archived stairs2line post on {platform}.',
+      approximateDate: '≈ {date}',
+      lostTitle: 'Lost post on {platform}',
+      lostMediaOnly: 'The post itself was not preserved; only its images remain. The date is approximate and inferred from the Twitter media identifier.'
     },
     validation: {
       title: 'Archive validation',
@@ -197,6 +220,7 @@ export const DEFAULT_LOCALES = {
       unknownDate: '日付不明',
       deleted: '削除済み',
       alive: '公開中',
+      lost: '消失',
       source: '出典',
       posts: '投稿',
       versions: 'バージョン',
@@ -218,13 +242,20 @@ export const DEFAULT_LOCALES = {
     posts: {
       pageTitle: 'stairs2line 投稿',
       all: 'すべての投稿',
+      activity: 'アクティビティ',
+      publicationCount: '投稿: {count}',
+      lessActivity: '少ない',
+      moreActivity: '多い',
       grouped: 'プラットフォーム別',
       view: '投稿表示',
       fullView: '通常表示',
       compactView: 'コンパクト表示',
       versionLabel: 'バージョン {current} / {total}',
       platformTitle: '{platform}の投稿',
-      genericDescription: '{platform}にある stairs2line のアーカイブ投稿。'
+      genericDescription: '{platform}にある stairs2line のアーカイブ投稿。',
+      approximateDate: '約 {date}',
+      lostTitle: '{platform}の消失した投稿',
+      lostMediaOnly: '投稿自体は保存されておらず、画像だけが残っています。日付は Twitter のメディア識別子から推定した概算です。'
     },
     validation: {
       title: 'アーカイブ検証',

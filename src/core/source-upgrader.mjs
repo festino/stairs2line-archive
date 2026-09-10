@@ -113,6 +113,49 @@ function migrateMediaReferences(post, values, mediaById, report) {
   return unique(output);
 }
 
+
+function upgradePlatform(platform) {
+  const sourceVersions = Array.isArray(platform.versions) && platform.versions.length > 0
+    ? platform.versions
+    : [{
+      ...(platform.defaultAccount ? { account: platform.defaultAccount } : {}),
+      ...(platform.description ? { description: platform.description } : {}),
+      ...(Object.prototype.hasOwnProperty.call(platform, 'avatar') ? { avatar: platform.avatar } : {}),
+      ...(Object.prototype.hasOwnProperty.call(platform, 'banner') ? { banner: platform.banner } : {})
+    }];
+  const versions = sourceVersions.map((version) => {
+    const upgraded = compactObject({
+      observedAt: version.observedAt,
+      account: version.account,
+      description: version.description,
+      avatar: version.avatar ? normalizePath(version.avatar) : undefined,
+      banner: version.banner ? normalizePath(version.banner) : undefined
+    });
+    // null is meaningful for profile assets: it explicitly means that the
+    // profile had no custom asset at this snapshot. An omitted field means
+    // that the archive does not know whether an asset existed.
+    if (version.avatar === null) upgraded.avatar = null;
+    if (version.banner === null) upgraded.banner = null;
+    return upgraded;
+  });
+  const {
+    versions: ignoredVersions,
+    description: ignoredDescription,
+    avatar: ignoredAvatar,
+    banner: ignoredBanner,
+    ...stable
+  } = platform;
+  return { ...stable, versions };
+}
+
+function upgradePlatforms(platformsSource) {
+  if (Array.isArray(platformsSource)) return platformsSource.map(upgradePlatform);
+  return {
+    ...(platformsSource ?? {}),
+    platforms: (platformsSource?.platforms ?? []).map(upgradePlatform)
+  };
+}
+
 function legacyVersionFromPost(post) {
   const {
     key,
@@ -148,8 +191,15 @@ export function upgradeSourcePosts(source) {
     convertedMediaReferenceCount: 0,
     unresolvedMediaReferences: [],
     ambiguousMediaReferences: [],
-    injectedLayouts: []
+    injectedLayouts: [],
+    platformCount: 0,
+    platformVersionCount: 0
   };
+
+  const upgradedPlatforms = upgradePlatforms(source.platforms);
+  const platformList = Array.isArray(upgradedPlatforms) ? upgradedPlatforms : upgradedPlatforms.platforms ?? [];
+  report.platformCount = platformList.length;
+  report.platformVersionCount = platformList.reduce((sum, platform) => sum + (platform.versions?.length ?? 0), 0);
 
   const posts = (source.posts ?? []).map((post) => {
     const key = post.key ?? `${post.platform}:${post.id}`;
@@ -175,7 +225,7 @@ export function upgradeSourcePosts(source) {
     };
   });
 
-  return { ...source, posts, report };
+  return { ...source, platforms: upgradedPlatforms, posts, report };
 }
 
 export async function writeUpgradedSource(sourceRoot, outputRoot, upgradedSource) {
@@ -191,6 +241,13 @@ export async function writeUpgradedSource(sourceRoot, outputRoot, upgradedSource
     path.join(outputPath, 'site.jsonc'),
     site,
     'Human-editable archive configuration. Code comments must remain in English.'
+  );
+
+
+  await writeJson(
+    path.join(outputPath, 'platforms.jsonc'),
+    cleanEntity(upgradedSource.platforms),
+    'Platform definitions. Profile fields live in ordered versions; the last version is current.'
   );
 
   const groups = new Map();

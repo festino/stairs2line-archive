@@ -78,6 +78,34 @@ function platformIconUrl(manifest, platform) {
   return joinUrl(manifest.site.basePath, `${mediaBase}/${platform.icon}`);
 }
 
+
+function currentPlatformVersion(platform) {
+  return platform?.versions?.at(-1) ?? platform ?? {};
+}
+
+function platformProfileAssetUrl(manifest, filePath) {
+  if (!filePath || !manifest.files[filePath]) return null;
+  return mediaUrl(manifest, filePath);
+}
+
+function platformAvatarUrl(manifest, platform) {
+  const profile = currentPlatformVersion(platform);
+  if (Object.prototype.hasOwnProperty.call(profile, 'avatar')) {
+    return profile.avatar === null ? null : platformProfileAssetUrl(manifest, profile.avatar);
+  }
+  return platformIconUrl(manifest, platform);
+}
+
+function platformBannerUrl(manifest, platform) {
+  const profile = currentPlatformVersion(platform);
+  return typeof profile.banner === 'string' ? platformProfileAssetUrl(manifest, profile.banner) : null;
+}
+
+function platformBannerKnownAbsent(platform) {
+  const profile = currentPlatformVersion(platform);
+  return Object.prototype.hasOwnProperty.call(profile, 'banner') && profile.banner === null;
+}
+
 function outputFile(outputRoot, language, relative = '') {
   const clean = String(relative).replace(/^\/+|\/+$/g, '');
   return path.join(outputRoot, language, clean, 'index.html');
@@ -176,10 +204,12 @@ function renderPlatformLinks(manifest, media, language) {
   for (const postId of media.postIds ?? []) {
     const post = postsByKey.get(postId);
     const platform = platformsById.get(post?.platform);
-    if (!post || !platform || !post.href) continue;
+    if (!post || !platform) continue;
     const icon = platformIconUrl(manifest, platform);
     const label = platformLabel(platform, language, manifest.defaultLanguage);
-    links.push(`<a class="platform-link ${post.status === 'deleted' ? 'is-deleted' : ''}" href="${escapeAttribute(post.href)}" target="_blank" rel="noreferrer" title="${escapeAttribute(label)}">${icon ? `<img src="${escapeAttribute(icon)}" alt="">` : escapeHtml(label)}</a>`);
+    const href = post.href ?? routeUrl(manifest, language, `posts/${encodeURIComponent(post.platform)}/${encodeURIComponent(post.id)}/`);
+    const external = Boolean(post.href);
+    links.push(`<a class="platform-link ${post.status === 'deleted' || post.status === 'lost' ? 'is-deleted' : ''}" href="${escapeAttribute(href)}"${external ? ' target="_blank" rel="noreferrer"' : ''} title="${escapeAttribute(label)}">${icon ? `<img src="${escapeAttribute(icon)}" alt="">` : escapeHtml(label)}</a>`);
   }
   return links.length > 0 ? `<div class="platform-links">${links.join('')}</div>` : '';
 }
@@ -222,6 +252,25 @@ function latestPostVersion(post) {
   return post.versions?.at(-1) ?? post;
 }
 
+function isRecoveredMediaOnly(post) {
+  return post?.recovery?.kind === 'media-only';
+}
+
+function displayPostDate(manifest, post, language, options = {}) {
+  if (!post.publishedAt) return localeText(manifest.locales, language, 'common.unknownDate');
+  const date = formatDate(post.publishedAt, language, options);
+  return post.dateApproximate
+    ? localeText(manifest.locales, language, 'posts.approximateDate', { date })
+    : date;
+}
+
+function fallbackPostTitle(manifest, post, platform, language) {
+  const label = platformLabel(platform, language, manifest.defaultLanguage);
+  return isRecoveredMediaOnly(post)
+    ? localeText(manifest.locales, language, 'posts.lostTitle', { platform: label })
+    : `${label} ${post.id}`;
+}
+
 function defaultTumblrRows(mediaCount) {
   const rows = [];
   let index = 0;
@@ -262,9 +311,10 @@ function twitterSingleMediaCropClass(manifest, mediaRef) {
 function renderPostMedia(manifest, post, version, language, index) {
   const mediaRefs = version.mediaRefs ?? post.mediaRefs ?? [];
   if (mediaRefs.length === 0) return '';
+  const platform = manifest.platforms.find((item) => item.id === post.platform);
   const title = localizedValue(version.title, language, version.originalLanguage)
     ?? localizedValue(version.description, language, version.originalLanguage)
-    ?? post.key;
+    ?? fallbackPostTitle(manifest, post, platform, language);
 
   if (post.platform === 'tumblr') {
     const used = new Set();
@@ -294,7 +344,7 @@ function renderPostCard(manifest, post, language, index, options = {}) {
   const icon = platformIconUrl(manifest, platform);
   const title = displayTitle(version, language, version.originalLanguage);
   const description = displayDescription(version, language, version.originalLanguage);
-  const date = post.publishedAt ? formatDate(post.publishedAt, language) : localeText(manifest.locales, language, 'common.unknownDate');
+  const date = displayPostDate(manifest, post, language, { includeTime: true });
   const href = routeUrl(manifest, language, `posts/${encodeURIComponent(post.platform)}/${encodeURIComponent(post.id)}/`);
   const versionCount = post.versions?.length ?? 1;
   const versionLabel = options.versionLabel ? `<div class="post-version-label">${escapeHtml(options.versionLabel)}</div>` : '';
@@ -313,6 +363,7 @@ function renderPostCard(manifest, post, language, index, options = {}) {
     <div class="post-body">
       ${title ? `<h2>${escapeHtml(title)}</h2>` : ''}
       ${description ? `<div class="post-text" lang="${escapeAttribute(version.originalLanguage)}">${linkify(description).replaceAll('\n', '<br>')}</div>` : ''}
+      ${isRecoveredMediaOnly(post) ? `<p class="lost-post-note">${escapeHtml(localeText(manifest.locales, language, 'posts.lostMediaOnly'))}</p>` : ''}
       ${renderPostMedia(manifest, post, version, language, index)}
     </div>
     <!--<footer class="post-footer">
@@ -342,13 +393,12 @@ function renderCompactPost(manifest, post, language) {
   const version = latestPostVersion(post);
   const mediaRefs = version.mediaRefs ?? [];
   const mediaCount = mediaRefs.length;
+  const platform = manifest.platforms.find((item) => item.id === post.platform);
   const title = displayTitle(version, language, version.originalLanguage)
     ?? displayDescription(version, language, version.originalLanguage)
-    ?? post.key;
+    ?? fallbackPostTitle(manifest, post, platform, language);
   const postHref = routeUrl(manifest, language, `posts/${encodeURIComponent(post.platform)}/${encodeURIComponent(post.id)}/`);
-  const date = post.publishedAt
-    ? formatDate(post.publishedAt, language, { includeTime: false })
-    : localeText(manifest.locales, language, 'common.unknownDate');
+  const date = displayPostDate(manifest, post, language, { includeTime: false });
   const badge = post.platform === 'pixiv' && mediaCount > 1
     ? `<span class="compact-media-count compact-media-count--pixiv">${layersIcon()}<span>${mediaCount}</span></span>`
     : post.platform === 'twitter' && mediaCount > 1
@@ -361,8 +411,12 @@ function renderCompactPost(manifest, post, language) {
       ? `<time class="compact-date-tooltip" datetime="${escapeAttribute(post.publishedAt ?? '')}">${escapeHtml(date)}</time>`
       : '';
 
-  return `<a class="compact-post compact-post--${escapeAttribute(post.platform)}" data-list-item href="${escapeAttribute(postHref)}" title="${escapeAttribute(post.platform === 'tumblr' ? date : title)}">
-    <span class="compact-post-media">${compactMediaElement(manifest, mediaRefs[0], title)}${badge}</span>
+  const lostBadge = isRecoveredMediaOnly(post)
+    ? `<span class="compact-lost-badge">${escapeHtml(localeText(manifest.locales, language, 'common.lost'))}</span>`
+    : '';
+
+  return `<a class="compact-post compact-post--${escapeAttribute(post.platform)}${isRecoveredMediaOnly(post) ? ' compact-post--lost' : ''}" data-list-item href="${escapeAttribute(postHref)}" title="${escapeAttribute(post.platform === 'tumblr' ? date : title)}">
+    <span class="compact-post-media">${compactMediaElement(manifest, mediaRefs[0], title)}${badge}${lostBadge}</span>
     ${titleMarkup}
   </a>`;
 }
@@ -376,6 +430,88 @@ function formatMonthYear(value, language) {
     year: 'numeric',
     timeZone: 'UTC'
   }).format(date);
+}
+
+
+function formatMonthName(monthIndex, language, style = 'short') {
+  return new Intl.DateTimeFormat(language, { month: style, timeZone: 'UTC' })
+    .format(new Date(Date.UTC(2020, monthIndex, 1)));
+}
+
+function activityLevel(count, nonzeroCounts) {
+  if (count <= 0) return 0;
+  const uniqueCounts = [...new Set(nonzeroCounts)].sort((a, b) => a - b);
+  if (uniqueCounts.length === 1) return 3;
+  const rank = uniqueCounts.indexOf(count);
+  return 1 + Math.round((rank / (uniqueCounts.length - 1)) * 4);
+}
+
+function renderActivityPost(manifest, post, language) {
+  const version = latestPostVersion(post);
+  const mediaRef = version.mediaRefs?.[0] ?? null;
+  const platform = manifest.platforms.find((item) => item.id === post.platform);
+  const icon = platformIconUrl(manifest, platform);
+  const label = platformLabel(platform, language, manifest.defaultLanguage);
+  const title = displayTitle(version, language, version.originalLanguage)
+    ?? displayDescription(version, language, version.originalLanguage)
+    ?? fallbackPostTitle(manifest, post, platform, language);
+  const date = displayPostDate(manifest, post, language, { includeTime: false });
+  const href = routeUrl(manifest, language, `posts/${encodeURIComponent(post.platform)}/${encodeURIComponent(post.id)}/`);
+  return `<a class="activity-post" href="${escapeAttribute(href)}" title="${escapeAttribute(title)}">
+    <span class="activity-post-thumbnail">${compactMediaElement(manifest, mediaRef, title)}${icon ? `<span class="activity-post-platform"><img src="${escapeAttribute(icon)}" alt="${escapeAttribute(label)}"></span>` : ''}</span>
+    <span class="activity-post-copy"><strong>${escapeHtml(title)}</strong><span>${escapeHtml(date)} · ${escapeHtml(label)}</span></span>
+  </a>`;
+}
+
+function renderPostActivityMap(manifest, posts, language, direction = 'desc') {
+  const byYear = new Map();
+  const unknown = [];
+  for (const post of posts) {
+    const date = post.publishedAt ? new Date(post.publishedAt) : null;
+    if (!date || Number.isNaN(date.getTime())) {
+      unknown.push(post);
+      continue;
+    }
+    const year = date.getUTCFullYear();
+    const month = date.getUTCMonth();
+    if (!byYear.has(year)) byYear.set(year, Array.from({ length: 12 }, () => []));
+    byYear.get(year)[month].push(post);
+  }
+
+  const counts = [...byYear.values()].flatMap((months) => months.map((items) => items.length)).filter(Boolean);
+  const years = [...byYear.keys()].sort((a, b) => direction === 'asc' ? a - b : b - a);
+  const rows = years.map((year) => {
+    const months = byYear.get(year);
+    const monthCells = months.map((monthPosts, monthIndex) => {
+      const count = monthPosts.length;
+      const monthName = formatMonthName(monthIndex, language, 'long');
+      const shortName = formatMonthName(monthIndex, language, 'short');
+      const label = `${monthName} ${year}`;
+      if (count === 0) {
+        return `<div class="activity-month activity-month--empty" title="${escapeAttribute(label)}"><span class="activity-month-dot" data-activity-level="0"></span><span class="activity-month-label">${escapeHtml(shortName)}</span></div>`;
+      }
+      const level = activityLevel(count, counts);
+      const sortedPosts = [...monthPosts].sort((a, b) => compareNullableDates(a.publishedAt, b.publishedAt, direction) || a.key.localeCompare(b.key));
+      return `<details class="activity-month" title="${escapeAttribute(`${label} · ${localeText(manifest.locales, language, 'posts.publicationCount', { count })}`)}">
+        <summary><span class="activity-month-dot" data-activity-level="${level}"><span>${count}</span></span><span class="activity-month-label">${escapeHtml(shortName)}</span></summary>
+        <div class="activity-popover">
+          <strong class="activity-popover-title">${escapeHtml(label)}</strong>
+          <span class="activity-popover-count">${escapeHtml(localeText(manifest.locales, language, 'posts.publicationCount', { count }))}</span>
+          <div class="activity-post-list">${sortedPosts.map((post) => renderActivityPost(manifest, post, language)).join('')}</div>
+        </div>
+      </details>`;
+    }).join('');
+    return `<section class="activity-year"><h2>${year}</h2><div class="activity-months">${monthCells}</div></section>`;
+  }).join('');
+
+  const unknownMarkup = unknown.length > 0
+    ? `<section class="activity-unknown"><h2>${escapeHtml(localeText(manifest.locales, language, 'common.unknownDate'))}</h2><div class="activity-post-list">${unknown.map((post) => renderActivityPost(manifest, post, language)).join('')}</div></section>`
+    : '';
+  return `<section class="post-activity" aria-label="${escapeAttribute(localeText(manifest.locales, language, 'posts.activity'))}">
+    <div class="activity-legend"><span>${escapeHtml(localeText(manifest.locales, language, 'posts.lessActivity'))}</span>${[0,1,2,3,4,5].map((level) => `<span class="activity-legend-dot" data-activity-level="${level}"></span>`).join('')}<span>${escapeHtml(localeText(manifest.locales, language, 'posts.moreActivity'))}</span></div>
+    ${rows || `<p>${escapeHtml(localeText(manifest.locales, language, 'common.noItems'))}</p>`}
+    ${unknownMarkup}
+  </section>`;
 }
 
 function renderCompactListing(manifest, posts, language, platform) {
@@ -408,24 +544,30 @@ function renderPlatformHero(manifest, platform, language, options = {}) {
   if (!platform) return '';
   const label = platformLabel(platform, language, manifest.defaultLanguage);
   const icon = platformIconUrl(manifest, platform);
-  const account = platform.defaultAccount ? String(platform.defaultAccount) : '';
+  const avatar = platformAvatarUrl(manifest, platform);
+  const banner = platformBannerUrl(manifest, platform);
+  const profile = currentPlatformVersion(platform);
+  const account = profile.account ?? platform.defaultAccount ?? '';
+  const bio = localizedValue(profile.description, language, manifest.defaultLanguage);
   const baseSegment = `posts/platform/${encodeURIComponent(platform.id)}`;
-  const fullHref = routeUrl(manifest, language, `${baseSegment}${options.oldest ? '/oldest' : ''}/`);
-  const compactHref = routeUrl(manifest, language, `${baseSegment}/compact${options.oldest ? '/oldest' : ''}/`);
-  const bannerStyle = platform.banner
-    ? ` style="background-image:url('${escapeAttribute(mediaUrl(manifest, platform.banner))}')"`
+  const compactHref = routeUrl(manifest, language, `${baseSegment}${options.oldest ? '/oldest' : ''}/`);
+  const fullHref = routeUrl(manifest, language, `${baseSegment}/full${options.oldest ? '/oldest' : ''}/`);
+  const bannerStyle = banner
+    ? ` style="background-image:url('${escapeAttribute(banner)}')"`
     : '';
-  return `<section class="platform-hero platform-hero--${escapeAttribute(platform.id)}">
+  const noBanner = platformBannerKnownAbsent(platform);
+  return `<section class="platform-hero platform-hero--${escapeAttribute(platform.id)}${noBanner ? ' platform-hero--no-banner' : ''}">
     <div class="platform-hero-banner"${bannerStyle}></div>
     <div class="platform-hero-profile">
-      <div class="platform-hero-icon">${icon ? `<img src="${escapeAttribute(icon)}" alt="">` : `<span>${escapeHtml(label.slice(0, 1))}</span>`}</div>
+      <div class="platform-hero-icon">${avatar ? `<img src="${escapeAttribute(avatar)}" alt="">` : `<span>${escapeHtml(label.slice(0, 1))}</span>`}${avatar && icon && avatar !== icon ? `<span class="platform-hero-platform-icon"><img src="${escapeAttribute(icon)}" alt=""></span>` : ''}</div>
       <div class="platform-hero-copy">
         <strong>${escapeHtml(label)}</strong>
         ${account ? `<span>${escapeHtml(platform.id === 'twitter' ? `@${account}` : account)}</span>` : ''}
+        ${bio ? `<p class="platform-hero-bio">${linkify(bio).replaceAll('\n', '<br>')}</p>` : ''}
       </div>
       <nav class="platform-view-tabs" aria-label="${escapeAttribute(localeText(manifest.locales, language, 'posts.view'))}">
-        <a class="${options.compact ? '' : 'active'}" href="${escapeAttribute(fullHref)}">${escapeHtml(localeText(manifest.locales, language, 'posts.fullView'))}</a>
         <a class="${options.compact ? 'active' : ''}" href="${escapeAttribute(compactHref)}">${escapeHtml(localeText(manifest.locales, language, 'posts.compactView'))}</a>
+        <a class="${options.compact ? '' : 'active'}" href="${escapeAttribute(fullHref)}">${escapeHtml(localeText(manifest.locales, language, 'posts.fullView'))}</a>
       </nav>
     </div>
   </section>`;
@@ -652,7 +794,7 @@ async function buildArtworkPages(outputRoot, manifest, language) {
           </details>-->
           ${linkedPosts.length > 0 ? `
           <ul class="artwork-posts">
-            ${linkedPosts.map((post) => `<li><a href="${escapeAttribute(routeUrl(manifest, language, `posts/${encodeURIComponent(post.platform)}/${encodeURIComponent(post.id)}/`))}"><div class="platform-link"><img src="${platformIconUrl(manifest, manifest.platforms.find((item) => item.id === post.platform))}" alt=""></div>${formatDate(post.publishedAt, language, { includeTime: true }) }</a></li>`).join('')}
+            ${linkedPosts.map((post) => `<li><a href="${escapeAttribute(routeUrl(manifest, language, `posts/${encodeURIComponent(post.platform)}/${encodeURIComponent(post.id)}/`))}"><div class="platform-link"><img src="${platformIconUrl(manifest, manifest.platforms.find((item) => item.id === post.platform))}" alt=""></div>${displayPostDate(manifest, post, language, { includeTime: true })}</a></li>`).join('')}
           </ul>` : ''}
         </article>`;
       }).join('');
@@ -681,7 +823,7 @@ function postsTabs(manifest, language, active) {
     {
       active: active === 'all',
       href: routeUrl(manifest, language, 'posts/'),
-      label: localeText(manifest.locales, language, 'posts.all')
+      label: localeText(manifest.locales, language, 'posts.activity')
     },
     {
       active: active === 'grouped',
@@ -695,28 +837,21 @@ async function buildPostListings(outputRoot, manifest, language) {
   for (const direction of ['desc', 'asc']) {
     const oldest = direction === 'asc';
     const baseRelative = oldest ? 'posts/oldest' : 'posts';
-    const posts = [...manifest.posts].sort((a, b) => compareNullableDates(a.publishedAt, b.publishedAt, direction) || a.key.localeCompare(b.key));
-    await writePaginatedListing(
-      outputRoot,
-      manifest,
-      language,
-      baseRelative,
-      posts,
-      manifest.site.pageSize?.posts ?? 20,
-      (post, index) => renderPostCard(manifest, post, language, index),
-      {
-        heading: localeText(manifest.locales, language, 'posts.pageTitle'),
-        title: `${localeText(manifest.locales, language, 'posts.pageTitle')} · stairs2line`,
-        description: localizedValue(manifest.site.description, language, manifest.defaultLanguage),
-        listClass: 'post-list',
-        noindex: oldest,
-        toolbar: {
-          tabs: postsTabs(manifest, language, 'all'),
-          sortHref: routeUrl(manifest, language, oldest ? 'posts/' : 'posts/oldest/'),
-          sortLabel: localeText(manifest.locales, language, oldest ? 'common.oldest' : 'common.newest')
-        }
-      }
-    );
+    const body = `<h1>${escapeHtml(localeText(manifest.locales, language, 'posts.pageTitle'))}</h1>
+      ${renderToolbar(manifest, language, {
+        tabs: postsTabs(manifest, language, 'all'),
+        sortHref: routeUrl(manifest, language, oldest ? 'posts/' : 'posts/oldest/'),
+        sortLabel: localeText(manifest.locales, language, oldest ? 'common.oldest' : 'common.newest'),
+        enableFeed: false
+      })}
+      ${renderPostActivityMap(manifest, manifest.posts, language, direction)}`;
+    await writePage(outputRoot, manifest, language, baseRelative, layout(manifest, language, `${baseRelative}/`, {
+      title: `${localeText(manifest.locales, language, 'posts.pageTitle')} · stairs2line`,
+      description: localizedValue(manifest.site.description, language, manifest.defaultLanguage),
+      noindex: oldest,
+      bodyClass: 'post-activity-page',
+      body
+    }));
   }
 
   for (const platform of manifest.platforms) {
@@ -725,35 +860,12 @@ async function buildPostListings(outputRoot, manifest, language) {
     for (const direction of ['desc', 'asc']) {
       const oldest = direction === 'asc';
       const baseSegment = `posts/platform/${encodeURIComponent(platform.id)}`;
-      const baseRelative = oldest ? `${baseSegment}/oldest` : baseSegment;
       const sorted = [...platformPosts].sort((a, b) => compareNullableDates(a.publishedAt, b.publishedAt, direction) || a.key.localeCompare(b.key));
       const label = platformLabel(platform, language, manifest.defaultLanguage);
-      await writePaginatedListing(
-        outputRoot,
-        manifest,
-        language,
-        baseRelative,
-        sorted,
-        manifest.site.pageSize?.posts ?? 20,
-        (post, index) => renderPostCard(manifest, post, language, index),
-        {
-          heading: localeText(manifest.locales, language, 'posts.platformTitle', { platform: label }),
-          title: `${label} · ${localeText(manifest.locales, language, 'posts.pageTitle')}`,
-          description: localeText(manifest.locales, language, 'posts.genericDescription', { platform: label }),
-          listClass: 'post-list',
-          beforeHeading: renderPlatformHero(manifest, platform, language, { oldest, compact: false }),
-          bodyClass: `platform-page platform-page--${platform.id}`,
-          noindex: oldest,
-          toolbar: {
-            tabs: postsTabs(manifest, language, 'grouped'),
-            sortHref: routeUrl(manifest, language, oldest ? `${baseSegment}/` : `${baseSegment}/oldest/`),
-            sortLabel: localeText(manifest.locales, language, oldest ? 'common.oldest' : 'common.newest')
-          }
-        }
-      );
 
-      const compactRelative = `${baseSegment}/compact${oldest ? '/oldest' : ''}`;
-      const compactSortHref = routeUrl(manifest, language, `${baseSegment}/compact${oldest ? '' : '/oldest'}/`);
+      // Compact archives are the canonical/default platform view.
+      const compactRelative = oldest ? `${baseSegment}/oldest` : baseSegment;
+      const compactSortHref = routeUrl(manifest, language, oldest ? `${baseSegment}/` : `${baseSegment}/oldest/`);
       const compactBody = `${renderPlatformHero(manifest, platform, language, { oldest, compact: true })}
         <h1>${escapeHtml(localeText(manifest.locales, language, 'posts.platformTitle', { platform: label }))}</h1>
         ${renderToolbar(manifest, language, {
@@ -770,8 +882,56 @@ async function buildPostListings(outputRoot, manifest, language) {
         bodyClass: `platform-page platform-page--${platform.id} compact-platform-page`,
         body: compactBody
       }));
+
+      // Preserve the old /compact route as a noindex compatibility alias.
+      const legacyCompactRelative = `${baseSegment}/compact${oldest ? '/oldest' : ''}`;
+      await writePage(outputRoot, manifest, language, legacyCompactRelative, layout(manifest, language, `${legacyCompactRelative}/`, {
+        title: `${label} · ${localeText(manifest.locales, language, 'posts.compactView')}`,
+        description: localeText(manifest.locales, language, 'posts.genericDescription', { platform: label }),
+        noindex: true,
+        bodyClass: `platform-page platform-page--${platform.id} compact-platform-page`,
+        body: compactBody
+      }));
+
+      const fullRelative = `${baseSegment}/full${oldest ? '/oldest' : ''}`;
+      await writePaginatedListing(
+        outputRoot,
+        manifest,
+        language,
+        fullRelative,
+        sorted,
+        manifest.site.pageSize?.posts ?? 20,
+        (post, index) => renderPostCard(manifest, post, language, index),
+        {
+          heading: localeText(manifest.locales, language, 'posts.platformTitle', { platform: label }),
+          title: `${label} · ${localeText(manifest.locales, language, 'posts.fullView')}`,
+          description: localeText(manifest.locales, language, 'posts.genericDescription', { platform: label }),
+          listClass: 'post-list',
+          beforeHeading: renderPlatformHero(manifest, platform, language, { oldest, compact: false }),
+          bodyClass: `platform-page platform-page--${platform.id} full-platform-page`,
+          noindex: oldest,
+          toolbar: {
+            tabs: postsTabs(manifest, language, 'grouped'),
+            sortHref: routeUrl(manifest, language, oldest ? `${baseSegment}/full/` : `${baseSegment}/full/oldest/`),
+            sortLabel: localeText(manifest.locales, language, oldest ? 'common.oldest' : 'common.newest')
+          }
+        }
+      );
     }
   }
+}
+
+function renderPlatformPreviewPost(manifest, post, language) {
+  const version = latestPostVersion(post);
+  const mediaRef = version.mediaRefs?.[0] ?? null;
+  const platform = manifest.platforms.find((item) => item.id === post.platform);
+  const title = displayTitle(version, language, version.originalLanguage)
+    ?? displayDescription(version, language, version.originalLanguage)
+    ?? fallbackPostTitle(manifest, post, platform, language);
+  const date = displayPostDate(manifest, post, language, { includeTime: false });
+  const href = routeUrl(manifest, language, `posts/${encodeURIComponent(post.platform)}/${encodeURIComponent(post.id)}/`);
+  const lostBadge = isRecoveredMediaOnly(post) ? `<span class="platform-preview-lost">${escapeHtml(localeText(manifest.locales, language, 'common.lost'))}</span>` : '';
+  return `<a class="platform-preview-post${isRecoveredMediaOnly(post) ? ' platform-preview-post--lost' : ''}" href="${escapeAttribute(href)}" title="${escapeAttribute(`${date} · ${title}`)}">${compactMediaElement(manifest, mediaRef, title)}${lostBadge}</a>`;
 }
 
 async function buildPlatformIndex(outputRoot, manifest, language) {
@@ -780,22 +940,39 @@ async function buildPlatformIndex(outputRoot, manifest, language) {
     if (posts.length === 0) return '';
     const label = platformLabel(platform, language, manifest.defaultLanguage);
     const icon = platformIconUrl(manifest, platform);
+    const avatar = platformAvatarUrl(manifest, platform);
+    const banner = platformBannerUrl(manifest, platform);
+    const profile = currentPlatformVersion(platform);
+    const account = profile.account ?? platform.defaultAccount ?? '';
+    const bio = localizedValue(profile.description, language, manifest.defaultLanguage);
     const dated = posts.filter((post) => post.publishedAt).sort((a, b) => compareNullableDates(a.publishedAt, b.publishedAt, 'asc'));
     const first = dated[0]?.publishedAt ? formatDate(dated[0].publishedAt, language, { includeTime: false }) : null;
     const last = dated.at(-1)?.publishedAt ? formatDate(dated.at(-1).publishedAt, language, { includeTime: false }) : null;
-    return `<article class="platform-card" data-list-item>
-      <h2><a href="${escapeAttribute(routeUrl(manifest, language, `posts/platform/${encodeURIComponent(platform.id)}/`))}">${icon ? `<img src="${escapeAttribute(icon)}" alt="">` : ''}${escapeHtml(label)}</a></h2>
-      <p>${posts.length} ${escapeHtml(localeText(manifest.locales, language, 'common.posts').toLowerCase())}</p>
-      ${first || last ? `<p class="metadata">${escapeHtml(first ?? '—')} — ${escapeHtml(last ?? '—')}</p>` : ''}
-      <div class="platform-preview">${posts.sort((a, b) => compareNullableDates(a.publishedAt, b.publishedAt, 'desc')).slice(0, 3).map((post, index) => renderPostCard(manifest, post, language, index)).join('')}</div>
+    const previewPosts = [...posts].sort((a, b) => compareNullableDates(a.publishedAt, b.publishedAt, 'desc')).slice(0, 6);
+    const href = routeUrl(manifest, language, `posts/platform/${encodeURIComponent(platform.id)}/`);
+    const noBanner = platformBannerKnownAbsent(platform);
+    return `<article class="platform-card platform-card--${escapeAttribute(platform.id)}${noBanner ? ' platform-card--no-banner' : ''}" data-list-item>
+      <a class="platform-card-banner" href="${escapeAttribute(href)}"${banner ? ` style="background-image:url('${escapeAttribute(banner)}')"` : ''} aria-label="${escapeAttribute(label)}"></a>
+      <div class="platform-card-profile">
+        <a class="platform-card-avatar" href="${escapeAttribute(href)}">${avatar ? `<img src="${escapeAttribute(avatar)}" alt="">` : `<span>${escapeHtml(label.slice(0, 1))}</span>`}${avatar && icon && avatar !== icon ? `<span class="platform-card-platform-icon"><img src="${escapeAttribute(icon)}" alt=""></span>` : ''}</a>
+        <div class="platform-card-copy">
+          <h2><a href="${escapeAttribute(href)}">${escapeHtml(label)}</a></h2>
+          ${account ? `<span class="metadata">${escapeHtml(platform.id === 'twitter' ? `@${account}` : account)}</span>` : ''}
+        </div>
+        <div class="platform-card-count"><strong>${posts.length}</strong><span>${escapeHtml(localeText(manifest.locales, language, 'common.posts').toLowerCase())}</span></div>
+      </div>
+      ${bio ? `<p class="platform-card-bio">${linkify(bio).replaceAll('\n', '<br>')}</p>` : ''}
+      ${first || last ? `<p class="metadata platform-card-dates">${escapeHtml(first ?? '—')} — ${escapeHtml(last ?? '—')}</p>` : ''}
+      <div class="platform-preview">${previewPosts.map((post) => renderPlatformPreviewPost(manifest, post, language)).join('')}</div>
     </article>`;
-  }).filter(Boolean).join('');
+  }).join('');
   const body = `<h1>${escapeHtml(localeText(manifest.locales, language, 'posts.grouped'))}</h1>
     ${renderToolbar(manifest, language, { tabs: postsTabs(manifest, language, 'grouped'), enableFeed: false })}
     <section class="platform-list" data-paged-list>${cards}</section>`;
   await writePage(outputRoot, manifest, language, 'posts/by-platform', layout(manifest, language, 'posts/by-platform/', {
     title: `${localeText(manifest.locales, language, 'posts.grouped')} · stairs2line`,
     description: localizedValue(manifest.site.description, language, manifest.defaultLanguage),
+    bodyClass: 'platform-index-page',
     body
   }));
 }
@@ -805,9 +982,12 @@ async function buildPostPages(outputRoot, manifest, language) {
     const platform = manifest.platforms.find((item) => item.id === post.platform);
     const label = platformLabel(platform, language, manifest.defaultLanguage);
     const currentVersion = latestPostVersion(post);
-    const title = displayTitle(currentVersion, language, currentVersion.originalLanguage) ?? `${label} ${post.id}`;
+    const title = displayTitle(currentVersion, language, currentVersion.originalLanguage)
+      ?? fallbackPostTitle(manifest, post, platform, language);
     const description = displayDescription(currentVersion, language, currentVersion.originalLanguage)
-      ?? localeText(manifest.locales, language, 'posts.genericDescription', { platform: label });
+      ?? (isRecoveredMediaOnly(post)
+        ? localeText(manifest.locales, language, 'posts.lostMediaOnly')
+        : localeText(manifest.locales, language, 'posts.genericDescription', { platform: label }));
     const versions = post.versions?.length ? post.versions : [currentVersion];
     const versionCards = versions.map((version, index) => renderPostCard(manifest, post, language, index, {
       version,
@@ -860,6 +1040,8 @@ function buildViewerIndex(manifest) {
       platform: post.platform,
       status: post.status,
       publishedAt: post.publishedAt,
+      dateApproximate: post.dateApproximate ?? false,
+      recovery: post.recovery ?? null,
       title: post.title,
       description: post.description,
       href: post.href,
@@ -871,7 +1053,8 @@ function buildViewerIndex(manifest) {
         description: version.description,
         href: version.href,
         mediaFiles: version.mediaFiles,
-        layout: version.layout
+        layout: version.layout,
+        recovery: version.recovery ?? null
       }))
     }])),
     artworks: Object.fromEntries(manifest.artworks.map((artwork) => [artwork.id, {

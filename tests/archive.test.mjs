@@ -8,11 +8,14 @@ import { DEFAULT_LOCALES } from '../src/core/default-data.mjs';
 import { buildFileCatalog, extractLegacyMediaId, extractPostIdFromFile } from '../src/core/file-catalog.mjs';
 import { parseLegacyArchive } from '../src/core/legacy-parser.mjs';
 import { buildStaticSite } from '../src/core/site-builder.mjs';
+import { upgradeSourcePosts } from '../src/core/source-upgrader.mjs';
 
 const TWITTER_FILE = 'twitter/123456789012345678_ABCDEF123456789.png';
 const PIXIV_FILE = 'pixiv/999_p0.png';
 const MISSING_FILE = 'pixiv/missing.png';
 const MEDIA_ID = 'artwork-0001/v01/m01';
+const ORPHAN_TWITTER_FILE = 'twitter/COJhPv9UsAAvk7w.png';
+const UNKNOWN_OTHER_FILE = 'other/before-2018-02-24_18ac61fd0b9bf40272f9905d74fa1bd0eb3609cf3cb9-eAQRcV_fw1200.png';
 const TWITTER_LAYOUT_FILES = [
   'twitter/200000000000000001_LAYOUT000000001.png',
   'twitter/200000000000000002_LAYOUT000000002.png',
@@ -26,6 +29,17 @@ function fakePng(width, height, extraBytes = 0) {
   buffer.writeUInt32BE(width, 16);
   buffer.writeUInt32BE(height, 20);
   return buffer;
+}
+
+const TWITTER_EPOCH_MS = 1288834974657n;
+
+function twitterMediaIdAt(isoDate, discriminator = 0) {
+  const milliseconds = BigInt(Date.parse(isoDate));
+  const snowflake = ((milliseconds - TWITTER_EPOCH_MS) << 22n) | BigInt(discriminator & 0x3fffff);
+  const bytes = Buffer.alloc(9);
+  bytes.writeBigUInt64BE(snowflake, 0);
+  bytes[8] = discriminator & 0xff;
+  return bytes.toString('base64url');
 }
 
 function fixtureSource() {
@@ -48,18 +62,21 @@ function fixtureSource() {
           id: 'twitter',
           label: { default: 'Twitter' },
           defaultAccount: 'stairs2line',
-          postUrlTemplate: 'https://twitter.com/{account}/status/{id}'
+          postUrlTemplate: 'https://twitter.com/{account}/status/{id}',
+          versions: [{ account: 'stairs2line' }]
         },
         {
           id: 'pixiv',
           label: { default: 'pixiv' },
-          postUrlTemplate: 'https://www.pixiv.net/artworks/{id}'
+          postUrlTemplate: 'https://www.pixiv.net/artworks/{id}',
+          versions: [{}]
         },
         {
           id: 'tumblr',
           label: { default: 'Tumblr' },
           defaultAccount: 'stairs2line',
-          postUrlTemplate: 'https://{account}.tumblr.com/post/{id}'
+          postUrlTemplate: 'https://{account}.tumblr.com/post/{id}',
+          versions: [{ account: 'stairs2line' }]
         }
       ]
     },
@@ -227,6 +244,7 @@ test('resolve step upgrades legacy posts to filename references and preserves au
   const mediaRoot = await createMediaFixture();
   const source = fixtureSource();
   source.site.schemaVersion = 1;
+  delete source.platforms.platforms[0].versions;
   source.artworks[0].versions[0].media[0].files = [MISSING_FILE];
   source.posts[0] = {
     key: 'twitter:123456789012345678',
@@ -254,6 +272,7 @@ test('resolve step upgrades legacy posts to filename references and preserves au
   assert.equal(source.site.schemaVersion, 2);
   assert.deepEqual(source.posts[0].versions[0].media, [TWITTER_FILE]);
   assert.equal('media' in source.posts[0], false);
+  assert.equal(source.platforms.platforms[0].versions[0].account, 'stairs2line');
 });
 
 test('post versions keep mutable fields and layout independent', async () => {
@@ -334,14 +353,22 @@ test('static pages use the logical media display file and expose paged/feed cont
   assert.match(artworkHtml, /href="\/repo\/en\/artworks\/oldest\/"/);
 
   const twitterHtml = await fs.readFile(path.join(output, 'en', 'posts', 'platform', 'twitter', 'index.html'), 'utf8');
-  assert.match(twitterHtml, /<img[^>]+data-file-path="twitter\/123456789012345678_ABCDEF123456789\.png"[^>]+src="\/repo\/media\/stairs2line\/pixiv\/999_p0\.png"/);
-  assert.match(twitterHtml, /post-media-count-1 twitter-single-media--natural/);
+  assert.match(twitterHtml, /compact-grid--twitter/);
+  assert.match(twitterHtml, /<img src="\/repo\/media\/stairs2line\/pixiv\/999_p0\.png"/);
+  assert.doesNotMatch(twitterHtml, /post-media-count-1 twitter-single-media--natural/);
+
+  const twitterFullHtml = await fs.readFile(path.join(output, 'en', 'posts', 'platform', 'twitter', 'full', 'index.html'), 'utf8');
+  assert.match(twitterFullHtml, /<img[^>]+data-file-path="twitter\/123456789012345678_ABCDEF123456789\.png"[^>]+src="\/repo\/media\/stairs2line\/pixiv\/999_p0\.png"/);
+  assert.match(twitterFullHtml, /post-media-count-1 twitter-single-media--natural/);
 
   const twitterCompactHtml = await fs.readFile(path.join(output, 'en', 'posts', 'platform', 'twitter', 'compact', 'index.html'), 'utf8');
-  assert.match(twitterCompactHtml, /<img src="\/repo\/media\/stairs2line\/pixiv\/999_p0\.png"/);
+  assert.match(twitterCompactHtml, /compact-grid--twitter/);
 
   const postsHtml = await fs.readFile(path.join(output, 'en', 'posts', 'index.html'), 'utf8');
-  assert.doesNotMatch(postsHtml, /<body class="platform-page/);
+  assert.match(postsHtml, /<body class="post-activity-page"/);
+  assert.match(postsHtml, /class="post-activity"/);
+  assert.match(postsHtml, /class="activity-popover"/);
+  assert.doesNotMatch(postsHtml, /class="post-list"/);
 
   const archiveCss = await fs.readFile(path.join(output, 'assets', 'archive.css'), 'utf8');
   assert.match(archiveCss, /\.platform-page--pixiv \.post-card--pixiv[\s\S]*?max-height:\s*min\(85dvh, 1000px\)/);
@@ -356,7 +383,7 @@ test('twitter full view derives 1-4 image layouts from media count without a lay
   const output = await fs.mkdtemp(path.join(os.tmpdir(), 'stairs2line-twitter-layout-site-'));
   await buildStaticSite(compilation, source, output, { mediaRoot, copyMedia: true });
 
-  const twitterHtml = await fs.readFile(path.join(output, 'en', 'posts', 'platform', 'twitter', 'index.html'), 'utf8');
+  const twitterHtml = await fs.readFile(path.join(output, 'en', 'posts', 'platform', 'twitter', 'full', 'index.html'), 'utf8');
   assert.match(twitterHtml, /post-media-count-1 twitter-single-media--natural/);
   assert.match(twitterHtml, /post-media-count-2/);
   assert.match(twitterHtml, /post-media-count-3/);
@@ -382,7 +409,304 @@ test('twitter single-image view only crops aspect ratios outside the supported 3
     const compilation = await compileArchive(source, { mediaRoot });
     const output = await fs.mkdtemp(path.join(os.tmpdir(), 'stairs2line-twitter-single-site-'));
     await buildStaticSite(compilation, source, output, { mediaRoot });
-    const twitterHtml = await fs.readFile(path.join(output, 'en', 'posts', 'platform', 'twitter', 'index.html'), 'utf8');
+    const twitterHtml = await fs.readFile(path.join(output, 'en', 'posts', 'platform', 'twitter', 'full', 'index.html'), 'utf8');
     assert.match(twitterHtml, new RegExp(`post-media-count-1 ${expected}`));
   }
+});
+
+
+test('post index uses month activity cells with post thumbnails and no artwork/version aggregation', async () => {
+  const mediaRoot = await createMediaFixture();
+  const source = fixtureSource();
+  source.posts.push({
+    key: 'twitter:123456789012345679',
+    platform: 'twitter',
+    id: '123456789012345679',
+    publishedAt: '2020-01-20T00:00:00Z',
+    versions: [{ status: 'alive', originalLanguage: 'en', title: { en: 'Second January post' }, media: [TWITTER_FILE] }],
+    __source: '/source/posts/twitter.jsonc'
+  });
+  const compilation = await compileArchive(source, { mediaRoot });
+  const output = await fs.mkdtemp(path.join(os.tmpdir(), 'stairs2line-activity-site-'));
+  await buildStaticSite(compilation, source, output, { mediaRoot });
+
+  const html = await fs.readFile(path.join(output, 'en', 'posts', 'index.html'), 'utf8');
+  assert.match(html, /<section class="activity-year"><h2>2020<\/h2>/);
+  assert.match(html, /<details class="activity-month"[^>]*>[\s\S]*?<span class="activity-month-dot" data-activity-level="[1-5]"><span>2<\/span>/);
+  assert.match(html, /activity-post-thumbnail/);
+  assert.match(html, /Posts: 2/);
+  assert.match(html, /January 20, 2020 · Twitter/);
+  assert.doesNotMatch(html, /artworkCount|versionCount|unique artworks/i);
+
+  const css = await fs.readFile(path.join(output, 'assets', 'archive.css'), 'utf8');
+  assert.match(css, /\.activity-popover\s*\{[\s\S]*?display:\s*block/);
+});
+
+test('platform directory uses bounded two-column cards with thumbnail previews', async () => {
+  const mediaRoot = await createMediaFixture();
+  const source = fixtureSource();
+  const compilation = await compileArchive(source, { mediaRoot });
+  const output = await fs.mkdtemp(path.join(os.tmpdir(), 'stairs2line-platform-index-'));
+  await buildStaticSite(compilation, source, output, { mediaRoot });
+
+  const html = await fs.readFile(path.join(output, 'en', 'posts', 'by-platform', 'index.html'), 'utf8');
+  assert.match(html, /class="platform-list"/);
+  assert.match(html, /class="platform-preview-post"/);
+  assert.doesNotMatch(html, /<div class="platform-preview"><article class="post-card/);
+
+  const css = await fs.readFile(path.join(output, 'assets', 'archive.css'), 'utf8');
+  assert.match(css, /\.platform-list\s*\{[\s\S]*?grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/);
+  assert.match(css, /\.platform-card-bio[\s\S]*?-webkit-line-clamp:\s*3/);
+});
+
+test('platform profile snapshots are versioned and the latest snapshot drives the hero', async () => {
+  const mediaRoot = await createMediaFixture();
+  await fs.mkdir(path.join(mediaRoot, 'profiles'), { recursive: true });
+  await fs.writeFile(path.join(mediaRoot, 'profiles', 'twitter-avatar.png'), fakePng(256, 256, 5));
+  await fs.writeFile(path.join(mediaRoot, 'profiles', 'twitter-banner.png'), fakePng(1200, 400, 8));
+
+  const source = fixtureSource();
+  source.platforms.platforms[0].versions = [
+    {
+      observedAt: '2019-01-01',
+      account: 'oldstairs',
+      description: { en: 'Old profile bio' }
+    },
+    {
+      observedAt: '2020-01-01',
+      account: 'stairs2line',
+      description: { en: 'Current profile bio' },
+      avatar: 'profiles/twitter-avatar.png',
+      banner: 'profiles/twitter-banner.png'
+    }
+  ];
+
+  const compilation = await compileArchive(source, { mediaRoot });
+  const twitter = compilation.manifest.platforms.find((platform) => platform.id === 'twitter');
+  assert.equal(twitter.versions.length, 2);
+  assert.equal(twitter.description.en, 'Current profile bio');
+  assert.equal(twitter.avatar, 'profiles/twitter-avatar.png');
+  assert.equal(twitter.banner, 'profiles/twitter-banner.png');
+  assert.equal(compilation.issues.some((issue) => issue.code.startsWith('platform.') && issue.severity === 'error'), false);
+
+  const output = await fs.mkdtemp(path.join(os.tmpdir(), 'stairs2line-platform-profile-'));
+  await buildStaticSite(compilation, source, output, { mediaRoot });
+  const html = await fs.readFile(path.join(output, 'en', 'posts', 'platform', 'twitter', 'index.html'), 'utf8');
+  assert.match(html, /Current profile bio/);
+  assert.match(html, /profiles\/twitter-avatar\.png/);
+  assert.match(html, /profiles\/twitter-banner\.png/);
+  assert.match(html, /class="active" href="\/repo\/en\/posts\/platform\/twitter\/">Compact view<\/a>/);
+  assert.match(html, /href="\/repo\/en\/posts\/platform\/twitter\/full\/">Full view<\/a>/);
+});
+
+test('missing versioned platform profile assets are validation errors', async () => {
+  const mediaRoot = await createMediaFixture();
+  const source = fixtureSource();
+  source.platforms.platforms[0].versions = [{
+    account: 'stairs2line',
+    avatar: 'profiles/missing-avatar.png',
+    banner: 'profiles/missing-banner.png'
+  }];
+  const compilation = await compileArchive(source, { mediaRoot });
+  assert.equal(compilation.issues.some((issue) => issue.code === 'platform.avatar-missing'), true);
+  assert.equal(compilation.issues.some((issue) => issue.code === 'platform.banner-missing'), true);
+});
+
+
+test('platform profile assets distinguish explicit null from unknown omitted fields', async () => {
+  const mediaRoot = await createMediaFixture();
+  const source = fixtureSource();
+  const pixiv = source.platforms.platforms.find((platform) => platform.id === 'pixiv');
+  const twitter = source.platforms.platforms.find((platform) => platform.id === 'twitter');
+  pixiv.versions = [{ account: '1593221', avatar: null, banner: null }];
+  twitter.versions = [{ account: 'stairs2line' }];
+
+  const upgraded = upgradeSourcePosts(structuredClone(source));
+  const upgradedPixiv = upgraded.platforms.platforms.find((platform) => platform.id === 'pixiv');
+  assert.equal(upgradedPixiv.versions[0].avatar, null);
+  assert.equal(upgradedPixiv.versions[0].banner, null);
+
+  const legacySource = fixtureSource();
+  const legacyPixiv = legacySource.platforms.platforms.find((platform) => platform.id === 'pixiv');
+  delete legacyPixiv.versions;
+  legacyPixiv.avatar = null;
+  legacyPixiv.banner = null;
+  const upgradedLegacy = upgradeSourcePosts(legacySource);
+  const upgradedLegacyPixiv = upgradedLegacy.platforms.platforms.find((platform) => platform.id === 'pixiv');
+  assert.equal(upgradedLegacyPixiv.versions[0].avatar, null);
+  assert.equal(upgradedLegacyPixiv.versions[0].banner, null);
+
+  const compilation = await compileArchive(upgraded, { mediaRoot });
+  const compiledPixiv = compilation.manifest.platforms.find((platform) => platform.id === 'pixiv');
+  const compiledTwitter = compilation.manifest.platforms.find((platform) => platform.id === 'twitter');
+  assert.equal(Object.hasOwn(compiledPixiv.versions[0], 'avatar'), true);
+  assert.equal(Object.hasOwn(compiledPixiv.versions[0], 'banner'), true);
+  assert.equal(compiledPixiv.versions[0].avatar, null);
+  assert.equal(compiledPixiv.versions[0].banner, null);
+  assert.equal(Object.hasOwn(compiledTwitter.versions[0], 'avatar'), true);
+  assert.equal(Object.hasOwn(compiledTwitter.versions[0], 'banner'), true);
+  assert.equal(compiledTwitter.versions[0].avatar, undefined);
+  assert.equal(compiledTwitter.versions[0].banner, undefined);
+  assert.equal(compilation.issues.some((issue) => issue.code === 'platform.avatar-missing' || issue.code === 'platform.banner-missing'), false);
+
+  const schema = JSON.parse(await fs.readFile(new URL('../schemas/archive-source.schema.json', import.meta.url), 'utf8'));
+  assert.deepEqual(schema.$defs.platformVersion.properties.avatar.type, ['string', 'null']);
+  assert.deepEqual(schema.$defs.platformVersion.properties.banner.type, ['string', 'null']);
+
+  const output = await fs.mkdtemp(path.join(os.tmpdir(), 'stairs2line-platform-null-'));
+  await buildStaticSite(compilation, upgraded, output, { mediaRoot });
+  const pixivHtml = await fs.readFile(path.join(output, 'en', 'posts', 'platform', 'pixiv', 'index.html'), 'utf8');
+  const twitterHtml = await fs.readFile(path.join(output, 'en', 'posts', 'platform', 'twitter', 'index.html'), 'utf8');
+  assert.match(pixivHtml, /platform-hero--pixiv platform-hero--no-banner/);
+  assert.doesNotMatch(twitterHtml, /platform-hero--twitter platform-hero--no-banner/);
+});
+
+test('orphan Twitter media with a decodable media timestamp is shown as an approximate lost post', async () => {
+  const mediaRoot = await createMediaFixture();
+  await fs.mkdir(path.join(mediaRoot, 'other'), { recursive: true });
+  await fs.writeFile(path.join(mediaRoot, ORPHAN_TWITTER_FILE), fakePng(1200, 800, 3));
+  await fs.writeFile(path.join(mediaRoot, UNKNOWN_OTHER_FILE), fakePng(1200, 800, 4));
+
+  const source = fixtureSource();
+  source.site.mediaDirectories = ['twitter', 'pixiv', 'other'];
+  source.artworks.push(
+    {
+      id: 'artwork-orphan-twitter',
+      title: { en: 'Recovered Twitter media' },
+      versions: [{
+        id: 'v01',
+        scope: 'top',
+        media: [{ id: 'artwork-orphan-twitter/v01/m01', files: [ORPHAN_TWITTER_FILE] }]
+      }],
+      __source: '/source/artworks/orphan-twitter.jsonc'
+    },
+    {
+      id: 'artwork-unknown-platform',
+      title: { en: 'Unknown platform media' },
+      versions: [{
+        id: 'v01',
+        scope: 'top',
+        media: [{ id: 'artwork-unknown-platform/v01/m01', files: [UNKNOWN_OTHER_FILE] }]
+      }],
+      __source: '/source/artworks/unknown-platform.jsonc'
+    }
+  );
+
+  const compilation = await compileArchive(source, { mediaRoot });
+  const recovered = compilation.manifest.posts.filter((post) => post.recovery?.kind === 'media-only');
+  assert.equal(recovered.length, 1);
+  assert.equal(recovered[0].key, 'twitter:lost-COJhPv9UsAAvk7w');
+  assert.equal(recovered[0].platform, 'twitter');
+  assert.equal(recovered[0].status, 'lost');
+  assert.equal(recovered[0].publishedAt, '2015-09-05T15:13:43.870Z');
+  assert.equal(recovered[0].dateApproximate, true);
+  assert.equal(recovered[0].href, null);
+  assert.deepEqual(recovered[0].mediaFiles, [ORPHAN_TWITTER_FILE]);
+  assert.equal(recovered[0].recovery.dateSource, 'twitter-media-id');
+  assert.deepEqual(recovered[0].recovery.sourceMediaIds, ['COJhPv9UsAAvk7w']);
+  assert.equal(compilation.manifest.posts.some((post) => post.mediaFiles?.includes(UNKNOWN_OTHER_FILE)), false);
+  assert.equal(
+    compilation.issues.some((issue) => issue.code === 'file.unassigned-to-post' && issue.entityId === ORPHAN_TWITTER_FILE),
+    false
+  );
+  assert.equal(
+    compilation.issues.some((issue) => issue.code === 'file.unassigned-to-post' && issue.entityId === UNKNOWN_OTHER_FILE),
+    true
+  );
+
+  const output = await fs.mkdtemp(path.join(os.tmpdir(), 'stairs2line-lost-twitter-'));
+  await buildStaticSite(compilation, source, output, { mediaRoot });
+  const twitterHtml = await fs.readFile(path.join(output, 'en', 'posts', 'platform', 'twitter', 'index.html'), 'utf8');
+  assert.match(twitterHtml, /compact-post--twitter compact-post--lost/);
+  assert.match(twitterHtml, /compact-lost-badge">Lost</);
+  assert.match(twitterHtml, /lost-COJhPv9UsAAvk7w/);
+
+  const detailHtml = await fs.readFile(path.join(output, 'en', 'posts', 'twitter', 'lost-COJhPv9UsAAvk7w', 'index.html'), 'utf8');
+  assert.match(detailHtml, /status status-lost">Lost</);
+  assert.match(detailHtml, /≈ September 5, 2015/);
+  assert.match(detailHtml, /The post itself was not preserved; only its images remain/);
+  assert.doesNotMatch(detailHtml, /twitter\.com\/stairs2line\/status\/lost-/);
+});
+
+test('orphan Twitter media are grouped across artworks only when their upload timestamps fit one minute', async () => {
+  const mediaRoot = await createMediaFixture();
+  const timestamps = [
+    '2015-09-05T15:10:00.000Z',
+    '2015-09-05T15:10:50.000Z',
+    '2015-09-05T15:11:40.000Z'
+  ];
+  const orphanFiles = timestamps.map((timestamp, index) =>
+    `twitter/${twitterMediaIdAt(timestamp, index + 1)}.png`
+  );
+  for (let index = 0; index < orphanFiles.length; index += 1) {
+    await fs.writeFile(path.join(mediaRoot, orphanFiles[index]), fakePng(1200, 800, 20 + index));
+  }
+
+  const source = fixtureSource();
+  source.artworks.push(...orphanFiles.map((filePath, index) => ({
+    id: `artwork-cluster-${index + 1}`,
+    title: { en: `Cluster media ${index + 1}` },
+    versions: [{
+      id: `v0${index + 1}`,
+      scope: 'top',
+      media: [{ id: `artwork-cluster-${index + 1}/v0${index + 1}/m01`, files: [filePath] }]
+    }],
+    __source: `/source/artworks/cluster-${index + 1}.jsonc`
+  })));
+
+  const compilation = await compileArchive(source, { mediaRoot });
+  const recovered = compilation.manifest.posts
+    .filter((post) => post.recovery?.kind === 'media-only')
+    .sort((a, b) => Date.parse(a.publishedAt) - Date.parse(b.publishedAt));
+
+  assert.equal(recovered.length, 2);
+  assert.deepEqual(recovered[0].mediaFiles, orphanFiles.slice(0, 2));
+  assert.equal(recovered[0].publishedAt, timestamps[1]);
+  assert.equal(recovered[0].recovery.groupingWindowSeconds, 60);
+  assert.deepEqual(recovered[1].mediaFiles, orphanFiles.slice(2));
+  assert.equal(recovered[1].publishedAt, timestamps[2]);
+});
+
+test('recovered Twitter media groups never exceed the four-image post limit', async () => {
+  const mediaRoot = await createMediaFixture();
+  const base = Date.parse('2015-09-05T16:00:00.000Z');
+  const timestamps = Array.from({ length: 5 }, (_, index) => new Date(base + index * 1000).toISOString());
+  const orphanFiles = timestamps.map((timestamp, index) =>
+    `twitter/${twitterMediaIdAt(timestamp, 20 + index)}.png`
+  );
+  for (let index = 0; index < orphanFiles.length; index += 1) {
+    await fs.writeFile(path.join(mediaRoot, orphanFiles[index]), fakePng(1200, 800, 30 + index));
+  }
+
+  const source = fixtureSource();
+  source.artworks.push(...orphanFiles.map((filePath, index) => ({
+    id: `artwork-limit-${index + 1}`,
+    title: { en: `Limit media ${index + 1}` },
+    versions: [{
+      id: 'v01',
+      scope: 'top',
+      media: [{ id: `artwork-limit-${index + 1}/v01/m01`, files: [filePath] }]
+    }],
+    __source: `/source/artworks/limit-${index + 1}.jsonc`
+  })));
+
+  const compilation = await compileArchive(source, { mediaRoot });
+  const recovered = compilation.manifest.posts
+    .filter((post) => post.recovery?.kind === 'media-only')
+    .sort((a, b) => Date.parse(a.publishedAt) - Date.parse(b.publishedAt));
+
+  assert.equal(recovered.length, 2);
+  assert.equal(recovered[0].mediaFiles.length, 4);
+  assert.equal(recovered[1].mediaFiles.length, 1);
+});
+
+test('media already linked to a known Twitter post is not duplicated as a recovered post', async () => {
+  const mediaRoot = await createMediaFixture();
+  await fs.writeFile(path.join(mediaRoot, ORPHAN_TWITTER_FILE), fakePng(1200, 800, 3));
+  const source = fixtureSource();
+  source.posts[0].versions[0].media = [ORPHAN_TWITTER_FILE];
+  source.artworks[0].versions[0].media[0].files = [ORPHAN_TWITTER_FILE, PIXIV_FILE];
+
+  const compilation = await compileArchive(source, { mediaRoot });
+  assert.equal(compilation.manifest.posts.some((post) => post.recovery?.kind === 'media-only'), false);
 });

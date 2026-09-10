@@ -14,6 +14,7 @@
   <nav class="tabs" aria-label="Editor sections">
     <button type="button" data-tab="validation" class="active">Validation</button>
     <button type="button" data-tab="posts">Posts</button>
+    <button type="button" data-tab="platforms">Platforms</button>
     <button type="button" data-tab="artworks">Artworks</button>
     <button type="button" data-tab="media">Media</button>
     <button type="button" data-tab="dates">Dates</button>
@@ -43,6 +44,30 @@
           </div>
         </form>
         <pre id="post-output"></pre>
+      </div>
+    </section>
+
+
+    <section data-panel="platforms">
+      <h2>Platform JSON</h2>
+      <div class="columns">
+        <form id="platform-form">
+          <label>Existing platform
+            <select id="platform-existing"><option value="">New platform</option></select>
+          </label>
+          <label>Platform ID <input id="platform-id" required></label>
+          <fieldset data-language-fields="platform-label"><legend>Platform label</legend></fieldset>
+          <label>Stable URL account fallback <input id="platform-default-account"></label>
+          <label>Post URL template <input id="platform-url-template" placeholder="https://example.com/{account}/post/{id}"></label>
+          <label>Platform icon <input id="platform-icon" placeholder="misc/example-icon.svg"></label>
+          <label>Profile versions JSON <textarea id="platform-versions" rows="18" spellcheck="false"></textarea></label>
+          <p>Each version is a full profile snapshot. Put the displayed account, localized description/bio, avatar and banner in the same version object; repeat unchanged fields when creating the next snapshot. <code>observedAt</code> is optional. Use <code>null</code> for avatar/banner when the asset is known not to exist; omit the field when it is unknown.</p>
+          <div class="actions">
+            <button type="submit">Generate</button>
+            <button type="button" data-download="platform-output">Download JSON</button>
+          </div>
+        </form>
+        <pre id="platform-output"></pre>
       </div>
     </section>
 

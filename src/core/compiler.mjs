@@ -1,6 +1,6 @@
 import path from 'node:path';
-import { buildFileCatalog } from './file-catalog.mjs';
-import { earliestDate } from './dates.mjs';
+import { buildFileCatalog, extractLegacyMediaId } from './file-catalog.mjs';
+import { earliestDate, latestDate, twitterMediaDate } from './dates.mjs';
 import { localizedValue } from './localization.mjs';
 import { upgradeSourcePosts } from './source-upgrader.mjs';
 import { normalizePath, stableHash, unique } from './util.mjs';
@@ -95,6 +95,102 @@ function buildPostUrl(post, platform) {
   return platform.postUrlTemplate
     .replaceAll('{id}', encodeURIComponent(post.id))
     .replaceAll('{account}', encodeURIComponent(post.account ?? platform.defaultAccount ?? ''));
+}
+
+
+function hasOwn(value, key) {
+  return value != null && Object.prototype.hasOwnProperty.call(value, key);
+}
+
+function sourcePlatformVersions(platform) {
+  if (Array.isArray(platform.versions) && platform.versions.length > 0) return platform.versions;
+  return [{
+    ...(platform.defaultAccount ? { account: platform.defaultAccount } : {}),
+    ...(platform.description ? { description: platform.description } : {}),
+    ...(hasOwn(platform, 'avatar') ? { avatar: platform.avatar } : {}),
+    ...(hasOwn(platform, 'banner') ? { banner: platform.banner } : {})
+  }];
+}
+
+function normalizedOptionalAsset(version, key) {
+  if (!hasOwn(version, key)) return undefined;
+  if (version[key] === null) return null;
+  return normalizePath(version[key]);
+}
+
+function platformAssetPaths(platforms) {
+  const result = new Set();
+  for (const platform of platforms) {
+    if (platform?.icon) result.add(normalizePath(platform.icon));
+    for (const version of sourcePlatformVersions(platform ?? {})) {
+      if (typeof version?.avatar === 'string' && version.avatar) result.add(normalizePath(version.avatar));
+      if (typeof version?.banner === 'string' && version.banner) result.add(normalizePath(version.banner));
+    }
+  }
+  return result;
+}
+
+function assetDirectory(filePath) {
+  const normalized = normalizePath(filePath);
+  const slashIndex = normalized.indexOf('/');
+  return slashIndex > 0 ? normalized.slice(0, slashIndex) : null;
+}
+
+function compilePlatforms(sourcePlatforms, filesByPath, issues, options) {
+  return sourcePlatforms.map((sourcePlatform) => {
+    const versions = sourcePlatformVersions(sourcePlatform).map((sourceVersion, index) => {
+      const avatar = normalizedOptionalAsset(sourceVersion, 'avatar');
+      const banner = normalizedOptionalAsset(sourceVersion, 'banner');
+      const entityId = `${sourcePlatform.id}#${index + 1}`;
+
+      for (const [kind, filePath] of [['avatar', avatar], ['banner', banner]]) {
+        if (typeof filePath !== 'string' || filesByPath.has(filePath)) continue;
+        issues.add({
+          severity: options.previewPlaceholders ? 'warning' : 'error',
+          code: `platform.${kind}-missing`,
+          entityType: 'platformVersion',
+          entityId,
+          source: sourceName(sourcePlatform),
+          details: filePath
+        });
+      }
+
+      return {
+        index,
+        observedAt: sourceVersion.observedAt ?? null,
+        account: sourceVersion.account ?? sourcePlatform.defaultAccount ?? null,
+        description: sourceVersion.description ?? {},
+        avatar,
+        banner
+      };
+    });
+
+    const currentVersion = versions.at(-1) ?? {
+      index: 0,
+      observedAt: null,
+      account: sourcePlatform.defaultAccount ?? null,
+      description: {},
+      avatar: undefined,
+      banner: undefined
+    };
+    const {
+      versions: ignoredVersions,
+      description: ignoredDescription,
+      avatar: ignoredAvatar,
+      banner: ignoredBanner,
+      ...stablePlatform
+    } = sourcePlatform;
+
+    return {
+      ...stripInternal(stablePlatform),
+      versions,
+      currentVersionIndex: Math.max(0, versions.length - 1),
+      account: currentVersion.account,
+      description: currentVersion.description,
+      avatar: currentVersion.avatar,
+      banner: currentVersion.banner
+    };
+  });
 }
 
 function sourcePostVersions(post) {
@@ -233,12 +329,160 @@ function placeholderFile(mediaId) {
   };
 }
 
+function inferTwitterMediaUpload(filePath) {
+  const normalized = normalizePath(filePath);
+  const slashIndex = normalized.indexOf('/');
+  if ((slashIndex >= 0 ? normalized.slice(0, slashIndex) : '') !== 'twitter') return null;
+
+  let filename = path.posix.basename(normalized);
+  if (/^\d{4}-\d{2}-\d{2}_/.test(filename)) filename = filename.slice(11);
+  const stem = filename.slice(0, filename.length - path.posix.extname(filename).length);
+
+  // Filenames beginning with a decimal snowflake already identify a known
+  // tweet and should be represented by a normal source post, not by recovery.
+  if (/^\d+[_-]/.test(stem)) return null;
+
+  const mediaId = extractLegacyMediaId(normalized);
+  if (!/^[A-Za-z0-9_-]{12,16}$/.test(mediaId)) return null;
+  const uploadedAt = twitterMediaDate(mediaId);
+  const timestamp = uploadedAt ? Date.parse(uploadedAt) : Number.NaN;
+  if (Number.isNaN(timestamp) || timestamp < 1288834974657 || timestamp > Date.now() + 24 * 60 * 60 * 1000) return null;
+  return { filePath: normalized, mediaId, uploadedAt };
+}
+
+const RECOVERED_TWITTER_GROUP_WINDOW_MS = 60 * 1000;
+const RECOVERED_TWITTER_MAX_MEDIA = 4;
+
+function groupRecoveredTwitterCandidates(entries) {
+  const sorted = [...entries].sort((a, b) =>
+    Date.parse(a.inferred.uploadedAt) - Date.parse(b.inferred.uploadedAt)
+      || a.media.id.localeCompare(b.media.id)
+  );
+  const groups = [];
+  let current = [];
+  let groupStartedAt = null;
+
+  for (const entry of sorted) {
+    const uploadedAt = Date.parse(entry.inferred.uploadedAt);
+    const fitsTimeWindow = current.length === 0
+      || uploadedAt - groupStartedAt <= RECOVERED_TWITTER_GROUP_WINDOW_MS;
+    const fitsMediaLimit = current.length < RECOVERED_TWITTER_MAX_MEDIA;
+
+    if (current.length > 0 && (!fitsTimeWindow || !fitsMediaLimit)) {
+      groups.push(current);
+      current = [];
+      groupStartedAt = null;
+    }
+
+    if (current.length === 0) groupStartedAt = uploadedAt;
+    current.push(entry);
+  }
+
+  if (current.length > 0) groups.push(current);
+  return groups;
+}
+
+function appendRecoveredTwitterPosts(posts, postIds, mediaById, platformsById, defaultLanguage) {
+  const platform = platformsById.get('twitter');
+  if (!platform) return;
+
+  // A logical media item already tied to a known Twitter post is represented
+  // by that post and must not produce a second inferred entry. Unlinked media
+  // are clustered by their native Twitter media timestamps, irrespective of
+  // artwork/version ownership: known multi-image tweets in this archive often
+  // contain media belonging to different artworks or artwork versions.
+  const postsByKey = new Map(posts.map((post) => [post.key, post]));
+  const candidates = [];
+  for (const media of mediaById.values()) {
+    const hasKnownTwitterPost = media.postIds.some((postKey) => postsByKey.get(postKey)?.platform === 'twitter');
+    if (hasKnownTwitterPost) continue;
+
+    const inferred = media.declaredFiles
+      .map((filePath) => inferTwitterMediaUpload(filePath))
+      .filter(Boolean)
+      .sort((a, b) => Date.parse(a.uploadedAt) - Date.parse(b.uploadedAt) || a.filePath.localeCompare(b.filePath))[0];
+    if (!inferred) continue;
+
+    candidates.push({ media, inferred });
+  }
+
+  for (const entries of groupRecoveredTwitterCandidates(candidates)) {
+    const primaryMediaId = entries[0].inferred.mediaId;
+    const groupIdentity = entries.map(({ media }) => media.id).join('|');
+    let id = `lost-${primaryMediaId}`;
+    let key = `twitter:${id}`;
+    if (postIds.has(key)) {
+      id = `lost-${primaryMediaId}-${stableHash(groupIdentity, 8)}`;
+      key = `twitter:${id}`;
+    }
+    if (postIds.has(key)) continue;
+
+    const mediaRefs = entries.map(({ media, inferred }) => ({
+      filePath: inferred.filePath,
+      mediaId: media.id,
+      mediaIds: [media.id],
+      displayFile: media.displayFile ?? null
+    }));
+    const publishedAt = latestDate(entries.map(({ inferred }) => inferred.uploadedAt));
+    const recovery = {
+      kind: 'media-only',
+      dateSource: 'twitter-media-id',
+      sourceMediaIds: entries.map(({ inferred }) => inferred.mediaId),
+      groupingWindowSeconds: RECOVERED_TWITTER_GROUP_WINDOW_MS / 1000
+    };
+    const version = {
+      index: 0,
+      account: platform.defaultAccount ?? null,
+      status: 'lost',
+      declaredStatus: 'lost',
+      originalLanguage: defaultLanguage,
+      title: {},
+      description: {},
+      mediaFiles: mediaRefs.map((item) => item.filePath),
+      mediaIds: mediaRefs.map((item) => item.mediaId),
+      mediaRefs,
+      href: null,
+      layout: null,
+      migration: null,
+      recovery
+    };
+    const post = {
+      key,
+      platform: 'twitter',
+      id,
+      publishedAt,
+      dateApproximate: true,
+      versions: [version],
+      versionCount: 1,
+      currentVersionIndex: 0,
+      account: version.account,
+      status: version.status,
+      declaredStatus: version.declaredStatus,
+      originalLanguage: version.originalLanguage,
+      title: version.title,
+      description: version.description,
+      mediaFiles: version.mediaFiles,
+      mediaIds: version.mediaIds,
+      mediaRefs: version.mediaRefs,
+      href: null,
+      layout: null,
+      recovery,
+      source: null
+    };
+
+    postIds.add(key);
+    posts.push(post);
+    for (const { media } of entries) media.postIds.push(key);
+  }
+}
+
 export async function compileArchive(source, options = {}) {
   const issues = new IssueCollector();
   const languages = source.site.languages ?? ['ru', 'en', 'ja'];
   const defaultLanguage = source.site.defaultLanguage ?? languages[0] ?? 'en';
-  const platforms = Array.isArray(source.platforms) ? source.platforms : source.platforms.platforms ?? [];
-  const platformsById = new Map(platforms.map((platform) => [platform.id, platform]));
+  const sourcePlatforms = Array.isArray(source.platforms) ? source.platforms : source.platforms.platforms ?? [];
+  const platformAssets = platformAssetPaths(sourcePlatforms);
+  const platformAssetDirectories = [...platformAssets].map(assetDirectory).filter(Boolean);
   const knownPostIds = source.posts.map((post) => ({
     key: post.key ?? `${post.platform}:${post.id}`,
     platform: post.platform,
@@ -246,11 +490,16 @@ export async function compileArchive(source, options = {}) {
   }));
   const files = options.mediaRoot
     ? await buildFileCatalog(options.mediaRoot, {
-      includeDirectories: source.site.mediaDirectories ?? ['twitter', 'tumblr', 'pixiv', 'other'],
+      includeDirectories: unique([
+        ...(source.site.mediaDirectories ?? ['twitter', 'tumblr', 'pixiv', 'other']),
+        ...platformAssetDirectories
+      ]),
       knownPostIds
     })
     : [];
   const filesByPath = new Map(files.map((file) => [normalizePath(file.path), file]));
+  const platforms = compilePlatforms(sourcePlatforms, filesByPath, issues, options);
+  const platformsById = new Map(platforms.map((platform) => [platform.id, platform]));
   const filesByLegacyId = new Map();
   for (const file of files) {
     if (!filesByLegacyId.has(file.legacyMediaId)) filesByLegacyId.set(file.legacyMediaId, []);
@@ -659,6 +908,8 @@ export async function compileArchive(source, options = {}) {
     });
   }
 
+  appendRecoveredTwitterPosts(posts, postIds, mediaById, platformsById, defaultLanguage);
+
   const postsById = new Map(posts.map((post) => [post.key, post]));
   for (const media of mediaById.values()) media.postIds = unique(media.postIds);
 
@@ -699,6 +950,7 @@ export async function compileArchive(source, options = {}) {
     for (const filePath of media.existingFiles) filesWithPosts.add(filePath);
   }
   for (const file of files) {
+    if (platformAssets.has(file.path)) continue;
     if (!referencedFiles.has(file.path)) {
       issues.add({
         severity: 'warning',
@@ -804,6 +1056,7 @@ export function resolveSourceFiles(source, fileCatalog) {
 
   const upgraded = upgradeSourcePosts(source);
   source.posts = upgraded.posts;
+  source.platforms = upgraded.platforms;
   source.site = { ...source.site, schemaVersion: 2 };
 
   return source;

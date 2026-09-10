@@ -994,3 +994,560 @@ h2 {
     text-align: center;
   }
 }
+
+/* Cross-platform post activity. The index is a calendar-like archive, not a
+   mixed feed: one cell per month, intensity driven only by post count. */
+.post-activity {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.activity-legend {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.35rem;
+  margin-bottom: 0.35rem;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.activity-legend-dot,
+.activity-month-dot {
+  --activity-fill: color-mix(in srgb, var(--surface) 96%, var(--accent) 4%);
+  display: grid;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, currentColor 14%, transparent);
+  background: var(--activity-fill);
+}
+
+.activity-legend-dot {
+  width: 0.8rem;
+  height: 0.8rem;
+  border-radius: 50%;
+}
+
+[data-activity-level="1"] { --activity-fill: color-mix(in srgb, var(--surface) 80%, var(--accent) 20%); }
+[data-activity-level="2"] { --activity-fill: color-mix(in srgb, var(--surface) 63%, var(--accent) 37%); }
+[data-activity-level="3"] { --activity-fill: color-mix(in srgb, var(--surface) 45%, var(--accent) 55%); }
+[data-activity-level="4"] { --activity-fill: color-mix(in srgb, var(--surface) 25%, var(--accent) 75%); }
+[data-activity-level="5"] { --activity-fill: color-mix(in srgb, var(--surface) 8%, var(--accent) 92%); color: white; }
+
+.activity-year {
+  display: grid;
+  grid-template-columns: 4.5rem minmax(0, 1fr);
+  align-items: start;
+  gap: 0.75rem;
+  padding: 0.7rem 0;
+  border-top: 1px solid var(--border);
+}
+
+.activity-year > h2 {
+  margin: 0.5rem 0 0;
+  font-size: 1rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.activity-months {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: clamp(0.2rem, 0.7vw, 0.65rem);
+}
+
+.activity-month {
+  position: relative;
+  min-width: 0;
+  text-align: center;
+}
+
+.activity-month > summary,
+.activity-month--empty {
+  display: grid;
+  justify-items: center;
+  gap: 0.3rem;
+  list-style: none;
+}
+
+.activity-month > summary {
+  cursor: pointer;
+}
+
+.activity-month > summary::-webkit-details-marker {
+  display: none;
+}
+
+.activity-month-dot {
+  width: clamp(2rem, 3.4vw, 2.8rem);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  font-size: clamp(0.62rem, 1vw, 0.78rem);
+  font-weight: 750;
+  font-variant-numeric: tabular-nums;
+  transition: transform 100ms ease, box-shadow 100ms ease;
+}
+
+.activity-month-dot > span {
+  opacity: 0.86;
+}
+
+.activity-month > summary:hover .activity-month-dot,
+.activity-month > summary:focus-visible .activity-month-dot,
+.activity-month[open] > summary .activity-month-dot {
+  transform: translateY(-2px);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent);
+}
+
+.activity-month-label {
+  min-width: 0;
+  color: var(--muted);
+  font-size: clamp(0.62rem, 1vw, 0.76rem);
+  text-transform: capitalize;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.activity-month--empty {
+  opacity: 0.42;
+}
+
+.activity-popover {
+  display: block;
+  position: absolute;
+  z-index: 30;
+  left: 50%;
+  top: calc(100% + 0.55rem);
+  width: min(360px, calc(100vw - 2rem));
+  max-height: min(440px, 72vh);
+  overflow: auto;
+  padding: 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 0.9rem;
+  background: Canvas;
+  box-shadow: 0 1rem 2.8rem rgb(0 0 0 / 0.24);
+  text-align: left;
+  opacity: 0;
+  visibility: hidden;
+  transform: translate(-50%, -0.2rem);
+  transition: opacity 100ms ease, transform 100ms ease, visibility 100ms ease;
+}
+
+.activity-month:hover .activity-popover,
+.activity-month:focus-within .activity-popover,
+.activity-month[open] .activity-popover {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, 0);
+}
+
+.activity-month:nth-child(-n+2) .activity-popover {
+  left: 0;
+  transform: translate(0, -0.2rem);
+}
+
+.activity-month:nth-child(-n+2):hover .activity-popover,
+.activity-month:nth-child(-n+2):focus-within .activity-popover,
+.activity-month:nth-child(-n+2)[open] .activity-popover {
+  transform: none;
+}
+
+.activity-month:nth-child(n+11) .activity-popover {
+  right: 0;
+  left: auto;
+  transform: translate(0, -0.2rem);
+}
+
+.activity-month:nth-child(n+11):hover .activity-popover,
+.activity-month:nth-child(n+11):focus-within .activity-popover,
+.activity-month:nth-child(n+11)[open] .activity-popover {
+  transform: none;
+}
+
+.activity-popover-title,
+.activity-popover-count {
+  display: block;
+}
+
+.activity-popover-count {
+  margin: 0.1rem 0 0.65rem;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.activity-post-list {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.activity-post {
+  display: grid;
+  grid-template-columns: 3.4rem minmax(0, 1fr);
+  align-items: center;
+  gap: 0.65rem;
+  min-width: 0;
+  padding: 0.3rem;
+  border-radius: 0.55rem;
+  color: inherit;
+  text-decoration: none;
+}
+
+.activity-post:hover,
+.activity-post:focus-visible {
+  background: var(--surface);
+}
+
+.activity-post-thumbnail {
+  position: relative;
+  width: 3.4rem;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: 0.45rem;
+  background: var(--surface);
+}
+
+.activity-post-thumbnail > img,
+.activity-post-thumbnail > video,
+.activity-post-thumbnail > .compact-media-placeholder {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.activity-post-platform {
+  position: absolute;
+  right: 0.2rem;
+  bottom: 0.2rem;
+  display: grid;
+  place-items: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  padding: 0.14rem;
+  border-radius: 50%;
+  background: Canvas;
+  box-shadow: 0 0 0 1px var(--border);
+}
+
+.activity-post-platform img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.activity-post-copy {
+  display: grid;
+  min-width: 0;
+}
+
+.activity-post-copy strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.88rem;
+}
+
+.activity-post-copy > span {
+  overflow: hidden;
+  color: var(--muted);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.76rem;
+}
+
+.activity-unknown {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.activity-unknown > h2 {
+  font-size: 1rem;
+}
+
+.activity-unknown .activity-post-list {
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+}
+
+/* Platform directory cards stay bounded regardless of post text/media count. */
+.platform-index-page main {
+  --page-width: 1320px;
+}
+
+.platform-list {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  align-items: start;
+}
+
+.platform-card {
+  padding: 0;
+}
+
+.platform-card-banner {
+  display: block;
+  min-height: 100px;
+  background-position: center;
+  background-size: cover;
+  text-decoration: none;
+}
+
+.platform-card--pixiv .platform-card-banner {
+  background:
+    radial-gradient(circle at 18% 35%, rgb(255 255 255 / 0.55) 0 5%, transparent 5.5%),
+    linear-gradient(135deg, #8fd4ff, #0096fa 62%, #70c8ff);
+}
+
+.platform-card--twitter .platform-card-banner {
+  background:
+    linear-gradient(145deg, transparent 0 42%, rgb(255 255 255 / 0.52) 42.5% 44%, transparent 44.5% 100%),
+    linear-gradient(35deg, #c9edf9, #eff8fb 52%, #b9dce8);
+}
+
+.platform-card--tumblr .platform-card-banner {
+  background: linear-gradient(180deg, #27455f, #001935);
+}
+
+.platform-card-profile {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 0.7rem;
+  padding: 0 0.85rem;
+}
+
+.platform-card-avatar {
+  position: relative;
+  width: 4rem;
+  height: 4rem;
+  margin-top: -1.8rem;
+  display: grid;
+  place-items: center;
+  overflow: visible;
+  border: 3px solid Canvas;
+  border-radius: 50%;
+  background: Canvas;
+  text-decoration: none;
+  font-size: 1.35rem;
+  font-weight: 800;
+}
+
+.platform-card-avatar > img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.platform-card-platform-icon,
+.platform-hero-platform-icon {
+  position: absolute;
+  right: -0.15rem;
+  bottom: -0.15rem;
+  display: grid;
+  place-items: center;
+  width: 1.45rem;
+  height: 1.45rem;
+  padding: 0.18rem;
+  border-radius: 50%;
+  background: Canvas;
+  box-shadow: 0 0 0 1px var(--border);
+}
+
+.platform-card-platform-icon img,
+.platform-hero-platform-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.platform-card-copy {
+  min-width: 0;
+  padding-top: 0.55rem;
+}
+
+.platform-card-copy h2 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.platform-card-copy h2 a {
+  display: inline;
+}
+
+.platform-card-copy .metadata {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.platform-card-count {
+  display: grid;
+  justify-items: end;
+  padding-bottom: 0.2rem;
+  line-height: 1.05;
+}
+
+.platform-card-count strong {
+  font-size: 1.2rem;
+}
+
+.platform-card-count span {
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+
+.platform-card-bio {
+  display: -webkit-box;
+  min-height: 0;
+  margin: 0.75rem 0.85rem 0;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  font-size: 0.88rem;
+}
+
+.platform-card-dates {
+  margin: 0.55rem 0.85rem;
+}
+
+.platform-preview {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 2px;
+  margin-top: 0.7rem;
+}
+
+.platform-preview-post {
+  display: block;
+  min-width: 0;
+  aspect-ratio: 1;
+  overflow: hidden;
+  background: var(--surface);
+}
+
+.platform-preview-post img,
+.platform-preview-post video,
+.platform-preview-post .compact-media-placeholder {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.platform-hero-icon {
+  position: relative;
+  overflow: visible;
+}
+
+.platform-hero-icon > img:first-child {
+  overflow: hidden;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.platform-hero-bio {
+  max-width: 70ch;
+  margin: 0.35rem 0 0;
+  color: inherit;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 900px) {
+  .platform-list {
+    grid-template-columns: 1fr;
+  }
+
+  .activity-year {
+    grid-template-columns: 3.5rem minmax(0, 1fr);
+  }
+
+  .activity-months {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    row-gap: 0.8rem;
+  }
+
+  .activity-month:nth-child(n) .activity-popover {
+    left: 50%;
+    right: auto;
+    transform: translate(-50%, -0.2rem);
+  }
+
+  .activity-month:nth-child(n):hover .activity-popover,
+  .activity-month:nth-child(n):focus-within .activity-popover,
+  .activity-month:nth-child(n)[open] .activity-popover {
+    transform: translate(-50%, 0);
+  }
+}
+
+@media (max-width: 560px) {
+  .activity-year {
+    grid-template-columns: 1fr;
+  }
+
+  .activity-year > h2 {
+    margin: 0;
+  }
+
+  .activity-months {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .activity-month-dot {
+    width: 2.4rem;
+  }
+
+  .platform-preview {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* A null profile asset is different from an unknown one. Explicitly absent
+   banners are not replaced by the platform-flavoured fallback artwork. */
+.platform-hero--no-banner .platform-hero-banner,
+.platform-card--no-banner .platform-card-banner {
+  display: none;
+}
+
+.platform-hero--no-banner .platform-hero-profile {
+  padding-top: 1rem;
+}
+
+.platform-hero--no-banner .platform-hero-icon,
+.platform-card--no-banner .platform-card-avatar {
+  margin-top: 0;
+}
+
+.platform-card--no-banner .platform-card-profile {
+  padding-top: 0.85rem;
+}
+
+.status-lost {
+  opacity: 0.72;
+}
+
+.lost-post-note {
+  margin: 0.7rem 0 0;
+  padding: 0.7rem 0.8rem;
+  border: 1px dashed var(--border);
+  border-radius: 0.7rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.compact-lost-badge,
+.platform-preview-lost {
+  position: absolute;
+  z-index: 2;
+  left: 0.45rem;
+  top: 0.45rem;
+  padding: 0.22rem 0.42rem;
+  border-radius: 0.35rem;
+  color: white;
+  background: rgb(0 0 0 / 0.68);
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.1;
+  pointer-events: none;
+}
+
+.platform-preview-post {
+  position: relative;
+}

@@ -635,6 +635,58 @@ test('artwork media may define two pixel viewer anchor points used only on the a
   assert.equal(anchorSchema.properties.points.maxItems, 2);
   assert.equal(anchorSchema.properties.points.items.properties.x.minimum, 0);
   assert.equal(anchorSchema.properties.points.items.properties.y.minimum, 0);
+  assert.equal(anchorSchema.properties.flipX.type, 'boolean');
+  assert.equal(anchorSchema.properties.rotation.type, 'number');
+});
+
+test('viewer anchor orientation supports optional flipX and clockwise rotation', async () => {
+  const mediaRoot = await createMediaFixture();
+  const source = fixtureSource();
+  source.artworks[0].versions[0].media[0].viewerAnchor = {
+    file: TWITTER_FILE,
+    flipX: true,
+    rotation: 180,
+    points: [
+      { x: 80.5, y: 300.25 },
+      { x: 320.25, y: 90.5 }
+    ]
+  };
+
+  const compilation = await compileArchive(source, { mediaRoot });
+  assert.deepEqual(compilation.manifest.media[MEDIA_ID].viewerAnchor, {
+    file: TWITTER_FILE,
+    flipX: true,
+    rotation: 180,
+    points: [
+      { x: 80.5, y: 300.25 },
+      { x: 320.25, y: 90.5 }
+    ]
+  });
+  assert.deepEqual(compilation.manifest.media[MEDIA_ID].viewerAlignment, {
+    points: [
+      { x: 80.5, y: 300.25 },
+      { x: 320.25, y: 90.5 }
+    ],
+    flipX: true,
+    rotation: 180
+  });
+
+  const output = await fs.mkdtemp(path.join(os.tmpdir(), 'stairs2line-viewer-orientation-'));
+  await buildStaticSite(compilation, source, output, { mediaRoot });
+  const detailHtml = await fs.readFile(path.join(output, 'en', 'artworks', 'artwork-0001', 'index.html'), 'utf8');
+  assert.match(detailHtml, /data-viewer-flip-x="true"/);
+  assert.match(detailHtml, /data-viewer-rotation="180"/);
+
+  const omittedSource = fixtureSource();
+  omittedSource.artworks[0].versions[0].media[0].viewerAnchor = {
+    file: TWITTER_FILE,
+    points: [{ x: 80, y: 300 }, { x: 320, y: 90 }]
+  };
+  const omittedCompilation = await compileArchive(omittedSource, { mediaRoot });
+  assert.equal(Object.hasOwn(omittedCompilation.manifest.media[MEDIA_ID].viewerAnchor, 'flipX'), false);
+  assert.equal(Object.hasOwn(omittedCompilation.manifest.media[MEDIA_ID].viewerAnchor, 'rotation'), false);
+  assert.equal(Object.hasOwn(omittedCompilation.manifest.media[MEDIA_ID].viewerAlignment, 'flipX'), false);
+  assert.equal(Object.hasOwn(omittedCompilation.manifest.media[MEDIA_ID].viewerAlignment, 'rotation'), false);
 });
 
 test('viewer anchor pixels are rescaled from an explicit reference file to the lightest display file', async () => {
@@ -676,6 +728,24 @@ test('invalid artwork viewer anchors are reported and ignored', async () => {
   assert.equal(compilation.issues.some((issue) => issue.code === 'media.viewer-anchor-invalid'), true);
 });
 
+test('invalid viewer anchor orientation fields are reported and ignored', async () => {
+  const mediaRoot = await createMediaFixture();
+  const source = fixtureSource();
+  source.artworks[0].versions[0].media[0].viewerAnchor = {
+    file: TWITTER_FILE,
+    flipX: 'yes',
+    rotation: '180',
+    points: [{ x: 20, y: 30 }, { x: 200, y: 220 }]
+  };
+  const compilation = await compileArchive(source, { mediaRoot });
+  assert.equal(compilation.manifest.media[MEDIA_ID].viewerAnchor, null);
+  assert.equal(compilation.manifest.media[MEDIA_ID].viewerAlignment, null);
+  const issue = compilation.issues.find((item) => item.code === 'media.viewer-anchor-invalid');
+  assert.ok(issue);
+  assert.ok(issue.details.some((detail) => detail.includes('flipX')));
+  assert.ok(issue.details.some((detail) => detail.includes('rotation')));
+});
+
 test('MediaViewer uses large previews, side-area navigation, human dates, inactive current posts, and two-point artwork registration', async () => {
   const mediaRoot = await createMediaFixture();
   const source = fixtureSource();
@@ -696,6 +766,10 @@ test('MediaViewer uses large previews, side-area navigation, human dates, inacti
   assert.match(js, /aria-current', 'page'/);
   assert.match(js, /reference\.span \/ item\.geometry\.span/);
   assert.match(js, /unionWidth/);
+  assert.match(js, /function orientationMatrix\(flipX = false, rotation = 0\)/);
+  assert.match(js, /flipX \+ 180deg equals flipY/);
+  assert.match(js, /for \(const corner of item\.geometry\.corners\)/);
+  assert.match(js, /media\.style\.transform = `matrix\(/);
   assert.match(js, /width \/ 2, y: 0/);
   assert.match(js, /width \/ 2, y: height/);
   assert.match(css, /\.modal\s*\{[\s\S]*?grid-template-rows:\s*minmax\(0, 1fr\) auto/);

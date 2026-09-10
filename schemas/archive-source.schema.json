@@ -52,6 +52,14 @@
               "minLength": 1,
               "description": "Optional declared file whose pixel coordinate system is used. If omitted, the first declared existing image with known dimensions is used."
             },
+            "flipX": {
+              "type": "boolean",
+              "description": "Optional horizontal mirror applied before rotation. Omitted means false."
+            },
+            "rotation": {
+              "type": "number",
+              "description": "Optional clockwise rotation in degrees applied after flipX. Omitted means 0."
+            },
             "points": {
               "type": "array",
               "minItems": 2,

@@ -110,6 +110,8 @@ Artwork media may optionally define a two-point registration for comparing versi
   ],
   "viewerAnchor": {
     "file": "pixiv/12345678_p0-original.png",
+    "flipX": true,
+    "rotation": 180,
     "points": [
       { "x": 418.5, "y": 271.25 },
       { "x": 1262.75, "y": 1038.5 }
@@ -120,7 +122,9 @@ Artwork media may optionally define a two-point registration for comparing versi
 
 `viewerAnchor.points` contains exactly two distinct points in **pixel coordinates of that image**, and fractional coordinates are allowed. `viewerAnchor.file` names the declared physical file whose pixel coordinate system the numbers refer to. The field is optional; when it is omitted, the first declared existing image with known dimensions is used as the reference. The compiler rescales the coordinates to the lightest `displayFile`, so choosing a smaller equivalent file for the generated site does not change the intended registration.
 
-The pair represents translation and scale, not a rotation. Its midpoint is the stable position of the matched area and the distance between the two points defines the scale. When corresponding pairs are supplied for two cropped/resized versions, the common source pixels therefore remain at the same screen coordinates while moving between them. The viewer computes the transformed bounds of **all** media in the artwork group before choosing the screen scale; it fits the union of those bounds into the available stage. Consequently an uncropped version may occupy a larger rectangle than a cropped version, but neither can run outside the viewport and the registered common area does not jump or change screen scale.
+The pair represents translation and scale. Its midpoint is the stable position of the matched area and the distance between the two points defines the scale. Point order does **not** imply mirroring or rotation. For orientation changes, `viewerAnchor.flipX` and `viewerAnchor.rotation` are optional: omitted `flipX` means `false`, and omitted `rotation` means `0`. `flipX: true` mirrors left/right first; `rotation` then rotates clockwise by the given number of degrees. Thus `flipX: true` together with `rotation: 180` is equivalent to a vertical flip. Arbitrary finite rotation values are accepted rather than only multiples of 90 degrees.
+
+When corresponding pairs are supplied for cropped/resized/reoriented versions, the common source pixels remain at the same screen coordinates while moving between them. The viewer transforms all four image corners before computing the bounds of **all** media in the artwork group, then fits the union of those bounds into the available stage. Consequently an uncropped or rotated version may occupy a larger rectangle than the current version, but no version can run outside the viewport and the registered common area does not jump or change screen scale. The visual orientation is applied to the regular `<img>`/`<video>` element with a CSS transform; the underlying downloadable file is not rewritten.
 
 When `viewerAnchor` is absent, MediaViewer behaves as though the two points were the horizontal center of the top and bottom image edges: `(width / 2, 0)` and `(width / 2, height)`. Thus unregistered versions are aligned by height and centered horizontally. Explicit registration is recommended whenever cropping or resizing changed the relationship between the outer image bounds and the unchanged content.
 

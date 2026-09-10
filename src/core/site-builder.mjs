@@ -163,7 +163,11 @@ function mediaElement(manifest, media, language, alt, contextType, contextId, op
         `data-viewer-anchor-x1="${escapeAttribute(media.viewerAlignment.points[0].x)}"`,
         `data-viewer-anchor-y1="${escapeAttribute(media.viewerAlignment.points[0].y)}"`,
         `data-viewer-anchor-x2="${escapeAttribute(media.viewerAlignment.points[1].x)}"`,
-        `data-viewer-anchor-y2="${escapeAttribute(media.viewerAlignment.points[1].y)}"`
+        `data-viewer-anchor-y2="${escapeAttribute(media.viewerAlignment.points[1].y)}"`,
+        ...(media.viewerAlignment.flipX ? ['data-viewer-flip-x="true"'] : []),
+        ...(Number.isFinite(media.viewerAlignment.rotation) && media.viewerAlignment.rotation !== 0
+          ? [`data-viewer-rotation="${escapeAttribute(media.viewerAlignment.rotation)}"`]
+          : [])
       ] : [])
     ] : [])
   ].join(' ');

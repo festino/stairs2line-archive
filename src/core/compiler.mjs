@@ -149,6 +149,12 @@ function normalizeViewerAnchor(value, declaredFiles, displayFile, filesByPath, i
   const span = validPointShape
     ? Math.hypot(points[1].x - points[0].x, points[1].y - points[0].y)
     : 0;
+  const hasFlipX = hasOwn(value, 'flipX');
+  const flipX = hasFlipX ? value.flipX : false;
+  const validFlipX = !hasFlipX || typeof flipX === 'boolean';
+  const hasRotation = hasOwn(value, 'rotation');
+  const rotation = hasRotation ? value.rotation : 0;
+  const validRotation = !hasRotation || (typeof rotation === 'number' && Number.isFinite(rotation));
 
   const requestedReference = typeof value?.file === 'string' && value.file.trim()
     ? normalizePath(value.file)
@@ -167,10 +173,12 @@ function normalizeViewerAnchor(value, declaredFiles, displayFile, filesByPath, i
     point.x <= reference.width && point.y <= reference.height
   );
 
-  if (!validPointShape || span <= 1e-9 || !referenceDeclared || !referenceUsable || !displayUsable || !pointsInBounds) {
+  if (!validPointShape || span <= 1e-9 || !validFlipX || !validRotation || !referenceDeclared || !referenceUsable || !displayUsable || !pointsInBounds) {
     const details = [];
     if (!validPointShape) details.push('viewerAnchor.points must contain exactly two finite non-negative {x, y} pixel coordinates');
     else if (span <= 1e-9) details.push('viewerAnchor.points must be two distinct points');
+    if (!validFlipX) details.push('viewerAnchor.flipX must be a boolean when present');
+    if (!validRotation) details.push('viewerAnchor.rotation must be a finite number of degrees when present');
     if (!referenceDeclared) details.push("viewerAnchor.file must name one of this media item's declared files");
     if (!referenceUsable) details.push('viewerAnchor requires a declared image file with known pixel dimensions');
     if (referenceUsable && !pointsInBounds) details.push(`viewerAnchor points must fit inside ${reference.width}x${reference.height} reference pixels`);
@@ -191,10 +199,14 @@ function normalizeViewerAnchor(value, declaredFiles, displayFile, filesByPath, i
   return {
     viewerAnchor: {
       file: referenceFile,
-      points
+      points,
+      ...(hasFlipX ? { flipX } : {}),
+      ...(hasRotation ? { rotation } : {})
     },
     viewerAlignment: {
-      points: points.map((point) => ({ x: point.x * scaleX, y: point.y * scaleY }))
+      points: points.map((point) => ({ x: point.x * scaleX, y: point.y * scaleY })),
+      ...(flipX ? { flipX: true } : {}),
+      ...(rotation !== 0 ? { rotation } : {})
     }
   };
 }

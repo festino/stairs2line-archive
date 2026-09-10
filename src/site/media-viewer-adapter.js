@@ -71,6 +71,34 @@
     return Number.isFinite(number) ? number : null;
   }
 
+  function orientationMatrix(flipX = false, rotation = 0) {
+    const radians = rotation * Math.PI / 180;
+    const cos = Math.cos(radians);
+    const sin = Math.sin(radians);
+    const mirror = flipX ? -1 : 1;
+
+    // Orientation is defined as a horizontal mirror first, then a clockwise
+    // rotation in screen coordinates. CSS matrix(a,b,c,d) uses the same
+    // coordinate convention. In particular flipX + 180deg equals flipY.
+    return {
+      a: cos * mirror,
+      b: sin * mirror,
+      c: -sin,
+      d: cos
+    };
+  }
+
+  function orientPoint(point, width, height, matrix) {
+    const centerX = width / 2;
+    const centerY = height / 2;
+    const x = point.x - centerX;
+    const y = point.y - centerY;
+    return {
+      x: centerX + matrix.a * x + matrix.c * y,
+      y: centerY + matrix.b * x + matrix.d * y
+    };
+  }
+
   function sourceAlignmentGeometry(element) {
     if (!element) return null;
     const width = finiteNumber(element.getAttribute('width'));
@@ -83,7 +111,7 @@
       finiteNumber(element.dataset.viewerAnchorX2),
       finiteNumber(element.dataset.viewerAnchorY2)
     ];
-    const points = explicit.every((value) => value !== null)
+    const rawPoints = explicit.every((value) => value !== null)
       ? [
         { x: explicit[0], y: explicit[1] },
         { x: explicit[2], y: explicit[3] }
@@ -92,6 +120,16 @@
         { x: width / 2, y: 0 },
         { x: width / 2, y: height }
       ];
+    const flipX = element.dataset.viewerFlipX === 'true';
+    const rotation = finiteNumber(element.dataset.viewerRotation) ?? 0;
+    const matrix = orientationMatrix(flipX, rotation);
+    const points = rawPoints.map((point) => orientPoint(point, width, height, matrix));
+    const corners = [
+      { x: 0, y: 0 },
+      { x: width, y: 0 },
+      { x: width, y: height },
+      { x: 0, y: height }
+    ].map((point) => orientPoint(point, width, height, matrix));
     const center = {
       x: (points[0].x + points[1].x) / 2,
       y: (points[0].y + points[1].y) / 2
@@ -99,7 +137,7 @@
     const span = Math.hypot(points[1].x - points[0].x, points[1].y - points[0].y);
     if (!(span > 0)) return null;
 
-    return { width, height, points, center, span };
+    return { width, height, points, center, span, corners, matrix };
   }
 
   class MediaViewer {
@@ -398,6 +436,8 @@
         media.style.removeProperty('top');
         media.style.removeProperty('width');
         media.style.removeProperty('height');
+        media.style.removeProperty('transform');
+        media.style.removeProperty('transform-origin');
       };
 
       const group = source.dataset.viewerAlignGroup || null;
@@ -441,12 +481,14 @@
 
         const left = reference.center.x - item.geometry.center.x * scaleToReference;
         const top = reference.center.y - item.geometry.center.y * scaleToReference;
-        const right = left + item.geometry.width * scaleToReference;
-        const bottom = top + item.geometry.height * scaleToReference;
-        unionLeft = Math.min(unionLeft, left);
-        unionTop = Math.min(unionTop, top);
-        unionRight = Math.max(unionRight, right);
-        unionBottom = Math.max(unionBottom, bottom);
+        for (const corner of item.geometry.corners) {
+          const x = left + corner.x * scaleToReference;
+          const y = top + corner.y * scaleToReference;
+          unionLeft = Math.min(unionLeft, x);
+          unionTop = Math.min(unionTop, y);
+          unionRight = Math.max(unionRight, x);
+          unionBottom = Math.max(unionBottom, y);
+        }
         positions.set(item.element, { left, top, scaleToReference, geometry: item.geometry });
       }
 
@@ -481,6 +523,9 @@
       media.style.height = `${height}px`;
       media.style.left = `${left}px`;
       media.style.top = `${top}px`;
+      const matrix = currentPosition.geometry.matrix;
+      media.style.transformOrigin = 'center center';
+      media.style.transform = `matrix(${matrix.a}, ${matrix.b}, ${matrix.c}, ${matrix.d}, 0, 0)`;
       tryPixelateImage(media);
     }
   }

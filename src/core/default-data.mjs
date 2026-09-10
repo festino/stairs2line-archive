@@ -32,7 +32,7 @@ export const DEFAULT_PLATFORMS = {
       defaultAccount: 'stairs2line',
       postUrlTemplate: 'https://twitter.com/{account}/status/{id}',
       icon: 'misc/twitter-icon-free-png.webp',
-      versions: [{ account: 'stairs2line' }]
+      versions: [{ account: 'stairs2line', sourceUrl: 'https://twitter.com/stairs2line' }]
     },
     {
       id: 'pixiv',
@@ -40,7 +40,7 @@ export const DEFAULT_PLATFORMS = {
       defaultAccount: '1593221',
       postUrlTemplate: 'https://www.pixiv.net/en/artworks/{id}',
       icon: 'misc/pixiv_favicon20250122.ico',
-      versions: [{ account: '1593221', banner: null }]
+      versions: [{ account: '1593221', sourceUrl: 'https://www.pixiv.net/users/1593221', banner: null }]
     },
     {
       id: 'tumblr',
@@ -48,7 +48,7 @@ export const DEFAULT_PLATFORMS = {
       defaultAccount: 'michinoku800',
       postUrlTemplate: 'https://michinoku800.tumblr.com/post/{id}',
       icon: 'misc/tumblr_favicon.ico',
-      versions: [{ account: 'michinoku800' }]
+      versions: [{ account: 'michinoku800', sourceUrl: 'https://michinoku800.tumblr.com/' }]
     },
     {
       id: 'instagram',
@@ -56,25 +56,25 @@ export const DEFAULT_PLATFORMS = {
       defaultAccount: 'stairs2line',
       postUrlTemplate: 'https://www.instagram.com/p/{id}/',
       icon: 'misc/instagram_favicon.png',
-      versions: [{ account: 'stairs2line' }]
+      versions: [{ account: 'stairs2line', sourceUrl: 'https://www.instagram.com/stairs2line/' }]
     },
     {
       id: 'piapro',
       label: { default: 'Piapro Blog' },
       icon: 'misc/blog-piapro_favicon.ico',
-      versions: [{}]
+      versions: [{ sourceUrl: 'https://blog.piapro.net/' }]
     },
     {
       id: 'snowmiku.com',
       label: { default: 'Snow Miku' },
       icon: 'misc/snowmiku_favicon.ico',
-      versions: [{}]
+      versions: [{ sourceUrl: 'https://snowmiku.com/' }]
     },
     {
       id: 'pixivFANBOX',
       label: { default: 'pixivFANBOX' },
       icon: 'misc/Pixiv_FANBOX_(Icon).svg',
-      versions: [{}]
+      versions: [{ sourceUrl: 'https://www.pixiv.net/fanbox/user/1593221' }]
     }
   ]
 };
@@ -133,7 +133,9 @@ export const DEFAULT_LOCALES = {
       genericDescription: 'Архивная публикация stairs2line на {platform}.',
       approximateDate: '≈ {date}',
       lostTitle: 'Утерянный пост на {platform}',
-      lostMediaOnly: 'Сам пост не сохранился; остались только изображения. Дата приблизительная и восстановлена по идентификатору медиа Twitter.'
+      lostMediaOnly: 'Сам пост не сохранился; остались только изображения. Дата приблизительная и восстановлена по идентификатору медиа Twitter.',
+      originalPost: 'Открыть оригинал поста',
+      officialPage: 'Официальная страница'
     },
     validation: {
       title: 'Проверка архива',
@@ -194,7 +196,9 @@ export const DEFAULT_LOCALES = {
       genericDescription: 'An archived stairs2line post on {platform}.',
       approximateDate: '≈ {date}',
       lostTitle: 'Lost post on {platform}',
-      lostMediaOnly: 'The post itself was not preserved; only its images remain. The date is approximate and inferred from the Twitter media identifier.'
+      lostMediaOnly: 'The post itself was not preserved; only its images remain. The date is approximate and inferred from the Twitter media identifier.',
+      originalPost: 'Open original post',
+      officialPage: 'Official page'
     },
     validation: {
       title: 'Archive validation',
@@ -255,7 +259,9 @@ export const DEFAULT_LOCALES = {
       genericDescription: '{platform}にある stairs2line のアーカイブ投稿。',
       approximateDate: '約 {date}',
       lostTitle: '{platform}の消失した投稿',
-      lostMediaOnly: '投稿自体は保存されておらず、画像だけが残っています。日付は Twitter のメディア識別子から推定した概算です。'
+      lostMediaOnly: '投稿自体は保存されておらず、画像だけが残っています。日付は Twitter のメディア識別子から推定した概算です。',
+      originalPost: '元の投稿を開く',
+      officialPage: '公式ページ'
     },
     validation: {
       title: 'アーカイブ検証',

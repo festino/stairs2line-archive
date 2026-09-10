@@ -63,20 +63,20 @@ function fixtureSource() {
           label: { default: 'Twitter' },
           defaultAccount: 'stairs2line',
           postUrlTemplate: 'https://twitter.com/{account}/status/{id}',
-          versions: [{ account: 'stairs2line' }]
+          versions: [{ account: 'stairs2line', sourceUrl: 'https://twitter.com/stairs2line' }]
         },
         {
           id: 'pixiv',
           label: { default: 'pixiv' },
           postUrlTemplate: 'https://www.pixiv.net/artworks/{id}',
-          versions: [{}]
+          versions: [{ sourceUrl: 'https://www.pixiv.net/users/1593221' }]
         },
         {
           id: 'tumblr',
           label: { default: 'Tumblr' },
           defaultAccount: 'stairs2line',
           postUrlTemplate: 'https://{account}.tumblr.com/post/{id}',
-          versions: [{ account: 'stairs2line' }]
+          versions: [{ account: 'stairs2line', sourceUrl: 'https://stairs2line.tumblr.com/' }]
         }
       ]
     },
@@ -360,6 +360,12 @@ test('static pages use the logical media display file and expose paged/feed cont
   const twitterFullHtml = await fs.readFile(path.join(output, 'en', 'posts', 'platform', 'twitter', 'full', 'index.html'), 'utf8');
   assert.match(twitterFullHtml, /<img[^>]+data-file-path="twitter\/123456789012345678_ABCDEF123456789\.png"[^>]+src="\/repo\/media\/stairs2line\/pixiv\/999_p0\.png"/);
   assert.match(twitterFullHtml, /post-media-count-1 twitter-single-media--natural/);
+  assert.doesNotMatch(twitterFullHtml, /class="post-platform"/);
+  assert.match(twitterFullHtml, /class="post-original-link-icon"[^>]+title="Open original post"/);
+
+  const twitterDetailHtml = await fs.readFile(path.join(output, 'en', 'posts', 'twitter', '123456789012345678', 'index.html'), 'utf8');
+  assert.match(twitterDetailHtml, /class="post-platform"/);
+  assert.match(twitterDetailHtml, /class="post-original-link-icon"[^>]+title="Open original post"/);
 
   const twitterCompactHtml = await fs.readFile(path.join(output, 'en', 'posts', 'platform', 'twitter', 'compact', 'index.html'), 'utf8');
   assert.match(twitterCompactHtml, /compact-grid--twitter/);
@@ -371,7 +377,8 @@ test('static pages use the logical media display file and expose paged/feed cont
   assert.doesNotMatch(postsHtml, /class="post-list"/);
 
   const archiveCss = await fs.readFile(path.join(output, 'assets', 'archive.css'), 'utf8');
-  assert.match(archiveCss, /\.platform-page--pixiv \.post-card--pixiv[\s\S]*?max-height:\s*min\(85dvh, 1000px\)/);
+  assert.match(archiveCss, /\.platform-page \.post-card \.post-media-item \.media-link img,[\s\S]*?max-height:\s*min\(80dvh, 900px\)/);
+  assert.match(archiveCss, /\.platform-page--pixiv \.post-card--pixiv[\s\S]*?max-height:\s*min\(80dvh, 900px\)/);
   assert.doesNotMatch(archiveCss, /^\.post-card--(?:pixiv|twitter|tumblr)\s*\{/m);
 });
 
@@ -452,6 +459,7 @@ test('platform directory uses bounded two-column cards with thumbnail previews',
   const html = await fs.readFile(path.join(output, 'en', 'posts', 'by-platform', 'index.html'), 'utf8');
   assert.match(html, /class="platform-list"/);
   assert.match(html, /class="platform-preview-post"/);
+  assert.match(html, /class="platform-source-link" href="https:\/\/twitter\.com\/stairs2line"[^>]*>Official page/);
   assert.doesNotMatch(html, /<div class="platform-preview"><article class="post-card/);
 
   const css = await fs.readFile(path.join(output, 'assets', 'archive.css'), 'utf8');
@@ -476,6 +484,7 @@ test('platform profile snapshots are versioned and the latest snapshot drives th
       observedAt: '2020-01-01',
       account: 'stairs2line',
       description: { en: 'Current profile bio' },
+      sourceUrl: 'https://twitter.com/stairs2line',
       avatar: 'profiles/twitter-avatar.png',
       banner: 'profiles/twitter-banner.png'
     }
@@ -485,6 +494,7 @@ test('platform profile snapshots are versioned and the latest snapshot drives th
   const twitter = compilation.manifest.platforms.find((platform) => platform.id === 'twitter');
   assert.equal(twitter.versions.length, 2);
   assert.equal(twitter.description.en, 'Current profile bio');
+  assert.equal(twitter.sourceUrl, 'https://twitter.com/stairs2line');
   assert.equal(twitter.avatar, 'profiles/twitter-avatar.png');
   assert.equal(twitter.banner, 'profiles/twitter-banner.png');
   assert.equal(compilation.issues.some((issue) => issue.code.startsWith('platform.') && issue.severity === 'error'), false);
@@ -494,9 +504,15 @@ test('platform profile snapshots are versioned and the latest snapshot drives th
   const html = await fs.readFile(path.join(output, 'en', 'posts', 'platform', 'twitter', 'index.html'), 'utf8');
   assert.match(html, /Current profile bio/);
   assert.match(html, /profiles\/twitter-avatar\.png/);
-  assert.match(html, /profiles\/twitter-banner\.png/);
+  assert.match(html, /<img class="platform-banner-image" src="\/repo\/media\/stairs2line\/profiles\/twitter-banner\.png" alt="">/);
+  assert.match(html, /class="platform-source-link" href="https:\/\/twitter\.com\/stairs2line"[^>]*>Official page/);
   assert.match(html, /class="active" href="\/repo\/en\/posts\/platform\/twitter\/">Compact view<\/a>/);
   assert.match(html, /href="\/repo\/en\/posts\/platform\/twitter\/full\/">Full view<\/a>/);
+
+  const directoryHtml = await fs.readFile(path.join(output, 'en', 'posts', 'by-platform', 'index.html'), 'utf8');
+  assert.match(directoryHtml, /<img class="platform-banner-image" src="\/repo\/media\/stairs2line\/profiles\/twitter-banner\.png" alt="">/);
+  const css = await fs.readFile(path.join(output, 'assets', 'archive.css'), 'utf8');
+  assert.match(css, /\.platform-hero-banner \.platform-banner-image,[\s\S]*?object-fit:\s*contain/);
 });
 
 test('missing versioned platform profile assets are validation errors', async () => {

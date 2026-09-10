@@ -267,6 +267,7 @@ h2 {
 .post-date {
   color: var(--muted);
   display: flex;
+  align-items: center;
   gap: 0.5em;
   text-decoration: none;
 }
@@ -284,6 +285,38 @@ h2 {
 
 .status-deleted {
   opacity: 0.55;
+}
+
+.post-original-link-icon,
+.platform-source-link svg {
+  width: 1em;
+  height: 1em;
+  flex: 0 0 auto;
+}
+
+.post-original-link-icon {
+  display: inline-flex;
+  align-items: center;
+  opacity: 0.8;
+}
+
+.platform-source-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  width: fit-content;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.platform-hero .platform-source-link {
+  color: inherit;
+  opacity: 0.72;
+}
+
+.platform-hero .platform-source-link:hover,
+.platform-hero .platform-source-link:focus-visible {
+  opacity: 1;
 }
 
 .post-text {
@@ -492,9 +525,21 @@ h2 {
 }
 
 .platform-hero-banner {
-  min-height: clamp(120px, 18vw, 220px);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  height: clamp(120px, 18vw, 220px);
   background-position: center;
   background-size: cover;
+}
+
+.platform-hero-banner .platform-banner-image,
+.platform-card-banner .platform-banner-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
 }
 
 .platform-hero--pixiv .platform-hero-banner {
@@ -584,10 +629,17 @@ h2 {
 
 .platform-page .post-card .post-media-item .media-link img,
 .platform-page .post-card .post-media-item .media-link video {
-  width: 100%;
+  width: auto;
+  max-width: 100%;
   height: auto;
+  max-height: min(80dvh, 900px);
   aspect-ratio: auto;
   object-fit: contain;
+}
+
+.platform-page .post-card .post-media-item .media-link {
+  display: flex;
+  justify-content: center;
 }
 
 .platform-page--pixiv .post-card--pixiv {
@@ -627,7 +679,7 @@ h2 {
   width: auto;
   height: auto;
   max-width: 100%;
-  max-height: min(85dvh, 1000px);
+  max-height: min(80dvh, 900px);
   object-fit: contain;
 }
 
@@ -658,8 +710,10 @@ h2 {
 
 .platform-page--twitter .post-card--twitter .post-media-grid.post-media-count-1.twitter-single-media--natural img,
 .platform-page--twitter .post-card--twitter .post-media-grid.post-media-count-1.twitter-single-media--natural video {
-  width: 100%;
+  width: auto;
+  max-width: 100%;
   height: auto;
+  max-height: min(80dvh, 900px);
   aspect-ratio: auto;
   object-fit: contain;
 }
@@ -674,6 +728,8 @@ h2 {
 }
 
 .platform-page--twitter .post-card--twitter .post-media-grid.post-media-count-1.twitter-single-media--tall {
+  width: min(100%, 60dvh, 675px);
+  margin-inline: auto;
   aspect-ratio: 3 / 4;
 }
 
@@ -1283,10 +1339,13 @@ h2 {
 }
 
 .platform-card-banner {
-  display: block;
-  min-height: 100px;
+  display: grid;
+  place-items: center;
+  height: 120px;
+  overflow: hidden;
   background-position: center;
   background-size: cover;
+  background-repeat: no-repeat;
   text-decoration: none;
 }
 
@@ -1404,6 +1463,10 @@ h2 {
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
   font-size: 0.88rem;
+}
+
+.platform-card-source {
+  margin: 0.45rem 0.85rem 0;
 }
 
 .platform-card-dates {

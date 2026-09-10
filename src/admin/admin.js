@@ -112,6 +112,7 @@
       observedAt: version.observedAt || undefined,
       account: version.account || undefined,
       description: version.description && Object.keys(version.description).length > 0 ? version.description : undefined,
+      sourceUrl: version.sourceUrl || undefined,
       avatar: version.avatar === null ? null : (version.avatar || undefined),
       banner: version.banner === null ? null : (version.banner || undefined)
     })) ?? [{ account: platform?.defaultAccount || undefined }], null, 2);

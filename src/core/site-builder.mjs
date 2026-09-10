@@ -106,6 +106,13 @@ function platformBannerKnownAbsent(platform) {
   return Object.prototype.hasOwnProperty.call(profile, 'banner') && profile.banner === null;
 }
 
+function platformSourceUrl(platform) {
+  const profile = currentPlatformVersion(platform);
+  return typeof profile.sourceUrl === 'string' && profile.sourceUrl.trim()
+    ? profile.sourceUrl.trim()
+    : null;
+}
+
 function outputFile(outputRoot, language, relative = '') {
   const clean = String(relative).replace(/^\/+|\/+$/g, '');
   return path.join(outputRoot, language, clean, 'index.html');
@@ -346,17 +353,25 @@ function renderPostCard(manifest, post, language, index, options = {}) {
   const description = displayDescription(version, language, version.originalLanguage);
   const date = displayPostDate(manifest, post, language, { includeTime: true });
   const href = routeUrl(manifest, language, `posts/${encodeURIComponent(post.platform)}/${encodeURIComponent(post.id)}/`);
+  const originalHref = version.href ?? post.href ?? null;
   const versionCount = post.versions?.length ?? 1;
   const versionLabel = options.versionLabel ? `<div class="post-version-label">${escapeHtml(options.versionLabel)}</div>` : '';
+  const platformMarkup = options.hidePlatform
+    ? ''
+    : `<a class="post-platform" href="${escapeAttribute(routeUrl(manifest, language, `posts/platform/${encodeURIComponent(post.platform)}/`))}">
+        ${icon ? `<img src="${escapeAttribute(icon)}" alt="">` : ''}<span>${escapeHtml(label)}</span>
+      </a>`;
+  const externalHint = originalHref
+    ? `<span class="post-original-link-icon" title="${escapeAttribute(localeText(manifest.locales, language, 'posts.originalPost'))}" aria-label="${escapeAttribute(localeText(manifest.locales, language, 'posts.originalPost'))}">${externalLinkIcon()}</span>`
+    : '';
   return `<article class="post-card post-card--${escapeAttribute(post.platform)}" data-list-item data-post-id="${escapeAttribute(post.key)}" data-post-version="${version.index ?? 0}">
     ${versionLabel}
     <header class="post-header">
-      <a class="post-platform" href="${escapeAttribute(routeUrl(manifest, language, `posts/platform/${encodeURIComponent(post.platform)}/`))}">
-        ${icon ? `<img src="${escapeAttribute(icon)}" alt="">` : ''}<span>${escapeHtml(label)}</span>
-      </a>
-      <a class="post-date" href="${escapeAttribute(version.href ?? post.href ?? href)}" ${version.href ?? post.href ? 'target="_blank" rel="noreferrer"' : ''}>
+      ${platformMarkup}
+      <a class="post-date" href="${escapeAttribute(originalHref ?? href)}" ${originalHref ? 'target="_blank" rel="noreferrer"' : ''}>
         <time${post.publishedAt ? ` datetime="${escapeAttribute(post.publishedAt)}"` : ''}>${escapeHtml(date)}</time>
         <span class="status status-${escapeAttribute(version.status)}">${escapeHtml(localeText(manifest.locales, language, `common.${version.status}`))}</span>
+        ${externalHint}
       </a>
       <a class="post-version-count" href="${escapeAttribute(href)}">${versionCount} ${escapeHtml(localeText(manifest.locales, language, `common.versions`))}</a>
     </header>
@@ -375,6 +390,10 @@ function renderPostCard(manifest, post, language, index, options = {}) {
 
 function layersIcon() {
   return `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 5.5h10a2 2 0 0 1 2 2v10h-2v-10h-10v-2Zm-3 3h10a2 2 0 0 1 2 2v10h-10a2 2 0 0 1-2-2v-10Zm2 2v8h8v-8h-8Z" fill="currentColor"/></svg>`;
+}
+
+function externalLinkIcon() {
+  return `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6h-2V7.41l-8.29 8.3-1.42-1.42 8.3-8.29H14V4ZM5 5h6v2H7v10h10v-4h2v6H5V5Z" fill="currentColor"/></svg>`;
 }
 
 function compactMediaElement(manifest, mediaRef, alt) {
@@ -549,21 +568,20 @@ function renderPlatformHero(manifest, platform, language, options = {}) {
   const profile = currentPlatformVersion(platform);
   const account = profile.account ?? platform.defaultAccount ?? '';
   const bio = localizedValue(profile.description, language, manifest.defaultLanguage);
+  const sourceUrl = platformSourceUrl(platform);
   const baseSegment = `posts/platform/${encodeURIComponent(platform.id)}`;
   const compactHref = routeUrl(manifest, language, `${baseSegment}${options.oldest ? '/oldest' : ''}/`);
   const fullHref = routeUrl(manifest, language, `${baseSegment}/full${options.oldest ? '/oldest' : ''}/`);
-  const bannerStyle = banner
-    ? ` style="background-image:url('${escapeAttribute(banner)}')"`
-    : '';
   const noBanner = platformBannerKnownAbsent(platform);
   return `<section class="platform-hero platform-hero--${escapeAttribute(platform.id)}${noBanner ? ' platform-hero--no-banner' : ''}">
-    <div class="platform-hero-banner"${bannerStyle}></div>
+    <div class="platform-hero-banner">${banner ? `<img class="platform-banner-image" src="${escapeAttribute(banner)}" alt="">` : ''}</div>
     <div class="platform-hero-profile">
       <div class="platform-hero-icon">${avatar ? `<img src="${escapeAttribute(avatar)}" alt="">` : `<span>${escapeHtml(label.slice(0, 1))}</span>`}${avatar && icon && avatar !== icon ? `<span class="platform-hero-platform-icon"><img src="${escapeAttribute(icon)}" alt=""></span>` : ''}</div>
       <div class="platform-hero-copy">
         <strong>${escapeHtml(label)}</strong>
         ${account ? `<span>${escapeHtml(platform.id === 'twitter' ? `@${account}` : account)}</span>` : ''}
         ${bio ? `<p class="platform-hero-bio">${linkify(bio).replaceAll('\n', '<br>')}</p>` : ''}
+        ${sourceUrl ? `<a class="platform-source-link" href="${escapeAttribute(sourceUrl)}" target="_blank" rel="noreferrer">${escapeHtml(localeText(manifest.locales, language, 'posts.officialPage'))}${externalLinkIcon()}</a>` : ''}
       </div>
       <nav class="platform-view-tabs" aria-label="${escapeAttribute(localeText(manifest.locales, language, 'posts.view'))}">
         <a class="${options.compact ? 'active' : ''}" href="${escapeAttribute(compactHref)}">${escapeHtml(localeText(manifest.locales, language, 'posts.compactView'))}</a>
@@ -901,7 +919,7 @@ async function buildPostListings(outputRoot, manifest, language) {
         fullRelative,
         sorted,
         manifest.site.pageSize?.posts ?? 20,
-        (post, index) => renderPostCard(manifest, post, language, index),
+        (post, index) => renderPostCard(manifest, post, language, index, { hidePlatform: true }),
         {
           heading: localeText(manifest.locales, language, 'posts.platformTitle', { platform: label }),
           title: `${label} · ${localeText(manifest.locales, language, 'posts.fullView')}`,
@@ -945,6 +963,7 @@ async function buildPlatformIndex(outputRoot, manifest, language) {
     const profile = currentPlatformVersion(platform);
     const account = profile.account ?? platform.defaultAccount ?? '';
     const bio = localizedValue(profile.description, language, manifest.defaultLanguage);
+    const sourceUrl = platformSourceUrl(platform);
     const dated = posts.filter((post) => post.publishedAt).sort((a, b) => compareNullableDates(a.publishedAt, b.publishedAt, 'asc'));
     const first = dated[0]?.publishedAt ? formatDate(dated[0].publishedAt, language, { includeTime: false }) : null;
     const last = dated.at(-1)?.publishedAt ? formatDate(dated.at(-1).publishedAt, language, { includeTime: false }) : null;
@@ -952,7 +971,7 @@ async function buildPlatformIndex(outputRoot, manifest, language) {
     const href = routeUrl(manifest, language, `posts/platform/${encodeURIComponent(platform.id)}/`);
     const noBanner = platformBannerKnownAbsent(platform);
     return `<article class="platform-card platform-card--${escapeAttribute(platform.id)}${noBanner ? ' platform-card--no-banner' : ''}" data-list-item>
-      <a class="platform-card-banner" href="${escapeAttribute(href)}"${banner ? ` style="background-image:url('${escapeAttribute(banner)}')"` : ''} aria-label="${escapeAttribute(label)}"></a>
+      <a class="platform-card-banner" href="${escapeAttribute(href)}" aria-label="${escapeAttribute(label)}">${banner ? `<img class="platform-banner-image" src="${escapeAttribute(banner)}" alt="">` : ''}</a>
       <div class="platform-card-profile">
         <a class="platform-card-avatar" href="${escapeAttribute(href)}">${avatar ? `<img src="${escapeAttribute(avatar)}" alt="">` : `<span>${escapeHtml(label.slice(0, 1))}</span>`}${avatar && icon && avatar !== icon ? `<span class="platform-card-platform-icon"><img src="${escapeAttribute(icon)}" alt=""></span>` : ''}</a>
         <div class="platform-card-copy">
@@ -962,6 +981,7 @@ async function buildPlatformIndex(outputRoot, manifest, language) {
         <div class="platform-card-count"><strong>${posts.length}</strong><span>${escapeHtml(localeText(manifest.locales, language, 'common.posts').toLowerCase())}</span></div>
       </div>
       ${bio ? `<p class="platform-card-bio">${linkify(bio).replaceAll('\n', '<br>')}</p>` : ''}
+      ${sourceUrl ? `<p class="platform-card-source"><a class="platform-source-link" href="${escapeAttribute(sourceUrl)}" target="_blank" rel="noreferrer">${escapeHtml(localeText(manifest.locales, language, 'posts.officialPage'))}${externalLinkIcon()}</a></p>` : ''}
       ${first || last ? `<p class="metadata platform-card-dates">${escapeHtml(first ?? '—')} — ${escapeHtml(last ?? '—')}</p>` : ''}
       <div class="platform-preview">${previewPosts.map((post) => renderPlatformPreviewPost(manifest, post, language)).join('')}</div>
     </article>`;

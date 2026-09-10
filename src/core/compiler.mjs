@@ -107,6 +107,7 @@ function sourcePlatformVersions(platform) {
   return [{
     ...(platform.defaultAccount ? { account: platform.defaultAccount } : {}),
     ...(platform.description ? { description: platform.description } : {}),
+    ...(platform.sourceUrl ? { sourceUrl: platform.sourceUrl } : {}),
     ...(hasOwn(platform, 'avatar') ? { avatar: platform.avatar } : {}),
     ...(hasOwn(platform, 'banner') ? { banner: platform.banner } : {})
   }];
@@ -160,6 +161,7 @@ function compilePlatforms(sourcePlatforms, filesByPath, issues, options) {
         observedAt: sourceVersion.observedAt ?? null,
         account: sourceVersion.account ?? sourcePlatform.defaultAccount ?? null,
         description: sourceVersion.description ?? {},
+        sourceUrl: sourceVersion.sourceUrl ?? null,
         avatar,
         banner
       };
@@ -170,12 +172,14 @@ function compilePlatforms(sourcePlatforms, filesByPath, issues, options) {
       observedAt: null,
       account: sourcePlatform.defaultAccount ?? null,
       description: {},
+      sourceUrl: null,
       avatar: undefined,
       banner: undefined
     };
     const {
       versions: ignoredVersions,
       description: ignoredDescription,
+      sourceUrl: ignoredSourceUrl,
       avatar: ignoredAvatar,
       banner: ignoredBanner,
       ...stablePlatform
@@ -187,6 +191,7 @@ function compilePlatforms(sourcePlatforms, filesByPath, issues, options) {
       currentVersionIndex: Math.max(0, versions.length - 1),
       account: currentVersion.account,
       description: currentVersion.description,
+      sourceUrl: currentVersion.sourceUrl,
       avatar: currentVersion.avatar,
       banner: currentVersion.banner
     };

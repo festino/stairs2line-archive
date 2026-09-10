@@ -14,6 +14,7 @@
         {
           "observedAt": "2024-01-01",
           "account": "stairs2line",
+          "sourceUrl": "https://twitter.com/stairs2line",
 		  "title": {
             "ja": "たるたる"
           },
@@ -26,6 +27,7 @@
         {
           "observedAt": "2026-03-01",
           "account": "stairs2line",
+          "sourceUrl": "https://twitter.com/stairs2line",
 		  "title": {
             "ja": "たるたる"
           },
@@ -38,6 +40,7 @@
         {
           "observedAt": "2026-09-10",
           "account": "stairs2line",
+          "sourceUrl": "https://twitter.com/stairs2line",
 		  "title": {
             "ja": "たるたる"
           },
@@ -62,6 +65,7 @@
         {
           "observedAt": "2026-09-10",
           "account": "1593221",
+          "sourceUrl": "https://www.pixiv.net/en/users/1593221",
 		  "title": {
             "ja": "せんたっき"
           },
@@ -86,6 +90,7 @@
         {
           "observedAt": "2026-03-01",
           "account": "michinoku800",
+          "sourceUrl": "https://michinoku800.tumblr.com/",
 		  "title": {
             "ja": "ツネヒゴロ"
           },
@@ -99,6 +104,7 @@
     },
     {
       "id": "instagram",
+	  "createdBefore": "2014-04-12T00:51:28.000Z",
       "label": {
         "default": "Instagram"
       },
@@ -107,7 +113,17 @@
       "icon": "misc/instagram_favicon.png",
       "versions": [
         {
-          "account": "stairs2line"
+          "observedAt": "2026-03-01",
+          "account": "stairs2line",
+          "sourceUrl": "https://www.instagram.com/stairs2line/",
+		  "title": {
+            "ja": "たるたる"
+          },
+		  "description": {
+            "ja": ""
+          },
+          "avatar": "profiles/other/11356618_507871202708657_697405863_a.jpg",
+          "banner": null
         }
       ]
     },
@@ -138,7 +154,15 @@
       },
       "icon": "misc/Pixiv_FANBOX_(Icon).svg",
       "versions": [
-        {}
+        {
+          "observedAt": "2026-09-10",
+		  "title": {
+            "ja": "せんたっき"
+          },
+          "sourceUrl": "https://jkagme2x.fanbox.cc/",
+          "avatar": "profiles/pixiv/5739104_せんたっき.png",
+          "banner": null
+		}
       ]
     }
   ]

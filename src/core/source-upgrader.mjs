@@ -120,6 +120,7 @@ function upgradePlatform(platform) {
     : [{
       ...(platform.defaultAccount ? { account: platform.defaultAccount } : {}),
       ...(platform.description ? { description: platform.description } : {}),
+      ...(platform.sourceUrl ? { sourceUrl: platform.sourceUrl } : {}),
       ...(Object.prototype.hasOwnProperty.call(platform, 'avatar') ? { avatar: platform.avatar } : {}),
       ...(Object.prototype.hasOwnProperty.call(platform, 'banner') ? { banner: platform.banner } : {})
     }];
@@ -128,6 +129,7 @@ function upgradePlatform(platform) {
       observedAt: version.observedAt,
       account: version.account,
       description: version.description,
+      sourceUrl: version.sourceUrl,
       avatar: version.avatar ? normalizePath(version.avatar) : undefined,
       banner: version.banner ? normalizePath(version.banner) : undefined
     });
@@ -141,6 +143,7 @@ function upgradePlatform(platform) {
   const {
     versions: ignoredVersions,
     description: ignoredDescription,
+    sourceUrl: ignoredSourceUrl,
     avatar: ignoredAvatar,
     banner: ignoredBanner,
     ...stable

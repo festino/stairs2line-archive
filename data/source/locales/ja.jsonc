@@ -50,6 +50,8 @@
     "approximateDate": "約 {date}",
     "lostTitle": "{platform}の消失した投稿",
     "lostMediaOnly": "投稿自体は保存されておらず、画像だけが残っています。日付は Twitter のメディア識別子から推定した概算です。",
+    "originalPost": "元の投稿を開く",
+    "officialPage": "公式ページ",
     "activity": "アクティビティ",
     "publicationCount": "投稿: {count}",
     "lessActivity": "少ない",

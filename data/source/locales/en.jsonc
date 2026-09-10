@@ -50,6 +50,8 @@
     "approximateDate": "≈ {date}",
     "lostTitle": "Lost post on {platform}",
     "lostMediaOnly": "The post itself was not preserved; only its images remain. The date is approximate and inferred from the Twitter media identifier.",
+    "originalPost": "Open original post",
+    "officialPage": "Official page",
     "activity": "Activity",
     "publicationCount": "Posts: {count}",
     "lessActivity": "Less",

@@ -50,6 +50,8 @@
     "approximateDate": "≈ {date}",
     "lostTitle": "Утерянный пост на {platform}",
     "lostMediaOnly": "Сам пост не сохранился; остались только изображения. Дата приблизительная и восстановлена по идентификатору медиа Twitter.",
+    "originalPost": "Открыть оригинал поста",
+    "officialPage": "Официальная страница",
     "activity": "Активность",
     "publicationCount": "Публикаций: {count}",
     "lessActivity": "Меньше",

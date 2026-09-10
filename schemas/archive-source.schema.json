@@ -41,22 +41,39 @@
           "uniqueItems": true
         },
         "viewerAnchor": {
-          "description": "Optional normalized alignment point used only when comparing media across versions of one artwork in MediaViewer.",
+          "description": "Optional two-point image registration in reference-file pixel coordinates, used only when comparing media across versions of one artwork in MediaViewer.",
           "type": "object",
           "required": [
-            "x",
-            "y"
+            "points"
           ],
           "properties": {
-            "x": {
-              "type": "number",
-              "minimum": 0,
-              "maximum": 1
+            "file": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Optional declared file whose pixel coordinate system is used. If omitted, the first declared existing image with known dimensions is used."
             },
-            "y": {
-              "type": "number",
-              "minimum": 0,
-              "maximum": 1
+            "points": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 2,
+              "items": {
+                "type": "object",
+                "required": [
+                  "x",
+                  "y"
+                ],
+                "properties": {
+                  "x": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "y": {
+                    "type": "number",
+                    "minimum": 0
+                  }
+                },
+                "additionalProperties": false
+              }
             }
           },
           "additionalProperties": false

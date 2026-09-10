@@ -137,22 +137,66 @@ function assetDirectory(filePath) {
   return slashIndex > 0 ? normalized.slice(0, slashIndex) : null;
 }
 
-function normalizeViewerAnchor(value, issues, entityId, source) {
-  if (value == null) return null;
-  const x = Number(value?.x);
-  const y = Number(value?.y);
-  if (!Number.isFinite(x) || !Number.isFinite(y) || x < 0 || x > 1 || y < 0 || y > 1) {
+function normalizeViewerAnchor(value, declaredFiles, displayFile, filesByPath, issues, entityId, source) {
+  if (value == null) return { viewerAnchor: null, viewerAlignment: null };
+
+  const points = Array.isArray(value?.points)
+    ? value.points.map((point) => ({ x: Number(point?.x), y: Number(point?.y) }))
+    : [];
+  const validPointShape = points.length === 2 && points.every((point) =>
+    Number.isFinite(point.x) && Number.isFinite(point.y) && point.x >= 0 && point.y >= 0
+  );
+  const span = validPointShape
+    ? Math.hypot(points[1].x - points[0].x, points[1].y - points[0].y)
+    : 0;
+
+  const requestedReference = typeof value?.file === 'string' && value.file.trim()
+    ? normalizePath(value.file)
+    : null;
+  const referenceFile = requestedReference
+    ?? declaredFiles.find((filePath) => {
+      const file = filesByPath.get(filePath);
+      return file?.width > 0 && file?.height > 0 && file.mimeType?.startsWith('image/');
+    })
+    ?? null;
+  const reference = referenceFile ? filesByPath.get(referenceFile) : null;
+  const referenceDeclared = !requestedReference || declaredFiles.includes(requestedReference);
+  const referenceUsable = reference?.width > 0 && reference?.height > 0 && reference.mimeType?.startsWith('image/');
+  const displayUsable = displayFile?.width > 0 && displayFile?.height > 0 && displayFile.mimeType?.startsWith('image/');
+  const pointsInBounds = validPointShape && referenceUsable && points.every((point) =>
+    point.x <= reference.width && point.y <= reference.height
+  );
+
+  if (!validPointShape || span <= 1e-9 || !referenceDeclared || !referenceUsable || !displayUsable || !pointsInBounds) {
+    const details = [];
+    if (!validPointShape) details.push('viewerAnchor.points must contain exactly two finite non-negative {x, y} pixel coordinates');
+    else if (span <= 1e-9) details.push('viewerAnchor.points must be two distinct points');
+    if (!referenceDeclared) details.push("viewerAnchor.file must name one of this media item's declared files");
+    if (!referenceUsable) details.push('viewerAnchor requires a declared image file with known pixel dimensions');
+    if (referenceUsable && !pointsInBounds) details.push(`viewerAnchor points must fit inside ${reference.width}x${reference.height} reference pixels`);
+    if (!displayUsable) details.push('viewerAnchor requires the selected display file to be an image with known pixel dimensions');
     issues.add({
       severity: 'error',
       code: 'media.viewer-anchor-invalid',
       entityType: 'media',
       entityId,
       source,
-      details: 'viewerAnchor.x and viewerAnchor.y must be finite numbers between 0 and 1'
+      details
     });
-    return null;
+    return { viewerAnchor: null, viewerAlignment: null };
   }
-  return { x, y };
+
+  const scaleX = displayFile.width / reference.width;
+  const scaleY = displayFile.height / reference.height;
+  return {
+    viewerAnchor: {
+      file: referenceFile,
+      points
+    },
+    viewerAlignment: {
+      points: points.map((point) => ({ x: point.x * scaleX, y: point.y * scaleY }))
+    }
+  };
 }
 
 function compilePlatforms(sourcePlatforms, filesByPath, issues, options) {
@@ -629,11 +673,21 @@ export async function compileArchive(source, options = {}) {
           });
         }
 
+        const viewerAnchor = normalizeViewerAnchor(
+          sourceMedia.viewerAnchor,
+          declaredFiles,
+          displayFile,
+          filesByPath,
+          issues,
+          mediaId,
+          sourceName(sourceArtwork)
+        );
         const compiledMedia = {
           id: mediaId,
           artworkId,
           versionId,
-          viewerAnchor: normalizeViewerAnchor(sourceMedia.viewerAnchor, issues, mediaId, sourceName(sourceArtwork)),
+          viewerAnchor: viewerAnchor.viewerAnchor,
+          viewerAlignment: viewerAnchor.viewerAlignment,
           declaredFiles,
           legacyIds,
           existingFiles: deduplicatedFiles.map((file) => file.path),

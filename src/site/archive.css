@@ -420,11 +420,12 @@ h2 {
   display: grid;
   grid-template-columns: auto auto;
   align-items: center;
-  gap: 0.35rem;
-  width: clamp(72px, 10vw, 132px);
-  min-height: clamp(84px, 18vh, 180px);
-  padding: 0.35rem;
+  gap: 0.5rem;
+  width: clamp(112px, 15vw, 220px);
+  min-height: clamp(120px, 28vh, 300px);
+  padding: 0.55rem;
   overflow: hidden;
+  box-sizing: border-box;
   border: 1px solid rgb(255 255 255 / 0.22);
   border-radius: 0.8rem;
   background: rgb(0 0 0 / 0.36);
@@ -460,7 +461,7 @@ h2 {
   display: grid;
   width: 100%;
   min-width: 0;
-  height: clamp(72px, 16vh, 160px);
+  height: clamp(110px, 26vh, 270px);
   place-items: center;
   overflow: hidden;
   border-radius: 0.55rem;
@@ -485,7 +486,7 @@ h2 {
 }
 
 .media-viewer-switcher-chevron {
-  font-size: 1.65rem;
+  font-size: 2rem;
   line-height: 1;
   opacity: 0.9;
 }
@@ -578,6 +579,41 @@ h2 {
   color: inherit;
 }
 
+.media-viewer-context {
+  margin-bottom: 0.45rem;
+  color: rgb(255 255 255 / 0.96);
+  font-weight: 600;
+}
+
+.media-viewer-post-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.media-viewer-post-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2rem;
+  padding: 0.28rem 0.55rem;
+  border: 1px solid rgb(255 255 255 / 0.18);
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.07);
+  text-decoration: none;
+}
+
+.media-viewer-post-link:hover,
+.media-viewer-post-link:focus-visible {
+  background: rgb(255 255 255 / 0.14);
+}
+
+.media-viewer-post-link.is-current {
+  border-color: rgb(255 255 255 / 0.1);
+  background: rgb(255 255 255 / 0.035);
+  color: rgb(255 255 255 / 0.55);
+  cursor: default;
+}
+
 @media (max-width: 768px) {
   #mediaModal .modal-dialog {
     padding-inline: 0.45rem;
@@ -586,14 +622,14 @@ h2 {
   .media-viewer-switcher {
     top: auto;
     bottom: calc(max(0.5rem, env(safe-area-inset-bottom)) + 0.25rem);
-    width: clamp(62px, 22vw, 96px);
-    min-height: 58px;
-    padding: 0.22rem;
+    width: clamp(78px, 28vw, 122px);
+    min-height: 66px;
+    padding: 0.28rem;
     transform: none;
   }
 
   .media-viewer-switcher-preview {
-    height: 54px;
+    height: 62px;
   }
 
   .media-viewer-switcher-chevron {

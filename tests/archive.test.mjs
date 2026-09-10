@@ -588,13 +588,31 @@ test('platform profile assets distinguish explicit null from unknown omitted fie
 });
 
 
-test('artwork media may define a normalized viewer anchor used only on the artwork detail page', async () => {
+test('artwork media may define two pixel viewer anchor points used only on the artwork detail page', async () => {
   const mediaRoot = await createMediaFixture();
   const source = fixtureSource();
-  source.artworks[0].versions[0].media[0].viewerAnchor = { x: 0.375, y: 0.625 };
+  source.artworks[0].versions[0].media[0].viewerAnchor = {
+    file: TWITTER_FILE,
+    points: [
+      { x: 100.5, y: 120.25 },
+      { x: 300.25, y: 320.75 }
+    ]
+  };
 
   const compilation = await compileArchive(source, { mediaRoot });
-  assert.deepEqual(compilation.manifest.media[MEDIA_ID].viewerAnchor, { x: 0.375, y: 0.625 });
+  assert.deepEqual(compilation.manifest.media[MEDIA_ID].viewerAnchor, {
+    file: TWITTER_FILE,
+    points: [
+      { x: 100.5, y: 120.25 },
+      { x: 300.25, y: 320.75 }
+    ]
+  });
+  assert.deepEqual(compilation.manifest.media[MEDIA_ID].viewerAlignment, {
+    points: [
+      { x: 100.5, y: 120.25 },
+      { x: 300.25, y: 320.75 }
+    ]
+  });
   assert.equal(compilation.issues.some((issue) => issue.code === 'media.viewer-anchor-invalid'), false);
 
   const output = await fs.mkdtemp(path.join(os.tmpdir(), 'stairs2line-viewer-anchor-'));
@@ -602,31 +620,63 @@ test('artwork media may define a normalized viewer anchor used only on the artwo
   const detailHtml = await fs.readFile(path.join(output, 'en', 'artworks', 'artwork-0001', 'index.html'), 'utf8');
   assert.match(detailHtml, /data-viewer-align="artwork"/);
   assert.match(detailHtml, /data-viewer-align-group="artwork-0001"/);
-  assert.match(detailHtml, /data-viewer-anchor-x="0\.375"/);
-  assert.match(detailHtml, /data-viewer-anchor-y="0\.625"/);
+  assert.match(detailHtml, /data-viewer-anchor-x1="100\.5"/);
+  assert.match(detailHtml, /data-viewer-anchor-y1="120\.25"/);
+  assert.match(detailHtml, /data-viewer-anchor-x2="300\.25"/);
+  assert.match(detailHtml, /data-viewer-anchor-y2="320\.75"/);
 
   const listingHtml = await fs.readFile(path.join(output, 'en', 'artworks', 'index.html'), 'utf8');
   assert.doesNotMatch(listingHtml, /data-viewer-align="artwork"/);
 
   const schema = JSON.parse(await fs.readFile(new URL('../schemas/archive-source.schema.json', import.meta.url), 'utf8'));
   const anchorSchema = schema.$defs.media.properties.viewerAnchor;
-  assert.deepEqual(anchorSchema.required, ['x', 'y']);
-  assert.equal(anchorSchema.properties.x.minimum, 0);
-  assert.equal(anchorSchema.properties.x.maximum, 1);
-  assert.equal(anchorSchema.properties.y.minimum, 0);
-  assert.equal(anchorSchema.properties.y.maximum, 1);
+  assert.deepEqual(anchorSchema.required, ['points']);
+  assert.equal(anchorSchema.properties.points.minItems, 2);
+  assert.equal(anchorSchema.properties.points.maxItems, 2);
+  assert.equal(anchorSchema.properties.points.items.properties.x.minimum, 0);
+  assert.equal(anchorSchema.properties.points.items.properties.y.minimum, 0);
+});
+
+test('viewer anchor pixels are rescaled from an explicit reference file to the lightest display file', async () => {
+  const mediaRoot = await createMediaFixture();
+  const hiResFile = 'pixiv/999_p0_hires.png';
+  await fs.writeFile(path.join(mediaRoot, hiResFile), fakePng(800, 800, 300));
+
+  const source = fixtureSource();
+  source.artworks[0].versions[0].media[0].files = [hiResFile, PIXIV_FILE];
+  source.artworks[0].versions[0].media[0].viewerAnchor = {
+    file: hiResFile,
+    points: [
+      { x: 200, y: 200 },
+      { x: 600, y: 600 }
+    ]
+  };
+  source.posts = source.posts.filter((post) => post.platform === 'pixiv');
+
+  const compilation = await compileArchive(source, { mediaRoot });
+  assert.equal(compilation.manifest.media[MEDIA_ID].displayFile, PIXIV_FILE);
+  assert.deepEqual(compilation.manifest.media[MEDIA_ID].viewerAlignment, {
+    points: [
+      { x: 100, y: 100 },
+      { x: 300, y: 300 }
+    ]
+  });
 });
 
 test('invalid artwork viewer anchors are reported and ignored', async () => {
   const mediaRoot = await createMediaFixture();
   const source = fixtureSource();
-  source.artworks[0].versions[0].media[0].viewerAnchor = { x: 1.5, y: -0.1 };
+  source.artworks[0].versions[0].media[0].viewerAnchor = {
+    file: TWITTER_FILE,
+    points: [{ x: 20, y: 20 }, { x: 20, y: 20 }]
+  };
   const compilation = await compileArchive(source, { mediaRoot });
   assert.equal(compilation.manifest.media[MEDIA_ID].viewerAnchor, null);
+  assert.equal(compilation.manifest.media[MEDIA_ID].viewerAlignment, null);
   assert.equal(compilation.issues.some((issue) => issue.code === 'media.viewer-anchor-invalid'), true);
 });
 
-test('MediaViewer keeps metadata visible, closes on backdrop rather than image, and exposes thumbnail and swipe navigation', async () => {
+test('MediaViewer uses large previews, side-area navigation, human dates, inactive current posts, and two-point artwork registration', async () => {
   const mediaRoot = await createMediaFixture();
   const source = fixtureSource();
   const compilation = await compileArchive(source, { mediaRoot });
@@ -635,15 +685,24 @@ test('MediaViewer keeps metadata visible, closes on backdrop rather than image, 
 
   const js = await fs.readFile(path.join(output, 'assets', 'media-viewer-adapter.js'), 'utf8');
   const css = await fs.readFile(path.join(output, 'assets', 'archive.css'), 'utf8');
-  assert.match(js, /event\.target\.closest\('\.media-viewer-current, \.modal-subtext, \.media-viewer-switcher'\)/);
+  assert.match(js, /event\.clientX < mediaRect\.left && this\.prev/);
+  assert.match(js, /event\.clientX > mediaRect\.right && this\.next/);
   assert.doesNotMatch(js, /image\.addEventListener\('click',[^\n]*viewer\.close/);
   assert.match(js, /media-viewer-switcher-preview/);
   assert.match(js, /pointerdown/);
   assert.match(js, /pointerType !== 'touch'/);
   assert.match(js, /edgeGuard = 28/);
+  assert.match(js, /new Intl\.DateTimeFormat\(language/);
+  assert.match(js, /aria-current', 'page'/);
+  assert.match(js, /reference\.span \/ item\.geometry\.span/);
+  assert.match(js, /unionWidth/);
+  assert.match(js, /width \/ 2, y: 0/);
+  assert.match(js, /width \/ 2, y: height/);
   assert.match(css, /\.modal\s*\{[\s\S]*?grid-template-rows:\s*minmax\(0, 1fr\) auto/);
   assert.match(css, /\.modal-subtext\s*\{[\s\S]*?max-height:\s*min\(24dvh, 12rem\)[\s\S]*?overflow:\s*auto/);
-  assert.match(css, /\.media-viewer-switcher-preview img,[\s\S]*?opacity:\s*0\.72/);
+  assert.match(css, /\.media-viewer-switcher\s*\{[\s\S]*?width:\s*clamp\(112px, 15vw, 220px\)/);
+  assert.match(css, /\.media-viewer-switcher-preview\s*\{[\s\S]*?height:\s*clamp\(110px, 26vh, 270px\)/);
+  assert.match(css, /\.media-viewer-post-link\.is-current/);
 });
 
 test('orphan Twitter media with a decodable media timestamp is shown as an approximate lost post', async () => {

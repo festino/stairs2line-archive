@@ -66,9 +66,40 @@
     return image;
   }
 
-  function finiteNormalized(value, fallback) {
+  function finiteNumber(value) {
     const number = Number.parseFloat(value ?? '');
-    return Number.isFinite(number) && number >= 0 && number <= 1 ? number : fallback;
+    return Number.isFinite(number) ? number : null;
+  }
+
+  function sourceAlignmentGeometry(element) {
+    if (!element) return null;
+    const width = finiteNumber(element.getAttribute('width'));
+    const height = finiteNumber(element.getAttribute('height'));
+    if (!(width > 0) || !(height > 0)) return null;
+
+    const explicit = [
+      finiteNumber(element.dataset.viewerAnchorX1),
+      finiteNumber(element.dataset.viewerAnchorY1),
+      finiteNumber(element.dataset.viewerAnchorX2),
+      finiteNumber(element.dataset.viewerAnchorY2)
+    ];
+    const points = explicit.every((value) => value !== null)
+      ? [
+        { x: explicit[0], y: explicit[1] },
+        { x: explicit[2], y: explicit[3] }
+      ]
+      : [
+        { x: width / 2, y: 0 },
+        { x: width / 2, y: height }
+      ];
+    const center = {
+      x: (points[0].x + points[1].x) / 2,
+      y: (points[0].y + points[1].y) / 2
+    };
+    const span = Math.hypot(points[1].x - points[0].x, points[1].y - points[0].y);
+    if (!(span > 0)) return null;
+
+    return { width, height, points, center, span };
   }
 
   class MediaViewer {
@@ -87,7 +118,7 @@
       this.renderedMedia = null;
       this.isSubscribed = false;
       this.navigationToken = 0;
-      this.alignmentTarget = null;
+      this.alignmentReference = null;
       this.swipe = null;
       this.ignoreClickUntil = 0;
       this.wheelDelta = 0;
@@ -117,7 +148,7 @@
 
       const nextGroup = element.dataset.viewerAlignGroup || null;
       const currentGroup = this.currentElement?.dataset.viewerAlignGroup || null;
-      if (nextGroup !== currentGroup) this.alignmentTarget = null;
+      if (nextGroup !== currentGroup) this.alignmentReference = nextGroup ? element : null;
 
       this.mediaProvider = mediaProvider;
       this.currentElement = element;
@@ -180,13 +211,16 @@
       this.next = null;
       this.currentElement = null;
       this.renderedMedia = null;
-      this.alignmentTarget = null;
+      this.alignmentReference = null;
       this.swipe = null;
       this.wheelDelta = 0;
       this.navigationToken += 1;
 
       this.updateSwitcher(this.leftSwitcher, null, 'prev');
       this.updateSwitcher(this.rightSwitcher, null, 'next');
+      for (const switcher of [this.leftSwitcher, this.rightSwitcher]) {
+        switcher?.style.removeProperty('max-width');
+      }
     }
 
     canSwitch() {
@@ -220,6 +254,19 @@
     onBackdropClick(event) {
       if (Date.now() < this.ignoreClickUntil || !this.canSwitch()) return;
       if (event.target.closest('.media-viewer-current, .modal-subtext, .media-viewer-switcher')) return;
+
+      const mediaRect = this.renderedMedia?.getBoundingClientRect?.();
+      if (mediaRect) {
+        if (event.clientX < mediaRect.left && this.prev) {
+          this.switchDirection('prev');
+          return;
+        }
+        if (event.clientX > mediaRect.right && this.next) {
+          this.switchDirection('next');
+          return;
+        }
+      }
+
       this.close();
     }
 
@@ -298,7 +345,10 @@
     }
 
     onResize() {
-      requestAnimationFrame(() => this.reflowAlignment());
+      requestAnimationFrame(() => {
+        this.reflowAlignment();
+        this.updateSwitcherPlacement();
+      });
     }
 
     onClick(direction, event) {
@@ -319,6 +369,22 @@
       this.renderedMedia = media;
       this.currentElement = sourceElement;
       this.reflowAlignment();
+      requestAnimationFrame(() => this.updateSwitcherPlacement());
+    }
+
+    updateSwitcherPlacement() {
+      for (const switcher of [this.leftSwitcher, this.rightSwitcher]) {
+        switcher?.style.removeProperty('max-width');
+      }
+      if (!this.renderedMedia || window.innerWidth <= 768) return;
+
+      const rect = this.renderedMedia.getBoundingClientRect?.();
+      if (!rect) return;
+      const gutter = 12;
+      const leftSpace = Math.max(0, rect.left - gutter);
+      const rightSpace = Math.max(0, window.innerWidth - rect.right - gutter);
+      if (this.leftSwitcher) this.leftSwitcher.style.maxWidth = `${leftSpace}px`;
+      if (this.rightSwitcher) this.rightSwitcher.style.maxWidth = `${rightSpace}px`;
     }
 
     reflowAlignment() {
@@ -326,61 +392,89 @@
       const source = this.currentElement;
       if (!media || !source) return;
 
-      const group = source.dataset.viewerAlignGroup || null;
-      if (!group) {
+      const clearAlignment = () => {
         media.classList.remove('is-artwork-aligned');
         media.style.removeProperty('left');
         media.style.removeProperty('top');
         media.style.removeProperty('width');
         media.style.removeProperty('height');
+      };
+
+      const group = source.dataset.viewerAlignGroup || null;
+      if (!group) {
+        clearAlignment();
         return;
+      }
+
+      if (!this.alignmentReference || this.alignmentReference.dataset.viewerAlignGroup !== group) {
+        this.alignmentReference = source;
       }
 
       const stage = this.modal.querySelector('#mediaModalContent');
       const rect = stage?.getBoundingClientRect();
       if (!rect || rect.width <= 0 || rect.height <= 0) return;
 
-      const isImage = media.matches('img');
-      const intrinsicWidth = isImage ? media.naturalWidth : media.videoWidth;
-      const intrinsicHeight = isImage ? media.naturalHeight : media.videoHeight;
-      if (!intrinsicWidth || !intrinsicHeight) {
-        const readyEvent = isImage ? 'load' : 'loadedmetadata';
-        media.addEventListener(readyEvent, () => this.reflowAlignment(), { once: true });
+      const reference = sourceAlignmentGeometry(this.alignmentReference);
+      if (!reference) {
+        clearAlignment();
         return;
       }
 
-      const anchorX = finiteNormalized(source.dataset.viewerAnchorX, 0.5);
-      const anchorY = finiteNormalized(source.dataset.viewerAnchorY, 0.5);
-      const stageWidth = rect.width;
-      const stageHeight = rect.height;
-
-      if (!this.alignmentTarget || this.alignmentTarget.group !== group) {
-        const centeredScale = Math.min(stageWidth / intrinsicWidth, stageHeight / intrinsicHeight);
-        const centeredWidth = intrinsicWidth * centeredScale;
-        const centeredHeight = intrinsicHeight * centeredScale;
-        const centeredLeft = (stageWidth - centeredWidth) / 2;
-        const centeredTop = (stageHeight - centeredHeight) / 2;
-        this.alignmentTarget = {
-          group,
-          x: (centeredLeft + anchorX * centeredWidth) / stageWidth,
-          y: (centeredTop + anchorY * centeredHeight) / stageHeight
-        };
+      const groupItems = (this.mediaProvider?.getItems?.() ?? [])
+        .filter((item) => item.dataset.viewerAlignGroup === group)
+        .map((item) => ({ element: item, geometry: sourceAlignmentGeometry(item) }))
+        .filter((item) => item.geometry);
+      if (!groupItems.some((item) => item.element === source)) {
+        clearAlignment();
+        return;
       }
 
-      const targetX = this.alignmentTarget.x * stageWidth;
-      const targetY = this.alignmentTarget.y * stageHeight;
-      const limits = [stageWidth / intrinsicWidth, stageHeight / intrinsicHeight];
-      if (anchorX > 0) limits.push(targetX / (anchorX * intrinsicWidth));
-      if (anchorX < 1) limits.push((stageWidth - targetX) / ((1 - anchorX) * intrinsicWidth));
-      if (anchorY > 0) limits.push(targetY / (anchorY * intrinsicHeight));
-      if (anchorY < 1) limits.push((stageHeight - targetY) / ((1 - anchorY) * intrinsicHeight));
-      const scale = Math.max(0, Math.min(...limits.filter((value) => Number.isFinite(value) && value >= 0)));
-      if (!scale) return;
+      const positions = new Map();
+      let unionLeft = Infinity;
+      let unionTop = Infinity;
+      let unionRight = -Infinity;
+      let unionBottom = -Infinity;
 
-      const width = intrinsicWidth * scale;
-      const height = intrinsicHeight * scale;
-      const left = targetX - anchorX * width;
-      const top = targetY - anchorY * height;
+      for (const item of groupItems) {
+        const scaleToReference = reference.span / item.geometry.span;
+        if (!(scaleToReference > 0) || !Number.isFinite(scaleToReference)) continue;
+
+        const left = reference.center.x - item.geometry.center.x * scaleToReference;
+        const top = reference.center.y - item.geometry.center.y * scaleToReference;
+        const right = left + item.geometry.width * scaleToReference;
+        const bottom = top + item.geometry.height * scaleToReference;
+        unionLeft = Math.min(unionLeft, left);
+        unionTop = Math.min(unionTop, top);
+        unionRight = Math.max(unionRight, right);
+        unionBottom = Math.max(unionBottom, bottom);
+        positions.set(item.element, { left, top, scaleToReference, geometry: item.geometry });
+      }
+
+      const currentPosition = positions.get(source);
+      const unionWidth = unionRight - unionLeft;
+      const unionHeight = unionBottom - unionTop;
+      if (!currentPosition || !(unionWidth > 0) || !(unionHeight > 0)) {
+        clearAlignment();
+        return;
+      }
+
+      // Fit the union of every registered version, not merely the currently
+      // visible image. This keeps the same source pixels at the same screen
+      // coordinates even when another version is a wider/taller uncropped
+      // image, while guaranteeing that every version still fits on screen.
+      const viewportScale = Math.min(rect.width / unionWidth, rect.height / unionHeight);
+      if (!(viewportScale > 0) || !Number.isFinite(viewportScale)) {
+        clearAlignment();
+        return;
+      }
+
+      const originX = (rect.width - unionWidth * viewportScale) / 2 - unionLeft * viewportScale;
+      const originY = (rect.height - unionHeight * viewportScale) / 2 - unionTop * viewportScale;
+      const scale = currentPosition.scaleToReference * viewportScale;
+      const width = currentPosition.geometry.width * scale;
+      const height = currentPosition.geometry.height * scale;
+      const left = originX + currentPosition.left * viewportScale;
+      const top = originY + currentPosition.top * viewportScale;
 
       media.classList.add('is-artwork-aligned');
       media.style.width = `${width}px`;
@@ -408,6 +502,38 @@
     return value[language] ?? value.default ?? Object.values(value).find(Boolean) ?? '';
   }
 
+  function formatViewerDate(value, language, approximate = false) {
+    if (!value) return 'Unknown date';
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return String(value);
+    let formatted;
+    try {
+      formatted = new Intl.DateTimeFormat(language, {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        timeZone: 'UTC'
+      }).format(date);
+    } catch {
+      formatted = date.toLocaleString();
+    }
+    return approximate ? `≈ ${formatted}` : formatted;
+  }
+
+  function viewerPlatformLabel(index, platformId, language) {
+    return localized(index.platforms?.[platformId]?.label, language) || platformId;
+  }
+
+  function postReferenceText(index, post, language, statusOverride = null) {
+    const date = formatViewerDate(post.publishedAt, language, post.dateApproximate);
+    const platform = viewerPlatformLabel(index, post.platform, language);
+    const status = statusOverride ?? post.status;
+    const suffix = status === 'deleted' || status === 'lost' ? ` · ${status}` : '';
+    return `${date} · ${platform}${suffix}`;
+  }
+
   async function updateFooter(element) {
     const footer = document.querySelector('.modal-subtext');
     if (!footer) return;
@@ -421,39 +547,60 @@
       const language = document.documentElement.lang || 'en';
       const contextType = element.dataset.contextType;
       const contextId = element.dataset.contextId;
+      let currentPost = null;
+      let currentVersion = null;
 
       if (contextType === 'post' && index.posts[contextId]) {
-        const post = index.posts[contextId];
+        currentPost = index.posts[contextId];
         const versionIndex = Number.parseInt(element.dataset.contextVersion ?? '', 10);
-        const version = Number.isInteger(versionIndex) && post.versions?.[versionIndex]
-          ? post.versions[versionIndex]
-          : post;
-        const line = document.createElement('div');
-        line.textContent = `${post.publishedAt ?? 'Unknown date'} · ${localized(version.title, language) || post.platform}`;
-        footer.append(line);
+        currentVersion = Number.isInteger(versionIndex) && currentPost.versions?.[versionIndex]
+          ? currentPost.versions[versionIndex]
+          : currentPost;
+        const title = localized(currentVersion.title, language);
+        if (title) {
+          const line = document.createElement('div');
+          line.className = 'media-viewer-context';
+          line.textContent = title;
+          footer.append(line);
+        }
       }
 
       if (contextType === 'artworkVersion') {
         const artwork = index.artworks[media.artworkId];
         if (artwork) {
           const line = document.createElement('div');
+          line.className = 'media-viewer-context';
           line.textContent = `${localized(artwork.title, language) || artwork.id} · ${media.versionId}`;
           footer.append(line);
         }
       }
 
-      for (const postId of media.postIds ?? []) {
-        const post = index.posts[postId];
-        if (!post) continue;
+      const postIds = [...new Set(media.postIds ?? [])];
+      if (currentPost && !postIds.includes(contextId)) postIds.unshift(contextId);
+      if (postIds.length > 0) {
+        const list = document.createElement('div');
+        list.className = 'media-viewer-post-list';
 
-        const line = document.createElement('div');
-        const link = document.createElement('a');
-        link.href = post.href || '#';
-        link.target = '_blank';
-        link.rel = 'noreferrer';
-        link.textContent = `${post.publishedAt ?? 'Unknown date'} · ${post.platform}${post.status === 'deleted' ? ' · deleted' : ''}`;
-        line.append(link);
-        footer.append(line);
+        for (const postId of postIds) {
+          const post = index.posts[postId];
+          if (!post) continue;
+          const isCurrent = Boolean(currentPost && postId === contextId);
+          const status = isCurrent ? currentVersion?.status ?? post.status : post.status;
+          const item = document.createElement(post.href && !isCurrent ? 'a' : 'span');
+          item.className = `media-viewer-post-link${isCurrent ? ' is-current' : ''}`;
+          item.textContent = postReferenceText(index, post, language, status);
+
+          if (item.matches('a')) {
+            item.href = post.href;
+            item.target = '_blank';
+            item.rel = 'noreferrer';
+          } else if (isCurrent) {
+            item.setAttribute('aria-current', 'page');
+          }
+          list.append(item);
+        }
+
+        footer.append(list);
       }
     } catch (error) {
       console.error('Could not render MediaViewer metadata.', error);

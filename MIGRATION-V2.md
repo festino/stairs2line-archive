@@ -99,16 +99,33 @@ Full post media on every platform is capped at `min(62dvh, 680px)` per rendered 
 
 ## MediaViewer alignment and navigation
 
-Artwork media may optionally define a normalized comparison anchor:
+Artwork media may optionally define a two-point registration for comparing versions of the same image:
 
 ```json
 {
   "id": "artwork-0042/v03/m01",
-  "files": ["pixiv/12345678_p0.png"],
-  "viewerAnchor": { "x": 0.47, "y": 0.31 }
+  "files": [
+    "pixiv/12345678_p0-original.png",
+    "pixiv/12345678_p0-small.png"
+  ],
+  "viewerAnchor": {
+    "file": "pixiv/12345678_p0-original.png",
+    "points": [
+      { "x": 418.5, "y": 271.25 },
+      { "x": 1262.75, "y": 1038.5 }
+    ]
+  }
 }
 ```
 
-`viewerAnchor.x` and `.y` are unit coordinates in the inclusive `0..1` range, not pixels. They are used only on an individual artwork page while moving between that artwork's version media in MediaViewer; normal post viewing is unaffected. The viewer keeps the anchor at the same screen position while rescaling each `<img>`/`<video>` as needed so the full media remains inside the available viewport. When no anchor is supplied, `{ "x": 0.5, "y": 0.5 }` is assumed. For portrait-oriented versions this naturally aligns them by height whenever height is the limiting dimension, so their top and bottom edges stay fixed as well.
+`viewerAnchor.points` contains exactly two distinct points in **pixel coordinates of that image**, and fractional coordinates are allowed. `viewerAnchor.file` names the declared physical file whose pixel coordinate system the numbers refer to. The field is optional; when it is omitted, the first declared existing image with known dimensions is used as the reference. The compiler rescales the coordinates to the lightest `displayFile`, so choosing a smaller equivalent file for the generated site does not change the intended registration.
 
-MediaViewer reserves a separate scrollable row for metadata, so a tall portrait can no longer push the text below the viewport. Clicking empty backdrop/stage space closes the viewer, while clicking the image/video, metadata, or navigation controls does not. Previous/next controls use dimmed media previews instead of oversized arrow hit areas. Touch devices can move between media with a horizontal swipe; gestures beginning within 28 CSS pixels of a screen edge are deliberately ignored to avoid competing with browser/system back-forward gestures. Keyboard arrows and wheel navigation remain supported.
+The pair represents translation and scale, not a rotation. Its midpoint is the stable position of the matched area and the distance between the two points defines the scale. When corresponding pairs are supplied for two cropped/resized versions, the common source pixels therefore remain at the same screen coordinates while moving between them. The viewer computes the transformed bounds of **all** media in the artwork group before choosing the screen scale; it fits the union of those bounds into the available stage. Consequently an uncropped version may occupy a larger rectangle than a cropped version, but neither can run outside the viewport and the registered common area does not jump or change screen scale.
+
+When `viewerAnchor` is absent, MediaViewer behaves as though the two points were the horizontal center of the top and bottom image edges: `(width / 2, 0)` and `(width / 2, height)`. Thus unregistered versions are aligned by height and centered horizontally. Explicit registration is recommended whenever cropping or resizing changed the relationship between the outer image bounds and the unchanged content.
+
+These coordinates are used only on an individual artwork page while moving among that artwork's version media; normal post viewing is unaffected. The displayed object remains a regular `<img>`/`<video>` rather than being redrawn to a canvas, so normal browser image actions remain available.
+
+MediaViewer reserves a separate scrollable row for metadata, so a tall portrait can no longer push the text below the viewport. Dates in the post-reference row are formatted through the browser locale rather than exposing raw ISO timestamps. The current post is kept in that row as a disabled `aria-current` item instead of being emitted a second time as a link.
+
+Clicking empty space directly to the left of the displayed full-size media moves to the previous item when one exists; clicking empty space to the right moves to the next. Other empty backdrop space closes the viewer. The visible previous/next controls use larger dimmed thumbnails and automatically shrink to the actual free side space so they do not cover the image. Touch devices can also move between media with a horizontal swipe; gestures beginning within 28 CSS pixels of a screen edge are deliberately ignored to avoid competing with browser/system back-forward gestures. Keyboard arrows and wheel navigation remain supported.

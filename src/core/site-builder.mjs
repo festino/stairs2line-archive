@@ -159,9 +159,11 @@ function mediaElement(manifest, media, language, alt, contextType, contextId, op
     ...(options.viewerAlignGroup ? [
       'data-viewer-align="artwork"',
       `data-viewer-align-group="${escapeAttribute(options.viewerAlignGroup)}"`,
-      ...(media.viewerAnchor ? [
-        `data-viewer-anchor-x="${escapeAttribute(media.viewerAnchor.x)}"`,
-        `data-viewer-anchor-y="${escapeAttribute(media.viewerAnchor.y)}"`
+      ...(media.viewerAlignment?.points?.length === 2 ? [
+        `data-viewer-anchor-x1="${escapeAttribute(media.viewerAlignment.points[0].x)}"`,
+        `data-viewer-anchor-y1="${escapeAttribute(media.viewerAlignment.points[0].y)}"`,
+        `data-viewer-anchor-x2="${escapeAttribute(media.viewerAlignment.points[1].x)}"`,
+        `data-viewer-anchor-y2="${escapeAttribute(media.viewerAlignment.points[1].y)}"`
       ] : [])
     ] : [])
   ].join(' ');
@@ -1061,6 +1063,10 @@ async function writePlaceholders(outputRoot, manifest) {
 
 function buildViewerIndex(manifest) {
   return {
+    platforms: Object.fromEntries(manifest.platforms.map((platform) => [platform.id, {
+      id: platform.id,
+      label: platform.label
+    }])),
     media: Object.fromEntries(Object.values(manifest.media).map((media) => [media.id, {
       displayFile: media.displayFile,
       files: media.existingFiles,

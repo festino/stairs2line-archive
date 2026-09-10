@@ -248,6 +248,17 @@ function tumblrLayoutRows(version) {
   return defaultTumblrRows(version.mediaRefs?.length ?? 0);
 }
 
+function twitterSingleMediaCropClass(manifest, mediaRef) {
+  const filePath = mediaRef?.displayFile ?? mediaRef?.filePath;
+  const file = filePath ? manifest.files[filePath] : null;
+  if (!file?.width || !file?.height) return 'twitter-single-media--natural';
+
+  const aspectRatio = file.width / file.height;
+  if (aspectRatio > 2) return 'twitter-single-media--wide';
+  if (aspectRatio < 3 / 4) return 'twitter-single-media--tall';
+  return 'twitter-single-media--natural';
+}
+
 function renderPostMedia(manifest, post, version, language, index) {
   const mediaRefs = version.mediaRefs ?? post.mediaRefs ?? [];
   if (mediaRefs.length === 0) return '';
@@ -270,7 +281,10 @@ function renderPostMedia(manifest, post, version, language, index) {
     return `<div class="post-media-grid tumblr-media-layout">${rows}${trailing}</div>`;
   }
 
-  return `<div class="post-media-grid post-media-grid--${escapeAttribute(post.platform)} post-media-count-${mediaRefs.length}">${mediaRefs.map((mediaRef, mediaIndex) => `<div class="post-media-item">${mediaRefElement(manifest, mediaRef, language, title, 'post', post.key, { eager: index === 0 && mediaIndex === 0, versionIndex: version.index })}</div>`).join('')}</div>`;
+  const platformLayoutClass = post.platform === 'twitter' && mediaRefs.length === 1
+    ? ` ${twitterSingleMediaCropClass(manifest, mediaRefs[0])}`
+    : '';
+  return `<div class="post-media-grid post-media-grid--${escapeAttribute(post.platform)} post-media-count-${mediaRefs.length}${platformLayoutClass}">${mediaRefs.map((mediaRef, mediaIndex) => `<div class="post-media-item">${mediaRefElement(manifest, mediaRef, language, title, 'post', post.key, { eager: index === 0 && mediaIndex === 0, versionIndex: version.index })}</div>`).join('')}</div>`;
 }
 
 function renderPostCard(manifest, post, language, index, options = {}) {

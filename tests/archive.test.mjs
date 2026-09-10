@@ -13,6 +13,12 @@ const TWITTER_FILE = 'twitter/123456789012345678_ABCDEF123456789.png';
 const PIXIV_FILE = 'pixiv/999_p0.png';
 const MISSING_FILE = 'pixiv/missing.png';
 const MEDIA_ID = 'artwork-0001/v01/m01';
+const TWITTER_LAYOUT_FILES = [
+  'twitter/200000000000000001_LAYOUT000000001.png',
+  'twitter/200000000000000002_LAYOUT000000002.png',
+  'twitter/200000000000000003_LAYOUT000000003.png',
+  'twitter/200000000000000004_LAYOUT000000004.png'
+];
 
 function fakePng(width, height, extraBytes = 0) {
   const buffer = Buffer.alloc(24 + extraBytes);
@@ -119,6 +125,48 @@ async function createMediaFixture() {
   await fs.writeFile(path.join(root, TWITTER_FILE), fakePng(400, 400, 100));
   await fs.writeFile(path.join(root, PIXIV_FILE), fakePng(400, 400, 10));
   return root;
+}
+
+async function createTwitterLayoutMediaFixture(dimensions = [[1200, 800], [800, 1200], [1600, 900], [900, 1600]]) {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'stairs2line-twitter-layout-'));
+  await fs.mkdir(path.join(root, 'twitter'), { recursive: true });
+  for (let index = 0; index < TWITTER_LAYOUT_FILES.length; index += 1) {
+    const [width, height] = dimensions[index] ?? [1200, 800];
+    await fs.writeFile(path.join(root, TWITTER_LAYOUT_FILES[index]), fakePng(width, height, index));
+  }
+  return root;
+}
+
+function twitterLayoutSource(counts = [1, 2, 3, 4]) {
+  const source = fixtureSource();
+  source.site.mediaDirectories = ['twitter'];
+  source.posts = counts.map((count) => ({
+    key: `twitter:20000000000000000${count}`,
+    platform: 'twitter',
+    id: `20000000000000000${count}`,
+    publishedAt: `2024-01-0${count}T00:00:00Z`,
+    versions: [{
+      status: 'alive',
+      originalLanguage: 'en',
+      description: { en: `${count} image layout` },
+      media: TWITTER_LAYOUT_FILES.slice(0, count)
+    }],
+    __source: '/source/posts/twitter.jsonc'
+  }));
+  source.artworks = [{
+    id: 'artwork-twitter-layout',
+    title: { en: 'Twitter layout' },
+    versions: [{
+      id: 'v01',
+      scope: 'top',
+      media: TWITTER_LAYOUT_FILES.map((filePath, index) => ({
+        id: `artwork-twitter-layout/v01/m${String(index + 1).padStart(2, '0')}`,
+        files: [filePath]
+      }))
+    }],
+    __source: '/source/artworks/twitter-layout.jsonc'
+  }];
+  return source;
 }
 
 test('legacy parser migrates all current records and stores status on each post', async () => {
@@ -287,7 +335,54 @@ test('static pages use the logical media display file and expose paged/feed cont
 
   const twitterHtml = await fs.readFile(path.join(output, 'en', 'posts', 'platform', 'twitter', 'index.html'), 'utf8');
   assert.match(twitterHtml, /<img[^>]+data-file-path="twitter\/123456789012345678_ABCDEF123456789\.png"[^>]+src="\/repo\/media\/stairs2line\/pixiv\/999_p0\.png"/);
+  assert.match(twitterHtml, /post-media-count-1 twitter-single-media--natural/);
 
   const twitterCompactHtml = await fs.readFile(path.join(output, 'en', 'posts', 'platform', 'twitter', 'compact', 'index.html'), 'utf8');
   assert.match(twitterCompactHtml, /<img src="\/repo\/media\/stairs2line\/pixiv\/999_p0\.png"/);
+
+  const postsHtml = await fs.readFile(path.join(output, 'en', 'posts', 'index.html'), 'utf8');
+  assert.doesNotMatch(postsHtml, /<body class="platform-page/);
+
+  const archiveCss = await fs.readFile(path.join(output, 'assets', 'archive.css'), 'utf8');
+  assert.match(archiveCss, /\.platform-page--pixiv \.post-card--pixiv[\s\S]*?max-height:\s*min\(85dvh, 1000px\)/);
+  assert.doesNotMatch(archiveCss, /^\.post-card--(?:pixiv|twitter|tumblr)\s*\{/m);
+});
+
+
+test('twitter full view derives 1-4 image layouts from media count without a layout field', async () => {
+  const mediaRoot = await createTwitterLayoutMediaFixture();
+  const source = twitterLayoutSource();
+  const compilation = await compileArchive(source, { mediaRoot });
+  const output = await fs.mkdtemp(path.join(os.tmpdir(), 'stairs2line-twitter-layout-site-'));
+  await buildStaticSite(compilation, source, output, { mediaRoot, copyMedia: true });
+
+  const twitterHtml = await fs.readFile(path.join(output, 'en', 'posts', 'platform', 'twitter', 'index.html'), 'utf8');
+  assert.match(twitterHtml, /post-media-count-1 twitter-single-media--natural/);
+  assert.match(twitterHtml, /post-media-count-2/);
+  assert.match(twitterHtml, /post-media-count-3/);
+  assert.match(twitterHtml, /post-media-count-4/);
+  assert.equal(source.posts.some((post) => 'layout' in post.versions[0]), false);
+
+  const archiveCss = await fs.readFile(path.join(output, 'assets', 'archive.css'), 'utf8');
+  assert.match(archiveCss, /post-media-count-2,[\s\S]*?post-media-count-4[\s\S]*?aspect-ratio:\s*16 \/ 9/);
+  assert.match(archiveCss, /post-media-count-3 \.post-media-item:first-child[\s\S]*?grid-row:\s*1 \/ span 2/);
+  assert.match(archiveCss, /post-media-count-2 img,[\s\S]*?post-media-count-4 video[\s\S]*?object-fit:\s*cover/);
+});
+
+test('twitter single-image view only crops aspect ratios outside the supported 3:4 to 2:1 range', async () => {
+  const cases = [
+    { dimensions: [1200, 1200], expected: 'twitter-single-media--natural' },
+    { dimensions: [2400, 600], expected: 'twitter-single-media--wide' },
+    { dimensions: [600, 1200], expected: 'twitter-single-media--tall' }
+  ];
+
+  for (const { dimensions, expected } of cases) {
+    const mediaRoot = await createTwitterLayoutMediaFixture([dimensions]);
+    const source = twitterLayoutSource([1]);
+    const compilation = await compileArchive(source, { mediaRoot });
+    const output = await fs.mkdtemp(path.join(os.tmpdir(), 'stairs2line-twitter-single-site-'));
+    await buildStaticSite(compilation, source, output, { mediaRoot });
+    const twitterHtml = await fs.readFile(path.join(output, 'en', 'posts', 'platform', 'twitter', 'index.html'), 'utf8');
+    assert.match(twitterHtml, new RegExp(`post-media-count-1 ${expected}`));
+  }
 });

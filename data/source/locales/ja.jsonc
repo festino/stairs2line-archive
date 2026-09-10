@@ -40,6 +40,10 @@
     "pageTitle": "stairs2line 投稿",
     "all": "すべての投稿",
     "grouped": "プラットフォーム別",
+    "view": "投稿表示",
+    "fullView": "通常表示",
+    "compactView": "コンパクト表示",
+    "versionLabel": "バージョン {current} / {total}",
     "platformTitle": "{platform}の投稿",
     "genericDescription": "{platform}にある stairs2line のアーカイブ投稿。"
   },

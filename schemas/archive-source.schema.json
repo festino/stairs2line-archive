@@ -70,26 +70,69 @@
       },
       "additionalProperties": false
     },
-    "post": {
+    "postLayoutRow": {
       "type": "object",
-      "required": ["platform", "id", "status"],
+      "required": ["blocks"],
       "properties": {
-        "key": { "type": "string", "minLength": 1 },
-        "platform": { "type": "string", "minLength": 1 },
-        "id": { "type": "string", "minLength": 1 },
+        "blocks": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "integer", "minimum": 0 },
+          "uniqueItems": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "postLayout": {
+      "type": "object",
+      "required": ["type", "display"],
+      "properties": {
+        "type": { "const": "rows" },
+        "display": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/postLayoutRow" }
+        }
+      },
+      "additionalProperties": false
+    },
+    "postVersion": {
+      "type": "object",
+      "required": ["status"],
+      "properties": {
         "account": { "type": "string" },
         "status": { "enum": ["alive", "deleted"] },
-        "publishedAt": { "type": "string", "format": "date-time" },
         "href": { "type": "string", "format": "uri" },
         "originalLanguage": { "type": "string" },
         "title": { "$ref": "#/$defs/localizedText" },
         "description": { "$ref": "#/$defs/localizedText" },
         "media": {
+          "description": "Physical file-path lookup keys. Each path identifies a logical artwork media item; rendering may use a smaller equivalent file from that media item.",
           "type": "array",
           "items": { "type": "string", "minLength": 1 },
           "uniqueItems": true
         },
-        "legacyAutoLink": { "type": "boolean" }
+        "layout": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/postLayout" }
+        },
+        "migration": { "type": "object" }
+      },
+      "additionalProperties": false
+    },
+    "post": {
+      "type": "object",
+      "required": ["platform", "id", "versions"],
+      "properties": {
+        "key": { "type": "string", "minLength": 1 },
+        "platform": { "type": "string", "minLength": 1 },
+        "id": { "type": "string", "minLength": 1 },
+        "publishedAt": { "type": "string", "format": "date-time" },
+        "versions": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/postVersion" }
+        }
       },
       "additionalProperties": false
     }

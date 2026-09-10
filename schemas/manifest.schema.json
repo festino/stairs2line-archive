@@ -5,7 +5,7 @@
   "type": "object",
   "required": ["schemaVersion", "site", "files", "media", "artworks", "posts", "summary"],
   "properties": {
-    "schemaVersion": { "const": 1 },
+    "schemaVersion": { "const": 2 },
     "generatedAt": { "type": "string", "format": "date-time" },
     "site": { "type": "object" },
     "platforms": { "type": "array" },
@@ -17,7 +17,7 @@
     "posts": { "type": "array", "items": { "type": "object" } },
     "summary": {
       "type": "object",
-      "required": ["artworkCount", "versionCount", "mediaCount", "postCount", "fileCount", "errorCount", "warningCount"]
+      "required": ["artworkCount", "versionCount", "mediaCount", "postCount", "postVersionCount", "fileCount", "errorCount", "warningCount"]
     }
   },
   "additionalProperties": true

@@ -40,6 +40,10 @@
     "pageTitle": "Посты stairs2line",
     "all": "Все посты",
     "grouped": "По площадкам",
+    "view": "Вид постов",
+    "fullView": "Полный вид",
+    "compactView": "Компактный вид",
+    "versionLabel": "Версия {current} из {total}",
     "platformTitle": "Посты на {platform}",
     "genericDescription": "Архивная публикация stairs2line на {platform}."
   },

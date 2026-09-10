@@ -2,6 +2,7 @@ import path from 'node:path';
 import { buildFileCatalog } from './file-catalog.mjs';
 import { earliestDate } from './dates.mjs';
 import { localizedValue } from './localization.mjs';
+import { upgradeSourcePosts } from './source-upgrader.mjs';
 import { normalizePath, stableHash, unique } from './util.mjs';
 
 class IssueCollector {
@@ -96,6 +97,123 @@ function buildPostUrl(post, platform) {
     .replaceAll('{account}', encodeURIComponent(post.account ?? platform.defaultAccount ?? ''));
 }
 
+function sourcePostVersions(post) {
+  if (Array.isArray(post.versions) && post.versions.length > 0) return post.versions;
+  const {
+    key,
+    platform,
+    id,
+    publishedAt,
+    __source,
+    ...legacyVersion
+  } = post;
+  return [legacyVersion];
+}
+
+function postFileScore(post, filePath) {
+  const normalized = normalizePath(filePath);
+  const slashIndex = normalized.indexOf('/');
+  const directory = slashIndex >= 0 ? normalized.slice(0, slashIndex) : '';
+  const filename = path.posix.basename(normalized);
+  const id = String(post.id);
+  let score = 0;
+  if (filename === id || filename.startsWith(`${id}.`)) score += 220;
+  if (filename.startsWith(`${id}_`) || filename.startsWith(`${id}-`)) score += 200;
+  if (filename.includes(id)) score += 140;
+  if (directory === post.platform) score += 80;
+  if (directory === 'other' && !['twitter', 'tumblr', 'pixiv'].includes(post.platform)) score += 40;
+  return score;
+}
+
+function selectDeclaredFileForPost(post, media) {
+  const candidates = media?.declaredFiles ?? [];
+  return [...candidates]
+    .sort((a, b) => postFileScore(post, b) - postFileScore(post, a) || a.localeCompare(b))[0]
+    ?? null;
+}
+
+function validatePostLayout(issues, postKey, source, layout, mediaCount, versionIndex) {
+  if (layout == null) return;
+  const entityId = `${postKey}#${versionIndex + 1}`;
+  if (!Array.isArray(layout)) {
+    issues.add({
+      severity: 'error',
+      code: 'post.layout-invalid',
+      entityType: 'postVersion',
+      entityId,
+      source,
+      details: 'layout must be an array'
+    });
+    return;
+  }
+
+  const used = new Set();
+  for (const section of layout) {
+    if (section?.type !== 'rows' || !Array.isArray(section.display)) {
+      issues.add({
+        severity: 'error',
+        code: 'post.layout-unsupported',
+        entityType: 'postVersion',
+        entityId,
+        source,
+        details: section?.type ?? 'missing type'
+      });
+      continue;
+    }
+    for (const row of section.display) {
+      if (!Array.isArray(row?.blocks) || row.blocks.length === 0) {
+        issues.add({
+          severity: 'error',
+          code: 'post.layout-invalid-row',
+          entityType: 'postVersion',
+          entityId,
+          source
+        });
+        continue;
+      }
+      for (const block of row.blocks) {
+        if (!Number.isInteger(block) || block < 0 || block >= mediaCount) {
+          issues.add({
+            severity: 'error',
+            code: 'post.layout-out-of-range',
+            entityType: 'postVersion',
+            entityId,
+            source,
+            details: String(block)
+          });
+          continue;
+        }
+        if (used.has(block)) {
+          issues.add({
+            severity: 'error',
+            code: 'post.layout-duplicate-block',
+            entityType: 'postVersion',
+            entityId,
+            source,
+            details: String(block)
+          });
+        }
+        used.add(block);
+      }
+    }
+  }
+
+  if (used.size < mediaCount) {
+    const missing = [];
+    for (let index = 0; index < mediaCount; index += 1) {
+      if (!used.has(index)) missing.push(String(index));
+    }
+    issues.add({
+      severity: 'warning',
+      code: 'post.layout-incomplete',
+      entityType: 'postVersion',
+      entityId,
+      source,
+      details: missing
+    });
+  }
+}
+
 function selectSmallestFile(files) {
   return [...files].sort((a, b) => a.byteLength - b.byteLength || a.path.localeCompare(b.path))[0] ?? null;
 }
@@ -142,6 +260,7 @@ export async function compileArchive(source, options = {}) {
   const compiledFiles = new Map(files.map((file) => [file.path, file]));
   const mediaById = new Map();
   const mediaIdsByFile = new Map();
+  const mediaIdsByDeclaredFile = new Map();
   const artworks = [];
   const artworkIds = new Set();
 
@@ -253,6 +372,11 @@ export async function compileArchive(source, options = {}) {
         mediaById.set(mediaId, compiledMedia);
         mediaIds.push(mediaId);
 
+        for (const filePath of declaredFiles) {
+          if (!mediaIdsByDeclaredFile.has(filePath)) mediaIdsByDeclaredFile.set(filePath, []);
+          mediaIdsByDeclaredFile.get(filePath).push(mediaId);
+        }
+
         for (const file of deduplicatedFiles) {
           if (!mediaIdsByFile.has(file.path)) mediaIdsByFile.set(file.path, []);
           mediaIdsByFile.get(file.path).push(mediaId);
@@ -315,96 +439,223 @@ export async function compileArchive(source, options = {}) {
 
   for (const sourcePost of source.posts) {
     const key = sourcePost.key ?? `${sourcePost.platform}:${sourcePost.id}`;
+    const source = sourceName(sourcePost);
     if (postIds.has(key)) {
       issues.add({
         severity: 'error',
         code: 'post.duplicate-id',
         entityType: 'post',
         entityId: key,
-        source: sourceName(sourcePost)
+        source
       });
       continue;
     }
     postIds.add(key);
 
-    if (!['alive', 'deleted'].includes(sourcePost.status)) {
+    const platform = platformsById.get(sourcePost.platform);
+    if (!platform) {
       issues.add({
         severity: 'error',
-        code: 'post.invalid-status',
+        code: 'post.unknown-platform',
         entityType: 'post',
         entityId: key,
-        source: sourceName(sourcePost),
-        details: String(sourcePost.status)
+        source,
+        details: String(sourcePost.platform)
       });
     }
 
-    if (sourcePost.title) {
-      validateLocalizedField(issues, 'post', key, sourceName(sourcePost), 'title', sourcePost.title, languages, false);
-    }
-    if (sourcePost.description) {
-      validateLocalizedField(issues, 'post', key, sourceName(sourcePost), 'description', sourcePost.description, languages, false);
-    }
-
-    const effectiveStatus = sourcePost.publishedAt ? sourcePost.status : 'deleted';
-    if (!sourcePost.publishedAt && sourcePost.status === 'alive') {
+    const versions = [];
+    const rawVersions = sourcePostVersions(sourcePost);
+    if (rawVersions.length === 0) {
       issues.add({
-        severity: 'warning',
-        code: 'post.date-missing-treated-deleted',
+        severity: 'error',
+        code: 'post.no-versions',
         entityType: 'post',
         entityId: key,
-        source: sourceName(sourcePost)
+        source
       });
     }
 
-    const resolvedMediaIds = new Set(sourcePost.media ?? []);
-    if (sourcePost.legacyAutoLink) {
-      for (const filePath of filesByPostKey.get(key) ?? []) {
-        for (const mediaId of mediaIdsByFile.get(filePath) ?? []) resolvedMediaIds.add(mediaId);
-      }
-    }
-
-    for (const mediaId of [...resolvedMediaIds]) {
-      const media = mediaById.get(mediaId);
-      if (!media) {
+    for (const [versionIndex, sourceVersion] of rawVersions.entries()) {
+      const versionEntityId = `${key}#${versionIndex + 1}`;
+      const declaredStatus = sourceVersion.status;
+      if (!['alive', 'deleted'].includes(declaredStatus)) {
         issues.add({
           severity: 'error',
-          code: 'post.unknown-media',
-          entityType: 'post',
-          entityId: key,
-          source: sourceName(sourcePost),
-          details: mediaId
+          code: 'post.invalid-status',
+          entityType: 'postVersion',
+          entityId: versionEntityId,
+          source,
+          details: String(declaredStatus)
         });
-        resolvedMediaIds.delete(mediaId);
-        continue;
       }
-      media.postIds.push(key);
+
+      if (sourceVersion.title) {
+        validateLocalizedField(issues, 'postVersion', versionEntityId, source, 'title', sourceVersion.title, languages, false);
+      }
+      if (sourceVersion.description) {
+        validateLocalizedField(issues, 'postVersion', versionEntityId, source, 'description', sourceVersion.description, languages, false);
+      }
+
+      const effectiveStatus = sourcePost.publishedAt ? declaredStatus : 'deleted';
+      if (!sourcePost.publishedAt && declaredStatus === 'alive') {
+        issues.add({
+          severity: 'warning',
+          code: 'post.date-missing-treated-deleted',
+          entityType: 'postVersion',
+          entityId: versionEntityId,
+          source
+        });
+      }
+
+      const rawMedia = [...(sourceVersion.media ?? [])];
+      if (sourceVersion.legacyAutoLink || (!Array.isArray(sourcePost.versions) && sourcePost.legacyAutoLink)) {
+        rawMedia.push(...(filesByPostKey.get(key) ?? []));
+      }
+
+      const mediaRefs = [];
+      const seenRefKeys = new Set();
+      for (const rawReference of rawMedia) {
+        const reference = String(rawReference);
+        let filePath = null;
+        let candidateMediaIds = [];
+
+        const legacyMedia = mediaById.get(reference);
+        if (legacyMedia) {
+          filePath = selectDeclaredFileForPost(sourcePost, legacyMedia);
+          candidateMediaIds = [legacyMedia.id];
+        } else {
+          filePath = normalizePath(reference);
+          candidateMediaIds = mediaIdsByDeclaredFile.get(filePath) ?? [];
+        }
+
+        if (!filePath) {
+          issues.add({
+            severity: 'error',
+            code: 'post.media-reference-unresolved',
+            entityType: 'postVersion',
+            entityId: versionEntityId,
+            source,
+            details: reference
+          });
+          continue;
+        }
+
+        if (candidateMediaIds.length === 0) {
+          issues.add({
+            severity: 'error',
+            code: 'post.file-unassigned-to-artwork',
+            entityType: 'postVersion',
+            entityId: versionEntityId,
+            source,
+            details: filePath
+          });
+        } else if (candidateMediaIds.length > 1) {
+          issues.add({
+            severity: 'warning',
+            code: 'post.file-ambiguous-artwork',
+            entityType: 'postVersion',
+            entityId: versionEntityId,
+            source,
+            details: `${filePath}: ${candidateMediaIds.join(', ')}`
+          });
+        }
+
+        const mediaId = candidateMediaIds[0] ?? null;
+        const media = mediaId ? mediaById.get(mediaId) : null;
+        const physicalFile = filesByPath.get(filePath) ?? null;
+        if (!physicalFile) {
+          issues.add({
+            severity: options.previewPlaceholders ? 'warning' : 'error',
+            code: 'post.file-missing',
+            entityType: 'postVersion',
+            entityId: versionEntityId,
+            source,
+            details: filePath
+          });
+        }
+
+        // The filename in a post is a stable human-friendly lookup key for the
+        // logical media item. Rendering should still use the lightest existing
+        // equivalent file selected for that media item.
+        const displayFile = media?.displayFile ?? physicalFile?.path ?? null;
+        const refKey = `${filePath}|${mediaId ?? ''}`;
+        if (seenRefKeys.has(refKey)) continue;
+        seenRefKeys.add(refKey);
+        mediaRefs.push({
+          filePath,
+          mediaId,
+          mediaIds: [...candidateMediaIds],
+          displayFile
+        });
+        for (const candidateMediaId of candidateMediaIds) {
+          mediaById.get(candidateMediaId)?.postIds.push(key);
+        }
+      }
+
+      if (mediaRefs.length === 0) {
+        issues.add({
+          severity: options.previewPlaceholders ? 'warning' : 'error',
+          code: 'post.no-media',
+          entityType: 'postVersion',
+          entityId: versionEntityId,
+          source
+        });
+      }
+
+      validatePostLayout(issues, key, source, sourceVersion.layout, mediaRefs.length, versionIndex);
+
+      const version = {
+        index: versionIndex,
+        account: sourceVersion.account ?? platform?.defaultAccount ?? null,
+        status: effectiveStatus,
+        declaredStatus,
+        originalLanguage: sourceVersion.originalLanguage ?? defaultLanguage,
+        title: sourceVersion.title ?? {},
+        description: sourceVersion.description ?? {},
+        mediaFiles: mediaRefs.map((item) => item.filePath),
+        mediaIds: unique(mediaRefs.flatMap((item) => item.mediaIds ?? (item.mediaId ? [item.mediaId] : []))),
+        mediaRefs,
+        href: buildPostUrl({ ...sourcePost, ...sourceVersion }, platform),
+        layout: stripInternal(sourceVersion.layout ?? null),
+        migration: sourceVersion.migration ?? null
+      };
+      versions.push(version);
     }
 
-    if (resolvedMediaIds.size === 0) {
-      issues.add({
-        severity: options.previewPlaceholders ? 'warning' : 'error',
-        code: 'post.no-media',
-        entityType: 'post',
-        entityId: key,
-        source: sourceName(sourcePost)
-      });
-    }
-
-    const platform = platformsById.get(sourcePost.platform);
+    const currentVersion = versions.at(-1) ?? {
+      account: platform?.defaultAccount ?? null,
+      status: sourcePost.publishedAt ? 'deleted' : 'deleted',
+      declaredStatus: 'deleted',
+      originalLanguage: defaultLanguage,
+      title: {},
+      description: {},
+      mediaFiles: [],
+      mediaIds: [],
+      mediaRefs: [],
+      href: buildPostUrl(sourcePost, platform),
+      layout: null
+    };
     posts.push({
       key,
       platform: sourcePost.platform,
       id: String(sourcePost.id),
-      account: sourcePost.account ?? platform?.defaultAccount ?? null,
-      status: effectiveStatus,
-      declaredStatus: sourcePost.status,
       publishedAt: sourcePost.publishedAt ?? null,
-      originalLanguage: sourcePost.originalLanguage ?? defaultLanguage,
-      title: sourcePost.title ?? {},
-      description: sourcePost.description ?? {},
-      mediaIds: [...resolvedMediaIds],
-      href: buildPostUrl(sourcePost, platform),
-      source: sourceName(sourcePost)
+      versions,
+      versionCount: versions.length,
+      currentVersionIndex: Math.max(0, versions.length - 1),
+      account: currentVersion.account,
+      status: currentVersion.status,
+      declaredStatus: currentVersion.declaredStatus,
+      originalLanguage: currentVersion.originalLanguage,
+      title: currentVersion.title,
+      description: currentVersion.description,
+      mediaFiles: currentVersion.mediaFiles,
+      mediaIds: currentVersion.mediaIds,
+      mediaRefs: currentVersion.mediaRefs,
+      href: currentVersion.href,
+      layout: currentVersion.layout,
+      source
     });
   }
 
@@ -469,7 +720,7 @@ export async function compileArchive(source, options = {}) {
   const media = [...mediaById.values()];
   const resultIssues = issues.toArray();
   const manifest = {
-    schemaVersion: 1,
+    schemaVersion: 2,
     generatedAt: new Date().toISOString(),
     site: stripInternal(source.site),
     platforms: stripInternal(platforms),
@@ -484,6 +735,7 @@ export async function compileArchive(source, options = {}) {
       versionCount: artworks.reduce((sum, artwork) => sum + artwork.versions.length, 0),
       mediaCount: media.length,
       postCount: posts.length,
+      postVersionCount: posts.reduce((sum, post) => sum + post.versions.length, 0),
       fileCount: files.length,
       errorCount: resultIssues.filter((issue) => issue.severity === 'error').length,
       warningCount: resultIssues.filter((issue) => issue.severity === 'warning').length
@@ -500,8 +752,7 @@ export function resolveSourceFiles(source, fileCatalog) {
     filesByLegacyId.get(file.legacyMediaId).push(file);
   }
 
-  const mediaByFile = new Map();
-  const mediaById = new Map();
+  const mediaIdsByFile = new Map();
   for (const artwork of source.artworks) {
     for (const version of artwork.versions ?? []) {
       for (const media of version.media ?? []) {
@@ -515,32 +766,45 @@ export function resolveSourceFiles(source, fileCatalog) {
           return (fileA?.byteLength ?? Number.MAX_SAFE_INTEGER) - (fileB?.byteLength ?? Number.MAX_SAFE_INTEGER)
             || a.localeCompare(b);
         });
-        mediaById.set(media.id, media);
         for (const filePath of media.files) {
-          if (!mediaByFile.has(filePath)) mediaByFile.set(filePath, []);
-          mediaByFile.get(filePath).push(media.id);
+          if (!mediaIdsByFile.has(filePath)) mediaIdsByFile.set(filePath, []);
+          mediaIdsByFile.get(filePath).push(String(media.id));
         }
       }
     }
   }
 
-  const filesByPost = new Map();
+  // Preserve legacy auto-linking while upgrading posts to filename references.
+  // Auto-linked filenames are only lookup keys; compileArchive later resolves
+  // them back to logical media and chooses that media's lightest display file.
+  const filesByPostKey = new Map();
   for (const file of fileCatalog) {
     if (!file.postKey) continue;
-    if (!filesByPost.has(file.postKey)) filesByPost.set(file.postKey, []);
-    filesByPost.get(file.postKey).push(file.path);
+    if (!filesByPostKey.has(file.postKey)) filesByPostKey.set(file.postKey, []);
+    filesByPostKey.get(file.postKey).push(file.path);
   }
 
-  for (const post of source.posts) {
+  const appendAutoLinkedFiles = (post, version) => {
+    if (!version?.legacyAutoLink) return;
     const key = post.key ?? `${post.platform}:${post.id}`;
-    const mediaIds = new Set(post.media ?? []);
-    if (post.legacyAutoLink) {
-      for (const filePath of filesByPost.get(key) ?? []) {
-        for (const mediaId of mediaByFile.get(filePath) ?? []) mediaIds.add(mediaId);
-      }
+    const media = new Set(version.media ?? []);
+    for (const filePath of filesByPostKey.get(key) ?? []) {
+      if ((mediaIdsByFile.get(filePath)?.length ?? 0) > 0) media.add(filePath);
     }
-    post.media = [...mediaIds].filter((mediaId) => mediaById.has(mediaId));
+    version.media = [...media];
+  };
+
+  for (const post of source.posts ?? []) {
+    if (Array.isArray(post.versions) && post.versions.length > 0) {
+      for (const version of post.versions) appendAutoLinkedFiles(post, version);
+    } else {
+      appendAutoLinkedFiles(post, post);
+    }
   }
+
+  const upgraded = upgradeSourcePosts(source);
+  source.posts = upgraded.posts;
+  source.site = { ...source.site, schemaVersion: 2 };
 
   return source;
 }

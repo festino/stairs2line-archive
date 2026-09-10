@@ -1,5 +1,5 @@
 export const DEFAULT_SITE = {
-  schemaVersion: 1,
+  schemaVersion: 2,
   id: 'stairs2line',
   basePath: '/',
   mediaBasePath: 'media/stairs2line/',
@@ -113,6 +113,10 @@ export const DEFAULT_LOCALES = {
       pageTitle: 'Посты stairs2line',
       all: 'Все посты',
       grouped: 'По площадкам',
+      view: 'Вид постов',
+      fullView: 'Полный вид',
+      compactView: 'Компактный вид',
+      versionLabel: 'Версия {current} из {total}',
       platformTitle: 'Посты на {platform}',
       genericDescription: 'Архивная публикация stairs2line на {platform}.'
     },
@@ -162,6 +166,10 @@ export const DEFAULT_LOCALES = {
       pageTitle: 'stairs2line posts',
       all: 'All posts',
       grouped: 'By platform',
+      view: 'Post view',
+      fullView: 'Full view',
+      compactView: 'Compact view',
+      versionLabel: 'Version {current} of {total}',
       platformTitle: 'Posts on {platform}',
       genericDescription: 'An archived stairs2line post on {platform}.'
     },
@@ -211,6 +219,10 @@ export const DEFAULT_LOCALES = {
       pageTitle: 'stairs2line 投稿',
       all: 'すべての投稿',
       grouped: 'プラットフォーム別',
+      view: '投稿表示',
+      fullView: '通常表示',
+      compactView: 'コンパクト表示',
+      versionLabel: 'バージョン {current} / {total}',
       platformTitle: '{platform}の投稿',
       genericDescription: '{platform}にある stairs2line のアーカイブ投稿。'
     },

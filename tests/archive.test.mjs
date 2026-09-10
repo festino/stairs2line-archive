@@ -9,6 +9,11 @@ import { buildFileCatalog, extractLegacyMediaId, extractPostIdFromFile } from '.
 import { parseLegacyArchive } from '../src/core/legacy-parser.mjs';
 import { buildStaticSite } from '../src/core/site-builder.mjs';
 
+const TWITTER_FILE = 'twitter/123456789012345678_ABCDEF123456789.png';
+const PIXIV_FILE = 'pixiv/999_p0.png';
+const MISSING_FILE = 'pixiv/missing.png';
+const MEDIA_ID = 'artwork-0001/v01/m01';
+
 function fakePng(width, height, extraBytes = 0) {
   const buffer = Buffer.alloc(24 + extraBytes);
   Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]).copy(buffer, 0);
@@ -21,6 +26,7 @@ function fixtureSource() {
   return {
     site: {
       id: 'test',
+      schemaVersion: 2,
       basePath: '/repo/',
       mediaBasePath: 'media/stairs2line/',
       defaultLanguage: 'en',
@@ -42,6 +48,12 @@ function fixtureSource() {
           id: 'pixiv',
           label: { default: 'pixiv' },
           postUrlTemplate: 'https://www.pixiv.net/artworks/{id}'
+        },
+        {
+          id: 'tumblr',
+          label: { default: 'Tumblr' },
+          defaultAccount: 'stairs2line',
+          postUrlTemplate: 'https://{account}.tumblr.com/post/{id}'
         }
       ]
     },
@@ -51,21 +63,28 @@ function fixtureSource() {
         key: 'twitter:123456789012345678',
         platform: 'twitter',
         id: '123456789012345678',
-        status: 'alive',
         publishedAt: '2020-01-01T00:00:00Z',
-        originalLanguage: 'ja',
-        description: { ja: '説明' },
-        media: ['artwork-0001/v01/m01'],
-        legacyAutoLink: true,
+        versions: [
+          {
+            status: 'alive',
+            originalLanguage: 'ja',
+            description: { ja: '説明' },
+            media: [TWITTER_FILE]
+          }
+        ],
         __source: '/source/posts/twitter.jsonc'
       },
       {
         key: 'pixiv:999',
         platform: 'pixiv',
         id: '999',
-        status: 'alive',
-        originalLanguage: 'ja',
-        media: ['artwork-0001/v01/m01'],
+        versions: [
+          {
+            status: 'alive',
+            originalLanguage: 'ja',
+            media: [PIXIV_FILE]
+          }
+        ],
         __source: '/source/posts/pixiv.jsonc'
       }
     ],
@@ -80,8 +99,8 @@ function fixtureSource() {
             scope: 'top',
             media: [
               {
-                id: 'artwork-0001/v01/m01',
-                files: ['pixiv/missing.png'],
+                id: MEDIA_ID,
+                files: [MISSING_FILE, TWITTER_FILE, PIXIV_FILE],
                 legacyIds: ['ABCDEF123456789', '999_p0', 'missing-id']
               }
             ]
@@ -97,8 +116,8 @@ async function createMediaFixture() {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'stairs2line-media-'));
   await fs.mkdir(path.join(root, 'twitter'), { recursive: true });
   await fs.mkdir(path.join(root, 'pixiv'), { recursive: true });
-  await fs.writeFile(path.join(root, 'twitter', '123456789012345678_ABCDEF123456789.png'), fakePng(400, 400, 100));
-  await fs.writeFile(path.join(root, 'pixiv', '999_p0.png'), fakePng(400, 400, 10));
+  await fs.writeFile(path.join(root, TWITTER_FILE), fakePng(400, 400, 100));
+  await fs.writeFile(path.join(root, PIXIV_FILE), fakePng(400, 400, 10));
   return root;
 }
 
@@ -115,9 +134,9 @@ test('legacy parser migrates all current records and stores status on each post'
 });
 
 test('legacy file ID extraction preserves the current filename conventions', () => {
-  assert.equal(extractLegacyMediaId('twitter/123456789012345678_ABCDEF123456789.png'), 'ABCDEF123456789');
+  assert.equal(extractLegacyMediaId(TWITTER_FILE), 'ABCDEF123456789');
   assert.equal(extractLegacyMediaId('tumblr/92164287224_tumblr_n8x7q9MNVH1s4v84ho1_540.png'), 'n8x7q9MNVH1s4v84ho1_540');
-  assert.equal(extractLegacyMediaId('pixiv/44930075_p0.png'), '44930075_p0');
+  assert.equal(extractLegacyMediaId(PIXIV_FILE), '999_p0');
   assert.equal(extractPostIdFromFile('other/sENMiFJpci.png', [
     { key: 'instagram:sENMiFJpci', platform: 'instagram', id: 'sENMiFJpci' }
   ]), 'instagram:sENMiFJpci');
@@ -127,32 +146,105 @@ test('compiler selects the smallest existing equivalent file and tolerates missi
   const mediaRoot = await createMediaFixture();
   const source = fixtureSource();
   const compilation = await compileArchive(source, { mediaRoot });
-  const media = compilation.manifest.media['artwork-0001/v01/m01'];
+  const media = compilation.manifest.media[MEDIA_ID];
 
-  assert.equal(media.displayFile, 'pixiv/999_p0.png');
-  assert.deepEqual(media.existingFiles.sort(), [
-    'pixiv/999_p0.png',
-    'twitter/123456789012345678_ABCDEF123456789.png'
-  ]);
+  assert.equal(media.displayFile, PIXIV_FILE);
+  assert.deepEqual(media.existingFiles.sort(), [PIXIV_FILE, TWITTER_FILE]);
   assert.equal(compilation.issues.some((issue) => issue.code === 'media.no-existing-file'), false);
   assert.equal(compilation.issues.some((issue) => issue.code === 'media.some-files-missing'), true);
 });
 
-
-test('resolve step writes exact files and auto-links posts through the catalog', async () => {
+test('post filenames identify logical media while display uses its smallest equivalent file', async () => {
   const mediaRoot = await createMediaFixture();
   const source = fixtureSource();
-  source.posts[0].media = [];
+  source.posts = [source.posts[0]];
+  const compilation = await compileArchive(source, { mediaRoot });
+  const post = compilation.manifest.posts[0];
+  const mediaRef = post.versions[0].mediaRefs[0];
+
+  assert.equal(mediaRef.filePath, TWITTER_FILE);
+  assert.equal(mediaRef.mediaId, MEDIA_ID);
+  assert.equal(mediaRef.displayFile, PIXIV_FILE);
+  assert.deepEqual(post.versions[0].mediaFiles, [TWITTER_FILE]);
+
+  // A post references the logical media entity, so all of that media's
+  // equivalent physical files count as assigned to the post.
+  assert.equal(
+    compilation.issues.some((issue) => issue.code === 'file.unassigned-to-post' && issue.entityId === PIXIV_FILE),
+    false
+  );
+});
+
+test('resolve step upgrades legacy posts to filename references and preserves auto-linking', async () => {
+  const mediaRoot = await createMediaFixture();
+  const source = fixtureSource();
+  source.site.schemaVersion = 1;
+  source.artworks[0].versions[0].media[0].files = [MISSING_FILE];
+  source.posts[0] = {
+    key: 'twitter:123456789012345678',
+    platform: 'twitter',
+    id: '123456789012345678',
+    status: 'alive',
+    publishedAt: '2020-01-01T00:00:00Z',
+    originalLanguage: 'ja',
+    description: { ja: '説明' },
+    media: [],
+    legacyAutoLink: true,
+    __source: '/source/posts/twitter.jsonc'
+  };
+
   const knownPostIds = source.posts.map((post) => ({ key: post.key, platform: post.platform, id: post.id }));
   const catalog = await buildFileCatalog(mediaRoot, {
     includeDirectories: source.site.mediaDirectories,
     knownPostIds
   });
   resolveSourceFiles(source, catalog);
+
   const media = source.artworks[0].versions[0].media[0];
-  assert.equal(media.files[0], 'pixiv/999_p0.png');
-  assert.ok(media.files.includes('twitter/123456789012345678_ABCDEF123456789.png'));
-  assert.deepEqual(source.posts[0].media, ['artwork-0001/v01/m01']);
+  assert.equal(media.files[0], PIXIV_FILE);
+  assert.ok(media.files.includes(TWITTER_FILE));
+  assert.equal(source.site.schemaVersion, 2);
+  assert.deepEqual(source.posts[0].versions[0].media, [TWITTER_FILE]);
+  assert.equal('media' in source.posts[0], false);
+});
+
+test('post versions keep mutable fields and layout independent', async () => {
+  const mediaRoot = await createMediaFixture();
+  const source = fixtureSource();
+  source.posts = [
+    {
+      key: 'tumblr:42',
+      platform: 'tumblr',
+      id: '42',
+      publishedAt: '2020-02-01T00:00:00Z',
+      versions: [
+        {
+          status: 'alive',
+          title: { en: 'First' },
+          media: [TWITTER_FILE]
+        },
+        {
+          status: 'deleted',
+          title: { en: 'Second' },
+          media: [PIXIV_FILE],
+          layout: [{ type: 'rows', display: [{ blocks: [0] }] }]
+        }
+      ],
+      __source: '/source/posts/tumblr.jsonc'
+    }
+  ];
+
+  const compilation = await compileArchive(source, { mediaRoot });
+  const post = compilation.manifest.posts[0];
+
+  assert.equal(post.versions.length, 2);
+  assert.equal(post.versions[0].title.en, 'First');
+  assert.equal(post.versions[1].title.en, 'Second');
+  assert.equal(post.versions[0].layout, null);
+  assert.deepEqual(post.versions[1].layout, [{ type: 'rows', display: [{ blocks: [0] }] }]);
+  assert.equal(post.status, 'deleted');
+  assert.equal(post.mediaRefs[0].displayFile, PIXIV_FILE);
+  assert.equal(compilation.issues.some((issue) => issue.code.startsWith('post.layout-')), false);
 });
 
 test('missing translation warnings are deduplicated by entity', async () => {
@@ -174,7 +266,7 @@ test('an alive post without a date is compiled as deleted', async () => {
   assert.equal(compilation.issues.some((issue) => issue.code === 'post.date-missing-treated-deleted'), true);
 });
 
-test('static pages contain media in HTML and expose paged/feed controls', async () => {
+test('static pages use the logical media display file and expose paged/feed controls', async () => {
   const mediaRoot = await createMediaFixture();
   const source = fixtureSource();
   source.site.pageSize.artworks = 1;
@@ -187,9 +279,15 @@ test('static pages contain media in HTML and expose paged/feed controls', async 
   const output = await fs.mkdtemp(path.join(os.tmpdir(), 'stairs2line-site-'));
   await buildStaticSite(compilation, source, output, { mediaRoot, copyMedia: true });
 
-  const html = await fs.readFile(path.join(output, 'en', 'artworks', 'index.html'), 'utf8');
-  assert.match(html, /<img[^>]+src="\/repo\/media\/stairs2line\/pixiv\/999_p0\.png"/);
-  assert.match(html, /data-feed-toggle/);
-  assert.match(html, /data-paged-list/);
-  assert.match(html, /href="\/repo\/en\/artworks\/oldest\/"/);
+  const artworkHtml = await fs.readFile(path.join(output, 'en', 'artworks', 'index.html'), 'utf8');
+  assert.match(artworkHtml, /<img[^>]+src="\/repo\/media\/stairs2line\/pixiv\/999_p0\.png"/);
+  assert.match(artworkHtml, /data-feed-toggle/);
+  assert.match(artworkHtml, /data-paged-list/);
+  assert.match(artworkHtml, /href="\/repo\/en\/artworks\/oldest\/"/);
+
+  const twitterHtml = await fs.readFile(path.join(output, 'en', 'posts', 'platform', 'twitter', 'index.html'), 'utf8');
+  assert.match(twitterHtml, /<img[^>]+data-file-path="twitter\/123456789012345678_ABCDEF123456789\.png"[^>]+src="\/repo\/media\/stairs2line\/pixiv\/999_p0\.png"/);
+
+  const twitterCompactHtml = await fs.readFile(path.join(output, 'en', 'posts', 'platform', 'twitter', 'compact', 'index.html'), 'utf8');
+  assert.match(twitterCompactHtml, /<img src="\/repo\/media\/stairs2line\/pixiv\/999_p0\.png"/);
 });

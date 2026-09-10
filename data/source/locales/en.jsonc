@@ -40,6 +40,10 @@
     "pageTitle": "stairs2line posts",
     "all": "All posts",
     "grouped": "By platform",
+    "view": "Post view",
+    "fullView": "Full view",
+    "compactView": "Compact view",
+    "versionLabel": "Version {current} of {total}",
     "platformTitle": "Posts on {platform}",
     "genericDescription": "An archived stairs2line post on {platform}."
   },

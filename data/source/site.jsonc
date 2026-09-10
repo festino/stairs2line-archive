@@ -1,6 +1,6 @@
 // Human-editable archive configuration. Code comments must remain in English.
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "id": "stairs2line",
   "basePath": "/",
   "mediaBasePath": "media/stairs2line/",

@@ -214,8 +214,12 @@
 
       if (contextType === 'post' && index.posts[contextId]) {
         const post = index.posts[contextId];
+        const versionIndex = Number.parseInt(element.dataset.contextVersion ?? '', 10);
+        const version = Number.isInteger(versionIndex) && post.versions?.[versionIndex]
+          ? post.versions[versionIndex]
+          : post;
         const line = document.createElement('div');
-        line.textContent = `${post.publishedAt ?? 'Unknown date'} · ${localized(post.title, language) || post.platform}`;
+        line.textContent = `${post.publishedAt ?? 'Unknown date'} · ${localized(version.title, language) || post.platform}`;
         footer.append(line);
       }
 

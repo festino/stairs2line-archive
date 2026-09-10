@@ -137,6 +137,38 @@ function mediaElement(manifest, media, language, alt, contextType, contextId, op
   </a>`;
 }
 
+function mediaRefElement(manifest, mediaRef, language, alt, contextType, contextId, options = {}) {
+  const filePath = mediaRef?.displayFile ?? mediaRef?.filePath;
+  if (!filePath) return '';
+  const file = manifest.files[filePath];
+  if (!file) return '';
+  const src = mediaUrl(manifest, file.path);
+  const sizeAttributes = file.width && file.height
+    ? ` width="${file.width}" height="${file.height}"`
+    : '';
+  const dataAttributes = [
+    'data-viewer-media',
+    `data-media-id="${escapeAttribute(mediaRef.mediaId ?? '')}"`,
+    `data-file-path="${escapeAttribute(mediaRef.filePath ?? file.path)}"`,
+    `data-context-type="${escapeAttribute(contextType)}"`,
+    `data-context-id="${escapeAttribute(contextId)}"`,
+    ...(Number.isInteger(options.versionIndex) ? [`data-context-version="${options.versionIndex}"`] : [])
+  ].join(' ');
+
+  if (file.mimeType?.startsWith('video/')) {
+    return `<a class="media-link" href="${escapeAttribute(src)}">
+      <video ${dataAttributes}${sizeAttributes} controls preload="metadata" aria-label="${escapeAttribute(alt)}">
+        <source src="${escapeAttribute(src)}" type="${escapeAttribute(file.mimeType)}">
+      </video>
+    </a>`;
+  }
+
+  const eager = options.eager ? ' fetchpriority="high"' : ' loading="lazy"';
+  return `<a class="media-link" href="${escapeAttribute(src)}">
+    <img ${dataAttributes} src="${escapeAttribute(src)}"${sizeAttributes}${eager} decoding="async" alt="${escapeAttribute(alt)}">
+  </a>`;
+}
+
 function renderPlatformLinks(manifest, media, language) {
   const postsByKey = new Map(manifest.posts.map((post) => [post.key, post]));
   const platformsById = new Map(manifest.platforms.map((platform) => [platform.id, platform]));
@@ -186,46 +218,203 @@ function renderVersionCard(manifest, artwork, version, language, index) {
   </article>`;
 }
 
-function renderPostMedia(manifest, post, language, index) {
-  if (post.mediaIds.length === 0) return '';
-  const title = localizedValue(post.title, language, post.originalLanguage)
-    ?? localizedValue(post.description, language, post.originalLanguage)
-    ?? post.key;
-  return `<div class="post-media-grid">${post.mediaIds.map((mediaId, mediaIndex) => {
-    const media = manifest.media[mediaId];
-    return `<div class="post-media-item">${mediaElement(manifest, media, language, title, 'post', post.key, { eager: index === 0 && mediaIndex === 0 })}</div>`;
-  }).join('')}</div>`;
+function latestPostVersion(post) {
+  return post.versions?.at(-1) ?? post;
 }
 
-function renderPostCard(manifest, post, language, index) {
+function defaultTumblrRows(mediaCount) {
+  const rows = [];
+  let index = 0;
+  if (mediaCount % 2 === 1 && mediaCount > 1) {
+    rows.push([0]);
+    index = 1;
+  }
+  while (index < mediaCount) {
+    rows.push(index + 1 < mediaCount ? [index, index + 1] : [index]);
+    index += 2;
+  }
+  return rows;
+}
+
+function tumblrLayoutRows(version) {
+  const rows = [];
+  for (const section of version.layout ?? []) {
+    if (section?.type !== 'rows') continue;
+    for (const row of section.display ?? []) {
+      if (Array.isArray(row?.blocks) && row.blocks.length > 0) rows.push(row.blocks);
+    }
+  }
+  if (rows.length > 0) return rows;
+  return defaultTumblrRows(version.mediaRefs?.length ?? 0);
+}
+
+function renderPostMedia(manifest, post, version, language, index) {
+  const mediaRefs = version.mediaRefs ?? post.mediaRefs ?? [];
+  if (mediaRefs.length === 0) return '';
+  const title = localizedValue(version.title, language, version.originalLanguage)
+    ?? localizedValue(version.description, language, version.originalLanguage)
+    ?? post.key;
+
+  if (post.platform === 'tumblr') {
+    const used = new Set();
+    const rows = tumblrLayoutRows(version).map((blocks) => {
+      const items = blocks.map((mediaIndex) => {
+        const mediaRef = mediaRefs[mediaIndex];
+        if (!mediaRef) return '';
+        used.add(mediaIndex);
+        return `<div class="post-media-item">${mediaRefElement(manifest, mediaRef, language, title, 'post', post.key, { eager: index === 0 && mediaIndex === 0, versionIndex: version.index })}</div>`;
+      }).filter(Boolean).join('');
+      return items ? `<div class="tumblr-media-row" style="--tumblr-row-columns:${blocks.length}">${items}</div>` : '';
+    }).join('');
+    const trailing = mediaRefs.map((mediaRef, mediaIndex) => used.has(mediaIndex) ? '' : `<div class="tumblr-media-row" style="--tumblr-row-columns:1"><div class="post-media-item">${mediaRefElement(manifest, mediaRef, language, title, 'post', post.key, { versionIndex: version.index })}</div></div>`).join('');
+    return `<div class="post-media-grid tumblr-media-layout">${rows}${trailing}</div>`;
+  }
+
+  return `<div class="post-media-grid post-media-grid--${escapeAttribute(post.platform)} post-media-count-${mediaRefs.length}">${mediaRefs.map((mediaRef, mediaIndex) => `<div class="post-media-item">${mediaRefElement(manifest, mediaRef, language, title, 'post', post.key, { eager: index === 0 && mediaIndex === 0, versionIndex: version.index })}</div>`).join('')}</div>`;
+}
+
+function renderPostCard(manifest, post, language, index, options = {}) {
+  const version = options.version ?? latestPostVersion(post);
   const platform = manifest.platforms.find((item) => item.id === post.platform);
   const label = platformLabel(platform, language, manifest.defaultLanguage);
   const icon = platformIconUrl(manifest, platform);
-  const title = displayTitle(post, language, post.originalLanguage);
-  const description = displayDescription(post, language, post.originalLanguage);
+  const title = displayTitle(version, language, version.originalLanguage);
+  const description = displayDescription(version, language, version.originalLanguage);
   const date = post.publishedAt ? formatDate(post.publishedAt, language) : localeText(manifest.locales, language, 'common.unknownDate');
   const href = routeUrl(manifest, language, `posts/${encodeURIComponent(post.platform)}/${encodeURIComponent(post.id)}/`);
-  return `<article class="post-card" data-list-item data-post-id="${escapeAttribute(post.key)}">
+  const versionCount = post.versions?.length ?? 1;
+  const versionLabel = options.versionLabel ? `<div class="post-version-label">${escapeHtml(options.versionLabel)}</div>` : '';
+  return `<article class="post-card post-card--${escapeAttribute(post.platform)}" data-list-item data-post-id="${escapeAttribute(post.key)}" data-post-version="${version.index ?? 0}">
+    ${versionLabel}
     <header class="post-header">
       <a class="post-platform" href="${escapeAttribute(routeUrl(manifest, language, `posts/platform/${encodeURIComponent(post.platform)}/`))}">
         ${icon ? `<img src="${escapeAttribute(icon)}" alt="">` : ''}<span>${escapeHtml(label)}</span>
       </a>
-      <a class="post-date" href="${escapeAttribute(post.href)}" target="_blank" rel="noreferrer">
+      <a class="post-date" href="${escapeAttribute(version.href ?? post.href ?? href)}" ${version.href ?? post.href ? 'target="_blank" rel="noreferrer"' : ''}>
         <time${post.publishedAt ? ` datetime="${escapeAttribute(post.publishedAt)}"` : ''}>${escapeHtml(date)}</time>
-        <span class="status status-${escapeAttribute(post.status)}">${escapeHtml(localeText(manifest.locales, language, `common.${post.status}`))}</span>
+        <span class="status status-${escapeAttribute(version.status)}">${escapeHtml(localeText(manifest.locales, language, `common.${version.status}`))}</span>
       </a>
-      <a href="${escapeAttribute(href)}">1 ${escapeHtml(localeText(manifest.locales, language, `common.versions`))}</a>
+      <a class="post-version-count" href="${escapeAttribute(href)}">${versionCount} ${escapeHtml(localeText(manifest.locales, language, `common.versions`))}</a>
     </header>
     <div class="post-body">
       ${title ? `<h2>${escapeHtml(title)}</h2>` : ''}
-      ${description ? `<div class="post-text" lang="${escapeAttribute(post.originalLanguage)}">${linkify(description).replaceAll('\n', '<br>')}</div>` : ''}
-      ${renderPostMedia(manifest, post, language, index)}
+      ${description ? `<div class="post-text" lang="${escapeAttribute(version.originalLanguage)}">${linkify(description).replaceAll('\n', '<br>')}</div>` : ''}
+      ${renderPostMedia(manifest, post, version, language, index)}
     </div>
     <!--<footer class="post-footer">
       <a href="${escapeAttribute(href)}">${escapeHtml(localeText(manifest.locales, language, 'common.open'))}</a>
       ${post.href ? `<a href="${escapeAttribute(post.href)}" target="_blank" rel="noreferrer">${escapeHtml(localeText(manifest.locales, language, 'common.source'))}</a>` : ''}
     </footer>-->
   </article>`;
+}
+
+function layersIcon() {
+  return `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 5.5h10a2 2 0 0 1 2 2v10h-2v-10h-10v-2Zm-3 3h10a2 2 0 0 1 2 2v10h-10a2 2 0 0 1-2-2v-10Zm2 2v8h8v-8h-8Z" fill="currentColor"/></svg>`;
+}
+
+function compactMediaElement(manifest, mediaRef, alt) {
+  const filePath = mediaRef?.displayFile ?? mediaRef?.filePath;
+  if (!filePath) return '<span class="compact-media-placeholder"></span>';
+  const file = manifest.files[filePath];
+  if (!file) return '<span class="compact-media-placeholder"></span>';
+  const src = mediaUrl(manifest, file.path);
+  if (file.mimeType?.startsWith('video/')) {
+    return `<video src="${escapeAttribute(src)}" muted playsinline preload="metadata" aria-label="${escapeAttribute(alt)}"></video>`;
+  }
+  return `<img src="${escapeAttribute(src)}" loading="lazy" decoding="async" alt="${escapeAttribute(alt)}">`;
+}
+
+function renderCompactPost(manifest, post, language) {
+  const version = latestPostVersion(post);
+  const mediaRefs = version.mediaRefs ?? [];
+  const mediaCount = mediaRefs.length;
+  const title = displayTitle(version, language, version.originalLanguage)
+    ?? displayDescription(version, language, version.originalLanguage)
+    ?? post.key;
+  const postHref = routeUrl(manifest, language, `posts/${encodeURIComponent(post.platform)}/${encodeURIComponent(post.id)}/`);
+  const date = post.publishedAt
+    ? formatDate(post.publishedAt, language, { includeTime: false })
+    : localeText(manifest.locales, language, 'common.unknownDate');
+  const badge = post.platform === 'pixiv' && mediaCount > 1
+    ? `<span class="compact-media-count compact-media-count--pixiv">${layersIcon()}<span>${mediaCount}</span></span>`
+    : post.platform === 'twitter' && mediaCount > 1
+      ? `<span class="compact-media-count compact-media-count--twitter">${layersIcon()}</span>`
+      : '';
+
+  const titleMarkup = post.platform === 'pixiv'
+    ? `<span class="compact-post-title">${escapeHtml(displayTitle(version, language, version.originalLanguage) ?? '')}</span>`
+    : post.platform === 'tumblr'
+      ? `<time class="compact-date-tooltip" datetime="${escapeAttribute(post.publishedAt ?? '')}">${escapeHtml(date)}</time>`
+      : '';
+
+  return `<a class="compact-post compact-post--${escapeAttribute(post.platform)}" data-list-item href="${escapeAttribute(postHref)}" title="${escapeAttribute(post.platform === 'tumblr' ? date : title)}">
+    <span class="compact-post-media">${compactMediaElement(manifest, mediaRefs[0], title)}${badge}</span>
+    ${titleMarkup}
+  </a>`;
+}
+
+function formatMonthYear(value, language) {
+  if (!value) return 'Unknown date';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return new Intl.DateTimeFormat(language, {
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'UTC'
+  }).format(date);
+}
+
+function renderCompactListing(manifest, posts, language, platform) {
+  if (platform.id !== 'tumblr') {
+    return `<section class="compact-grid compact-grid--${escapeAttribute(platform.id)}" data-paged-list>${posts.map((post) => renderCompactPost(manifest, post, language)).join('')}</section>`;
+  }
+
+  const groups = [];
+  const byKey = new Map();
+  for (const post of posts) {
+    const date = post.publishedAt ? new Date(post.publishedAt) : null;
+    const key = date && !Number.isNaN(date.getTime())
+      ? `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}`
+      : 'unknown';
+    if (!byKey.has(key)) {
+      const group = { key, first: post, posts: [] };
+      byKey.set(key, group);
+      groups.push(group);
+    }
+    byKey.get(key).posts.push(post);
+  }
+
+  return `<section class="tumblr-compact-archive" data-paged-list>${groups.map((group) => `<section class="tumblr-month-group">
+    <h2>${escapeHtml(group.key === 'unknown' ? localeText(manifest.locales, language, 'common.unknownDate') : formatMonthYear(group.first.publishedAt, language))}</h2>
+    <div class="compact-grid compact-grid--tumblr">${group.posts.map((post) => renderCompactPost(manifest, post, language)).join('')}</div>
+  </section>`).join('')}</section>`;
+}
+
+function renderPlatformHero(manifest, platform, language, options = {}) {
+  if (!platform) return '';
+  const label = platformLabel(platform, language, manifest.defaultLanguage);
+  const icon = platformIconUrl(manifest, platform);
+  const account = platform.defaultAccount ? String(platform.defaultAccount) : '';
+  const baseSegment = `posts/platform/${encodeURIComponent(platform.id)}`;
+  const fullHref = routeUrl(manifest, language, `${baseSegment}${options.oldest ? '/oldest' : ''}/`);
+  const compactHref = routeUrl(manifest, language, `${baseSegment}/compact${options.oldest ? '/oldest' : ''}/`);
+  const bannerStyle = platform.banner
+    ? ` style="background-image:url('${escapeAttribute(mediaUrl(manifest, platform.banner))}')"`
+    : '';
+  return `<section class="platform-hero platform-hero--${escapeAttribute(platform.id)}">
+    <div class="platform-hero-banner"${bannerStyle}></div>
+    <div class="platform-hero-profile">
+      <div class="platform-hero-icon">${icon ? `<img src="${escapeAttribute(icon)}" alt="">` : `<span>${escapeHtml(label.slice(0, 1))}</span>`}</div>
+      <div class="platform-hero-copy">
+        <strong>${escapeHtml(label)}</strong>
+        ${account ? `<span>${escapeHtml(platform.id === 'twitter' ? `@${account}` : account)}</span>` : ''}
+      </div>
+      <nav class="platform-view-tabs" aria-label="${escapeAttribute(localeText(manifest.locales, language, 'posts.view'))}">
+        <a class="${options.compact ? '' : 'active'}" href="${escapeAttribute(fullHref)}">${escapeHtml(localeText(manifest.locales, language, 'posts.fullView'))}</a>
+        <a class="${options.compact ? 'active' : ''}" href="${escapeAttribute(compactHref)}">${escapeHtml(localeText(manifest.locales, language, 'posts.compactView'))}</a>
+      </nav>
+    </div>
+  </section>`;
 }
 
 function renderToolbar(manifest, language, options) {
@@ -292,7 +481,7 @@ function layout(manifest, language, relative, options) {
   <link rel="alternate" hreflang="x-default" href="${escapeAttribute(absoluteUrl(manifest, routeUrl(manifest, manifest.defaultLanguage, relative)))}">
   <link rel="stylesheet" href="${escapeAttribute(joinUrl(manifest.site.basePath, 'assets/archive.css'))}">
 </head>
-<body>
+<body${options.bodyClass ? ` class="${escapeAttribute(options.bodyClass)}"` : ''}>
   <header class="site-header">
     <a class="site-title" href="${escapeAttribute(routeUrl(manifest, language, 'artworks/'))}">${escapeHtml(localizedValue(manifest.site.title, language, manifest.defaultLanguage) ?? 'stairs2line')}</a>
     <nav class="site-nav">
@@ -324,7 +513,7 @@ async function writePaginatedListing(outputRoot, manifest, language, baseRelativ
   for (let page = 1; page <= pageCount; page += 1) {
     const pageItems = items.slice((page - 1) * pageSize, page * pageSize);
     const relative = pageRelative(baseRelative, page);
-    const body = `<h1>${escapeHtml(pageOptions.heading)}</h1>
+    const body = `${pageOptions.beforeHeading ?? ''}<h1>${escapeHtml(pageOptions.heading)}</h1>
       ${renderToolbar(manifest, language, { ...pageOptions.toolbar, enableFeed: pageCount > 1 })}
       <section class="${escapeAttribute(pageOptions.listClass)}" data-paged-list>
         ${pageItems.length > 0 ? pageItems.map((item, index) => renderItem(item, index)).join('\n') : `<p>${escapeHtml(localeText(manifest.locales, language, 'common.noItems'))}</p>`}
@@ -335,6 +524,7 @@ async function writePaginatedListing(outputRoot, manifest, language, baseRelativ
       title: pageTitle,
       description: pageOptions.description,
       noindex: pageOptions.noindex,
+      bodyClass: pageOptions.bodyClass,
       body
     }));
   }
@@ -537,6 +727,8 @@ async function buildPostListings(outputRoot, manifest, language) {
           title: `${label} · ${localeText(manifest.locales, language, 'posts.pageTitle')}`,
           description: localeText(manifest.locales, language, 'posts.genericDescription', { platform: label }),
           listClass: 'post-list',
+          beforeHeading: renderPlatformHero(manifest, platform, language, { oldest, compact: false }),
+          bodyClass: `platform-page platform-page--${platform.id}`,
           noindex: oldest,
           toolbar: {
             tabs: postsTabs(manifest, language, 'grouped'),
@@ -545,6 +737,25 @@ async function buildPostListings(outputRoot, manifest, language) {
           }
         }
       );
+
+      const compactRelative = `${baseSegment}/compact${oldest ? '/oldest' : ''}`;
+      const compactSortHref = routeUrl(manifest, language, `${baseSegment}/compact${oldest ? '' : '/oldest'}/`);
+      const compactBody = `${renderPlatformHero(manifest, platform, language, { oldest, compact: true })}
+        <h1>${escapeHtml(localeText(manifest.locales, language, 'posts.platformTitle', { platform: label }))}</h1>
+        ${renderToolbar(manifest, language, {
+          tabs: postsTabs(manifest, language, 'grouped'),
+          sortHref: compactSortHref,
+          sortLabel: localeText(manifest.locales, language, oldest ? 'common.oldest' : 'common.newest'),
+          enableFeed: false
+        })}
+        ${renderCompactListing(manifest, sorted, language, platform)}`;
+      await writePage(outputRoot, manifest, language, compactRelative, layout(manifest, language, `${compactRelative}/`, {
+        title: `${label} · ${localeText(manifest.locales, language, 'posts.compactView')}`,
+        description: localeText(manifest.locales, language, 'posts.genericDescription', { platform: label }),
+        noindex: oldest,
+        bodyClass: `platform-page platform-page--${platform.id} compact-platform-page`,
+        body: compactBody
+      }));
     }
   }
 }
@@ -579,17 +790,26 @@ async function buildPostPages(outputRoot, manifest, language) {
   for (const post of manifest.posts) {
     const platform = manifest.platforms.find((item) => item.id === post.platform);
     const label = platformLabel(platform, language, manifest.defaultLanguage);
-    const title = displayTitle(post, language, post.originalLanguage) ?? `${label} ${post.id}`;
-    const description = displayDescription(post, language, post.originalLanguage)
+    const currentVersion = latestPostVersion(post);
+    const title = displayTitle(currentVersion, language, currentVersion.originalLanguage) ?? `${label} ${post.id}`;
+    const description = displayDescription(currentVersion, language, currentVersion.originalLanguage)
       ?? localeText(manifest.locales, language, 'posts.genericDescription', { platform: label });
-    const body = `<article class="post-page">${renderPostCard(manifest, post, language, 0)}</article>`;
-    const postImage = post.mediaIds
-      .map((mediaId) => manifest.media[mediaId]?.displayFile)
-      .find(Boolean);
+    const versions = post.versions?.length ? post.versions : [currentVersion];
+    const versionCards = versions.map((version, index) => renderPostCard(manifest, post, language, index, {
+      version,
+      versionLabel: versions.length > 1
+        ? localeText(manifest.locales, language, 'posts.versionLabel', { current: index + 1, total: versions.length })
+        : null
+    })).join('');
+    const body = `${renderPlatformHero(manifest, platform, language, { compact: false, oldest: false })}
+      <article class="post-page"><div class="post-version-list">${versionCards}</div></article>`;
+    const postImage = currentVersion.mediaRefs?.map((item) => item.displayFile).find(Boolean)
+      ?? post.mediaIds.map((mediaId) => manifest.media[mediaId]?.displayFile).find(Boolean);
     await writePage(outputRoot, manifest, language, `posts/${encodeURIComponent(post.platform)}/${encodeURIComponent(post.id)}`, layout(manifest, language, `posts/${encodeURIComponent(post.platform)}/${encodeURIComponent(post.id)}/`, {
       title: `${title} · stairs2line`,
       description: stripLinks(description),
       image: postImage,
+      bodyClass: `platform-page platform-page--${post.platform} post-detail-page`,
       body
     }));
   }
@@ -628,7 +848,17 @@ function buildViewerIndex(manifest) {
       publishedAt: post.publishedAt,
       title: post.title,
       description: post.description,
-      href: post.href
+      href: post.href,
+      mediaFiles: post.mediaFiles,
+      versions: post.versions.map((version) => ({
+        index: version.index,
+        status: version.status,
+        title: version.title,
+        description: version.description,
+        href: version.href,
+        mediaFiles: version.mediaFiles,
+        layout: version.layout
+      }))
     }])),
     artworks: Object.fromEntries(manifest.artworks.map((artwork) => [artwork.id, {
       id: artwork.id,

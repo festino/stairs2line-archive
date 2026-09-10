@@ -7,6 +7,7 @@ import { parseLegacyArchive } from './core/legacy-parser.mjs';
 import { loadSource } from './core/source-loader.mjs';
 import { writeMigratedSource } from './core/migration-writer.mjs';
 import { buildStaticSite } from './core/site-builder.mjs';
+import { upgradeSourcePosts, writeUpgradedSource } from './core/source-upgrader.mjs';
 import { writeJson } from './core/jsonc.mjs';
 import { asBoolean, copyDirectory, ensureDirectory, parseArguments } from './core/util.mjs';
 
@@ -15,6 +16,7 @@ function usage() {
 
 Commands:
   migrate  --input <legacy.cshtml.txt> --output <source-directory>
+  upgrade  --source <source-directory> --output <upgraded-source-directory>
   resolve  --source <source-directory> --media-root <media-directory> --output <resolved-source-directory>
   validate --source <source-directory> [--media-root <media-directory>] [--output <validation.json>]
   build    --source <source-directory> --output <site-directory> [--media-root <media-directory>]
@@ -52,7 +54,7 @@ async function writeResolvedCollections(source, sourceRoot, outputRoot) {
   for (const group of groups.values()) {
     const destination = path.join(outputRoot, group.relative);
     await ensureDirectory(path.dirname(destination));
-    await writeJson(destination, { [group.property]: group.entities }, 'Resolved physical file paths and explicit media relationships.');
+    await writeJson(destination, { [group.property]: group.entities }, 'Resolved physical file paths and logical media relationships.');
   }
 }
 
@@ -61,6 +63,15 @@ async function migrateCommand(args) {
   const migration = await parseLegacyArchive(path.resolve(args.input));
   await writeMigratedSource(path.resolve(args.output), migration);
   console.log(JSON.stringify({ output: path.resolve(args.output), ...migration.report, inferredLinks: undefined }, null, 2));
+}
+
+async function upgradeCommand(args) {
+  if (!args.source || !args.output) throw new Error('upgrade requires --source and --output.');
+  const sourceRoot = path.resolve(args.source);
+  const source = await loadSource(sourceRoot);
+  const upgraded = upgradeSourcePosts(source);
+  await writeUpgradedSource(sourceRoot, path.resolve(args.output), upgraded);
+  console.log(JSON.stringify({ output: path.resolve(args.output), ...upgraded.report }, null, 2));
 }
 
 async function resolveCommand(args) {
@@ -135,6 +146,7 @@ async function main() {
     return;
   }
   if (command === 'migrate') await migrateCommand(args);
+  else if (command === 'upgrade') await upgradeCommand(args);
   else if (command === 'resolve') await resolveCommand(args);
   else if (command === 'validate') await validateCommand(args);
   else if (command === 'build') await buildCommand(args);

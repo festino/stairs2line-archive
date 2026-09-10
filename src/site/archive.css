@@ -482,3 +482,416 @@ h2 {
         max-height: 90dvh;
     }
 }
+/* Platform pages */
+.platform-hero {
+  overflow: hidden;
+  margin: 0 0 1.75rem;
+  border: 1px solid var(--border);
+  border-radius: 1.15rem;
+  background: var(--surface);
+}
+
+.platform-hero-banner {
+  min-height: clamp(120px, 18vw, 220px);
+  background-position: center;
+  background-size: cover;
+}
+
+.platform-hero--pixiv .platform-hero-banner {
+  background:
+    radial-gradient(circle at 18% 35%, rgb(255 255 255 / 0.55) 0 5%, transparent 5.5%),
+    radial-gradient(circle at 72% 25%, rgb(255 255 255 / 0.3) 0 10%, transparent 10.5%),
+    linear-gradient(135deg, #8fd4ff, #0096fa 62%, #70c8ff);
+}
+
+.platform-hero--twitter .platform-hero-banner {
+  background:
+    linear-gradient(145deg, transparent 0 42%, rgb(255 255 255 / 0.52) 42.5% 44%, transparent 44.5% 100%),
+    linear-gradient(35deg, #c9edf9, #eff8fb 52%, #b9dce8);
+}
+
+.platform-hero--tumblr .platform-hero-banner {
+  background:
+    radial-gradient(ellipse at 20% 90%, rgb(255 255 255 / 0.12) 0 12%, transparent 12.5%),
+    radial-gradient(ellipse at 72% 35%, rgb(255 255 255 / 0.08) 0 16%, transparent 16.5%),
+    linear-gradient(180deg, #27455f, #001935);
+}
+
+.platform-hero-profile {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 1rem;
+  padding: 0 1rem 1rem;
+}
+
+.platform-hero-icon {
+  width: 5rem;
+  height: 5rem;
+  margin-top: -2.15rem;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 4px solid Canvas;
+  border-radius: 50%;
+  background: Canvas;
+  font-size: 2rem;
+  font-weight: 800;
+}
+
+.platform-hero-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.platform-hero-copy {
+  display: grid;
+  align-self: end;
+  gap: 0.1rem;
+}
+
+.platform-hero-copy strong {
+  font-size: 1.3rem;
+}
+
+.platform-hero-copy span {
+  color: var(--muted);
+}
+
+.platform-view-tabs {
+  display: flex;
+  gap: 0.35rem;
+  align-self: end;
+}
+
+.platform-view-tabs a {
+  padding: 0.48rem 0.72rem;
+  border-radius: 999px;
+  text-decoration: none;
+}
+
+.platform-view-tabs a.active {
+  background: CanvasText;
+  color: Canvas;
+}
+
+/* Platform-flavoured full post cards. */
+.platform-page .post-list {
+  margin-top: 0;
+}
+
+.post-card .post-media-item .media-link img,
+.post-card .post-media-item .media-link video {
+  width: 100%;
+  height: auto;
+  aspect-ratio: auto;
+  object-fit: contain;
+}
+
+.post-card--pixiv {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.post-card--pixiv .post-header {
+  border: 0;
+  padding-inline: 0;
+}
+
+.post-card--pixiv .post-body {
+  padding-inline: 0;
+}
+
+.post-card--pixiv .post-media-grid {
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+}
+
+.post-card--pixiv .post-media-item {
+  background: color-mix(in srgb, Canvas 95%, currentColor 5%);
+}
+
+.post-card--twitter {
+  max-width: 640px;
+  margin-inline: auto;
+  border-radius: 0;
+  background: Canvas;
+}
+
+.post-card--twitter .post-media-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+}
+
+.post-card--twitter .post-media-grid.post-media-count-1 {
+  grid-template-columns: 1fr;
+}
+
+.post-card--twitter .post-media-grid.post-media-count-3 .post-media-item:first-child {
+  grid-row: span 2;
+}
+
+.post-card--twitter .post-media-grid .media-link,
+.post-card--twitter .post-media-grid img,
+.post-card--twitter .post-media-grid video {
+  width: 100%;
+  height: 100%;
+}
+
+.post-card--twitter .post-media-grid img,
+.post-card--twitter .post-media-grid video {
+  aspect-ratio: 1.55;
+  object-fit: cover;
+  object-position: center;
+}
+
+.post-card--tumblr {
+  max-width: 560px;
+  margin-inline: auto;
+  border-radius: 0.35rem;
+  background: Canvas;
+}
+
+.platform-page--tumblr main {
+  --page-width: 1180px;
+}
+
+.tumblr-media-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2px;
+  margin-top: 1rem;
+}
+
+.tumblr-media-row {
+  display: grid;
+  grid-template-columns: repeat(var(--tumblr-row-columns), minmax(0, 1fr));
+  gap: 2px;
+}
+
+.tumblr-media-row .post-media-item,
+.tumblr-media-row .media-link {
+  min-width: 0;
+}
+
+.tumblr-media-row .media-link img,
+.tumblr-media-row .media-link video {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  object-fit: cover;
+}
+
+.post-version-list {
+  display: grid;
+  gap: 2rem;
+}
+
+.post-version-label {
+  padding: 0.55rem 0.9rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+/* Compact platform archives. */
+.compact-grid {
+  display: grid;
+  align-items: start;
+}
+
+.compact-grid--pixiv {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 1.6rem 1rem;
+}
+
+.compact-grid--twitter {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 2px;
+  max-width: 980px;
+  margin-inline: auto;
+}
+
+.compact-grid--tumblr {
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 0.55rem;
+}
+
+.compact-grid:not(.compact-grid--pixiv):not(.compact-grid--twitter):not(.compact-grid--tumblr) {
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1rem;
+}
+
+.compact-post {
+  min-width: 0;
+  display: grid;
+  gap: 0.55rem;
+  position: relative;
+  color: inherit;
+  text-decoration: none;
+  border: 0;
+  background: transparent;
+}
+
+.compact-post-media {
+  position: relative;
+  display: block;
+  aspect-ratio: 1;
+  overflow: hidden;
+  background: color-mix(in srgb, Canvas 92%, currentColor 8%);
+}
+
+.compact-post-media img,
+.compact-post-media video,
+.compact-media-placeholder {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.compact-post--pixiv .compact-post-media img,
+.compact-post--pixiv .compact-post-media video {
+  object-position: center top;
+}
+
+.compact-post--twitter .compact-post-media img,
+.compact-post--twitter .compact-post-media video,
+.compact-post--tumblr .compact-post-media img,
+.compact-post--tumblr .compact-post-media video {
+  object-position: center;
+}
+
+.compact-post-title {
+  min-height: 1.35em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+.compact-media-count {
+  position: absolute;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  background: rgb(0 0 0 / 0.66);
+  pointer-events: none;
+}
+
+.compact-media-count svg {
+  width: 1em;
+  height: 1em;
+}
+
+.compact-media-count--pixiv {
+  top: 0.45rem;
+  right: 0.45rem;
+  gap: 0.2rem;
+  min-height: 1.65rem;
+  padding: 0.2rem 0.42rem;
+  border-radius: 0.35rem;
+  font-size: 0.8rem;
+}
+
+.compact-media-count--twitter {
+  right: 0.55rem;
+  bottom: 0.55rem;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  font-size: 1.55rem;
+  background: rgb(0 0 0 / 0.48);
+}
+
+.tumblr-compact-archive {
+  display: grid;
+  gap: 2.4rem;
+}
+
+.tumblr-month-group > h2 {
+  margin: 0 0 0.8rem;
+  font-size: 1.2rem;
+  font-weight: 750;
+  text-transform: capitalize;
+}
+
+.compact-date-tooltip {
+  position: absolute;
+  left: 0.45rem;
+  right: 0.45rem;
+  bottom: 0.45rem;
+  z-index: 2;
+  padding: 0.35rem 0.45rem;
+  border-radius: 0.35rem;
+  color: white;
+  background: rgb(0 0 0 / 0.7);
+  text-align: center;
+  font-size: 0.78rem;
+  opacity: 0;
+  transform: translateY(0.25rem);
+  transition: opacity 100ms ease, transform 100ms ease;
+  pointer-events: none;
+}
+
+.compact-post--tumblr:hover .compact-date-tooltip,
+.compact-post--tumblr:focus-visible .compact-date-tooltip {
+  opacity: 1;
+  transform: none;
+}
+
+@media (max-width: 980px) {
+  .compact-grid--pixiv {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .platform-hero-profile {
+    grid-template-columns: auto 1fr;
+  }
+
+  .platform-view-tabs {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 620px) {
+  .compact-grid--pixiv {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .compact-grid--twitter {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .compact-grid--tumblr {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 2px;
+  }
+
+  .platform-hero {
+    border-radius: 0.75rem;
+  }
+
+  .platform-hero-icon {
+    width: 4.2rem;
+    height: 4.2rem;
+  }
+
+  .platform-view-tabs {
+    width: 100%;
+  }
+
+  .platform-view-tabs a {
+    flex: 1;
+    text-align: center;
+  }
+}

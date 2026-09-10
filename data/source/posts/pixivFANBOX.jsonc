@@ -1,19 +1,22 @@
-// Resolved physical file paths and explicit media relationships.
+// Versioned posts. Media entries are physical file paths relative to the archive media root.
 {
   "posts": [
     {
       "key": "pixivFANBOX:2956",
       "platform": "pixivFANBOX",
       "id": "2956",
-      "status": "deleted",
-      "href": "https://www.pixiv.net/fanbox/user/1593221/entry/2956",
-      "originalLanguage": "ja",
-      "description": {
-        "ja": "第12回　メイキング　渋谷凛　後編/せんたっき空間/せんたっき[pixivFANBOX] : オマカバーに行ったことはありますか、私はあります。 おしぼりがちょっぴり臭かったことだけ覚えています。 一人で焼肉に行ったことはありますか、私は先日行ってきました。   先月まで続いたルームシ ..."
-      },
-      "legacyAutoLink": true,
-      "media": [
-        "artwork-0238/v01/m01"
+      "versions": [
+        {
+          "status": "deleted",
+          "href": "https://www.pixiv.net/fanbox/user/1593221/entry/2956",
+          "originalLanguage": "ja",
+          "description": {
+            "ja": "第12回　メイキング　渋谷凛　後編/せんたっき空間/せんたっき[pixivFANBOX] : オマカバーに行ったことはありますか、私はあります。 おしぼりがちょっぴり臭かったことだけ覚えています。 一人で焼肉に行ったことはありますか、私は先日行ってきました。   先月まで続いたルームシ ..."
+          },
+          "media": [
+            "other/2956_1342f157f4e93b330a1ae5a63a4d0a9ff5d51e6e23f57-krhb78_fw1200.jpeg"
+          ]
+        }
       ]
     }
   ]

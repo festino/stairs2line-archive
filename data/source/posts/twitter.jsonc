@@ -1,931 +1,1110 @@
-// Resolved physical file paths and explicit media relationships.
+// Versioned posts. Media entries are physical file paths relative to the archive media root.
 {
   "posts": [
     {
       "key": "twitter:315437644974784512",
       "platform": "twitter",
       "id": "315437644974784512",
-      "status": "alive",
       "publishedAt": "2013-03-23T12:19:29.767Z",
-      "originalLanguage": "ja",
-      "description": {
-        "ja": "みっくみく"
-      },
-      "legacyAutoLink": true,
-      "media": [
-        "artwork-0007/v01/m01"
+      "versions": [
+        {
+          "status": "alive",
+          "originalLanguage": "ja",
+          "description": {
+            "ja": "みっくみく"
+          },
+          "media": [
+            "twitter/315437644974784512_BGCo3enCAAEt-99.png"
+          ]
+        }
       ]
     },
     {
       "key": "twitter:437560548058599425",
       "platform": "twitter",
       "id": "437560548058599425",
-      "status": "alive",
       "publishedAt": "2014-02-23T12:12:18.796Z",
-      "originalLanguage": "ja",
-      "description": {
-        "ja": "ざっくばらん"
-      },
-      "legacyAutoLink": true,
-      "media": [
-        "artwork-0096/v01/m01"
+      "versions": [
+        {
+          "status": "alive",
+          "originalLanguage": "ja",
+          "description": {
+            "ja": "ざっくばらん"
+          },
+          "media": [
+            "twitter/437560548058599425_BhKHAAsCEAAV9B4.png"
+          ]
+        }
       ]
     },
     {
       "key": "twitter:615545487463088128",
       "platform": "twitter",
       "id": "615545487463088128",
-      "status": "alive",
       "publishedAt": "2015-06-29T15:40:55.150Z",
-      "originalLanguage": "ja",
-      "description": {
-        "ja": "ガミガミ光線"
-      },
-      "legacyAutoLink": true,
-      "media": [
-        "artwork-0171/v01/m01"
+      "versions": [
+        {
+          "status": "alive",
+          "originalLanguage": "ja",
+          "description": {
+            "ja": "ガミガミ光線"
+          },
+          "media": [
+            "twitter/615545487463088128_CIrbW9KUkAAeEt7.png"
+          ]
+        }
       ]
     },
     {
       "key": "twitter:662065828867670016",
       "platform": "twitter",
       "id": "662065828867670016",
-      "status": "alive",
       "publishedAt": "2015-11-05T00:36:08.847Z",
-      "originalLanguage": "ja",
-      "description": {
-        "ja": "さむい"
-      },
-      "legacyAutoLink": true,
-      "media": [
-        "artwork-0156/v02/m01",
-        "artwork-0157/v01/m01",
-        "artwork-0158/v01/m01",
-        "artwork-0188/v01/m01"
+      "versions": [
+        {
+          "status": "alive",
+          "originalLanguage": "ja",
+          "description": {
+            "ja": "さむい"
+          },
+          "media": [
+            "twitter/662065828867670016_CTAhXJBUsAAU_2m.png",
+            "tumblr/102446579819_tumblr_new8j9Y1sz1s4v84ho2_500.png",
+            "tumblr/102446579819_tumblr_new8j9Y1sz1s4v84ho3_400.png",
+            "twitter/662065828867670016_CTAhXIzUsAA8SiB.png"
+          ]
+        }
       ]
     },
     {
       "key": "twitter:671328469398237184",
       "platform": "twitter",
       "id": "671328469398237184",
-      "status": "alive",
       "publishedAt": "2015-11-30T14:02:34.441Z",
-      "originalLanguage": "ja",
-      "description": {
-        "ja": "これもかなりお気に入り"
-      },
-      "legacyAutoLink": true,
-      "media": [
-        "artwork-0135/v03/m01"
+      "versions": [
+        {
+          "status": "alive",
+          "originalLanguage": "ja",
+          "description": {
+            "ja": "これもかなりお気に入り"
+          },
+          "media": [
+            "twitter/671328469398237184_CVEJr2QUwAAbqTk.png"
+          ]
+        }
       ]
     },
     {
       "key": "twitter:678705239327772676",
       "platform": "twitter",
       "id": "678705239327772676",
-      "status": "alive",
       "publishedAt": "2015-12-20T22:35:13.446Z",
-      "originalLanguage": "ja",
-      "description": {
-        "ja": "ちょこん"
-      },
-      "legacyAutoLink": true,
-      "media": [
-        "artwork-0099/v03/m01"
+      "versions": [
+        {
+          "status": "alive",
+          "originalLanguage": "ja",
+          "description": {
+            "ja": "ちょこん"
+          },
+          "media": [
+            "twitter/678705239327772676_CWs-0YwUsAAOgmG.png"
+          ]
+        }
       ]
     },
     {
       "key": "twitter:679975827577044992",
       "platform": "twitter",
       "id": "679975827577044992",
-      "status": "alive",
       "publishedAt": "2015-12-24T10:44:05.291Z",
-      "originalLanguage": "ja",
-      "description": {
-        "ja": "綺麗な線を意識する年だった {#2015自分が選ぶ今年の4枚|https://twitter.com/hashtag/2015自分が選ぶ今年の4枚}"
-      },
-      "legacyAutoLink": true,
-      "media": [
-        "artwork-0112/v04/m01",
-        "artwork-0155/v05/m01",
-        "artwork-0167/v03/m01",
-        "artwork-0183/v02/m01"
+      "versions": [
+        {
+          "status": "alive",
+          "originalLanguage": "ja",
+          "description": {
+            "ja": "綺麗な線を意識する年だった {#2015自分が選ぶ今年の4枚|https://twitter.com/hashtag/2015自分が選ぶ今年の4枚}"
+          },
+          "media": [
+            "twitter/679975827577044992_CW_CaWvUwAAdkAX.png",
+            "twitter/679975827577044992_CW_CaEkUoAAkSwq.png",
+            "twitter/679975827577044992_CW_CaAvU0AUtkCk.png",
+            "twitter/679975827577044992_CW_CaGJU0AEVb9W.png"
+          ]
+        }
       ]
     },
     {
       "key": "twitter:682476291841327104",
       "platform": "twitter",
       "id": "682476291841327104",
-      "status": "alive",
       "publishedAt": "2015-12-31T08:20:02.428Z",
-      "originalLanguage": "ja",
-      "description": {
-        "ja": "まだかな"
-      },
-      "legacyAutoLink": true,
-      "media": [
-        "artwork-0071/v02/m01",
-        "artwork-0072/v03/m01"
+      "versions": [
+        {
+          "status": "alive",
+          "originalLanguage": "ja",
+          "description": {
+            "ja": "まだかな"
+          },
+          "media": [
+            "twitter/682476291841327104_CXikkdzU0AAvnXJ.jpeg",
+            "twitter/682476291841327104_CXikju8UMAAIRNR.jpeg"
+          ]
+        }
       ]
     },
     {
       "key": "twitter:684389164448481280",
       "platform": "twitter",
       "id": "684389164448481280",
-      "status": "alive",
       "publishedAt": "2016-01-05T15:01:06.797Z",
-      "originalLanguage": "ja",
-      "description": {
-        "ja": "{@trcoot|https://twitter.com/trcoot} てらさんお誕生日おめでとうございます！！お洒落とセンスが錬金された唯一無二の絵が大好きです、良い一日を！！"
-      },
-      "legacyAutoLink": true,
-      "media": [
-        "artwork-0191/v01/m01"
+      "versions": [
+        {
+          "status": "alive",
+          "originalLanguage": "ja",
+          "description": {
+            "ja": "{@trcoot|https://twitter.com/trcoot} てらさんお誕生日おめでとうございます！！お洒落とセンスが錬金された唯一無二の絵が大好きです、良い一日を！！"
+          },
+          "media": [
+            "twitter/684389164448481280_CX9wUN7UAAALU7y.png"
+          ]
+        }
       ]
     },
     {
       "key": "twitter:685793462763950081",
       "platform": "twitter",
       "id": "685793462763950081",
-      "status": "alive",
       "publishedAt": "2016-01-09T12:01:17.606Z",
-      "originalLanguage": "ja",
-      "description": {
-        "ja": "【ポケモン】なおきさん({@_NaokiSaito|https://twitter.com/_NaokiSaito})とオーバを描きあってみました。"
-      },
-      "legacyAutoLink": true,
-      "media": [
-        "artwork-0192/v01/m01"
+      "versions": [
+        {
+          "status": "alive",
+          "originalLanguage": "ja",
+          "description": {
+            "ja": "【ポケモン】なおきさん({@_NaokiSaito|https://twitter.com/_NaokiSaito})とオーバを描きあってみました。"
+          },
+          "media": [
+            "twitter/685793462763950081_CYRthS1UEAEWMnJ.png"
+          ]
+        }
       ]
     },
     {
       "key": "twitter:690927158793928704",
       "platform": "twitter",
       "id": "690927158793928704",
-      "status": "alive",
       "publishedAt": "2016-01-23T16:00:46.119Z",
-      "originalLanguage": "ja",
-      "description": {
-        "ja": "{@sakurai_energy|https://twitter.com/sakurai_energy} 櫻井さんお誕生日おめでとうございます🎊！！！！良い一日を！！！"
-      },
-      "legacyAutoLink": true,
-      "media": [
-        "artwork-0200/v01/m01"
+      "versions": [
+        {
+          "status": "alive",
+          "originalLanguage": "ja",
+          "description": {
+            "ja": "{@sakurai_energy|https://twitter.com/sakurai_energy} 櫻井さんお誕生日おめでとうございます🎊！！！！良い一日を！！！"
+          },
+          "media": [
+            "twitter/690927158793928704_CZaqluxUAAA6fGB.png"
+          ]
+        }
       ]
     },
     {
       "key": "twitter:692664609057038336",
       "platform": "twitter",
       "id": "692664609057038336",
-      "status": "alive",
       "publishedAt": "2016-01-28T11:04:46.542Z",
-      "originalLanguage": "ja",
-      "description": {
-        "ja": "円弧"
-      },
-      "legacyAutoLink": true,
-      "media": [
-        "artwork-0201/v01/m01"
+      "versions": [
+        {
+          "status": "alive",
+          "originalLanguage": "ja",
+          "description": {
+            "ja": "円弧"
+          },
+          "media": [
+            "twitter/692664609057038336_CZzWypNUcAAy2UH.png"
+          ]
+        }
       ]
     },
     {
       "key": "twitter:694451726816940032",
       "platform": "twitter",
       "id": "694451726816940032",
-      "status": "alive",
       "publishedAt": "2016-02-02T09:26:08.619Z",
-      "originalLanguage": "ja",
-      "description": {
-        "ja": "後ろ向き"
-      },
-      "legacyAutoLink": true,
-      "media": [
-        "artwork-0083/v02/m01",
-        "artwork-0120/v02/m01"
+      "versions": [
+        {
+          "status": "alive",
+          "originalLanguage": "ja",
+          "description": {
+            "ja": "後ろ向き"
+          },
+          "media": [
+            "twitter/694451726816940032_CaMwKl3VIAA1BMV.png",
+            "twitter/694451726816940032_CaMwKl2UUAARlvq.png"
+          ]
+        }
       ]
     },
     {
       "key": "twitter:703208246358573056",
       "platform": "twitter",
       "id": "703208246358573056",
-      "status": "alive",
       "publishedAt": "2016-02-26T13:21:25.566Z",
-      "originalLanguage": "ja",
-      "description": {
-        "ja": "冬コミで参加していたOUTLiNEの本が届きました、紙媒体はよいな"
-      },
-      "legacyAutoLink": true,
-      "media": [
-        "artwork-0203/v01/m01",
-        "artwork-0204/v01/m01"
+      "versions": [
+        {
+          "status": "alive",
+          "originalLanguage": "ja",
+          "description": {
+            "ja": "冬コミで参加していたOUTLiNEの本が届きました、紙媒体はよいな"
+          },
+          "media": [
+            "twitter/703208246358573056_CcJME8uVAAAFXMP.jpeg",
+            "twitter/703208246358573056_CcJMG7dVIAAJu40.jpeg"
+          ]
+        }
       ]
     },
     {
       "key": "twitter:734017914211160064",
       "platform": "twitter",
       "id": "734017914211160064",
-      "status": "alive",
       "publishedAt": "2016-05-21T13:48:02.798Z",
-      "originalLanguage": "ja",
-      "description": {
-        "ja": "大好きな絵描きさん達と飲み会しました"
-      },
-      "legacyAutoLink": true,
-      "media": [
-        "artwork-0211/v01/m01"
+      "versions": [
+        {
+          "status": "alive",
+          "originalLanguage": "ja",
+          "description": {
+            "ja": "大好きな絵描きさん達と飲み会しました"
+          },
+          "media": [
+            "twitter/734017914211160064_Ci_BYQIUoAAsjZj.jpeg"
+          ]
+        }
       ]
     },
     {
       "key": "twitter:738710004660740096",
       "platform": "twitter",
       "id": "738710004660740096",
-      "status": "alive",
       "publishedAt": "2016-06-03T12:32:44.336Z",
-      "originalLanguage": "ja",
-      "description": {
-        "ja": "楕円"
-      },
-      "legacyAutoLink": true,
-      "media": [
-        "artwork-0212/v01/m01"
+      "versions": [
+        {
+          "status": "alive",
+          "originalLanguage": "ja",
+          "description": {
+            "ja": "楕円"
+          },
+          "media": [
+            "twitter/738710004660740096_CkBs1T5UkAUizg5.png"
+          ]
+        }
       ]
     },
     {
       "key": "twitter:754156330894499845",
       "platform": "twitter",
       "id": "754156330894499845",
-      "status": "alive",
       "publishedAt": "2016-07-16T03:30:55.489Z",
-      "originalLanguage": "ja",
-      "description": {
-        "ja": "暑くて溶けそう"
-      },
-      "legacyAutoLink": true,
-      "media": [
-        "artwork-0213/v01/m01"
+      "versions": [
+        {
+          "status": "alive",
+          "originalLanguage": "ja",
+          "description": {
+            "ja": "暑くて溶けそう"
+          },
+          "media": [
+            "twitter/754156330894499845_CndM3oXVUAAo5Fc.png"
+          ]
+        }
       ]
     },
     {
       "key": "twitter:757950680682278912",
       "platform": "twitter",
       "id": "757950680682278912",
-      "status": "alive",
       "publishedAt": "2016-07-26T14:48:18.974Z",
-      "originalLanguage": "ja",
-      "description": {
-        "ja": "by @@hatroid"
-      },
-      "legacyAutoLink": true,
-      "media": [
-        "artwork-0215/v01/m01"
+      "versions": [
+        {
+          "status": "alive",
+          "originalLanguage": "ja",
+          "description": {
+            "ja": "by @@hatroid"
+          },
+          "media": [
+            "twitter/757950680682278912_CoTH7CmUMAEw-bm.png"
+          ]
+        }
       ]
     },
     {
       "key": "twitter:772048970210086913",
       "platform": "twitter",
       "id": "772048970210086913",
-      "status": "alive",
       "publishedAt": "2016-09-03T12:29:53.131Z",
-      "originalLanguage": "ja",
-      "description": {
-        "ja": "リウイチ会やりました！伝統の集合色紙"
-      },
-      "legacyAutoLink": true,
-      "media": [
-        "artwork-0240/v01/m01"
+      "versions": [
+        {
+          "status": "alive",
+          "originalLanguage": "ja",
+          "description": {
+            "ja": "リウイチ会やりました！伝統の集合色紙"
+          },
+          "media": [
+            "twitter/772048970210086913_CrbebU9VUAAGu1s.jpeg"
+          ]
+        }
       ]
     },
     {
       "key": "twitter:772414331656949761",
       "platform": "twitter",
       "id": "772414331656949761",
-      "status": "alive",
       "publishedAt": "2016-09-04T12:41:42.088Z",
-      "originalLanguage": "ja",
-      "legacyAutoLink": true,
-      "media": [
-        "artwork-0107/v02/m01",
-        "artwork-0131/v03/m01",
-        "artwork-0136/v06/m01",
-        "artwork-0155/v06/m01"
+      "versions": [
+        {
+          "status": "alive",
+          "originalLanguage": "ja",
+          "media": [
+            "twitter/772414331656949761_CrgqtfNUkAADLLU.png",
+            "twitter/772414331656949761_CrgqsYvUEAAbhhK.png",
+            "twitter/772414331656949761_Crgqr0jUsAALvYu.png",
+            "twitter/772414331656949761_Crgqs4UVYAE49FD.png"
+          ]
+        }
       ]
     },
     {
       "key": "twitter:790055702207148032",
       "platform": "twitter",
       "id": "790055702207148032",
-      "status": "alive",
       "publishedAt": "2016-10-23T05:02:12.588Z",
-      "originalLanguage": "ja",
-      "description": {
-        "ja": "先日、ハトラ／Okayの展示会に行ってきました。心地良さと枯れぬ斬新さが融合した素敵な場所、ちょこっとお手伝いしてます。"
-      },
-      "legacyAutoLink": true,
-      "media": [
-        "artwork-0218/v04/m01",
-        "artwork-0218/v05/m01"
+      "versions": [
+        {
+          "status": "alive",
+          "originalLanguage": "ja",
+          "description": {
+            "ja": "先日、ハトラ／Okayの展示会に行ってきました。心地良さと枯れぬ斬新さが融合した素敵な場所、ちょこっとお手伝いしてます。"
+          },
+          "media": [
+            "twitter/790055702207148032_CvbXbE1VMAA_vL3.jpeg",
+            "twitter/790055702207148032_CvbXYCxUIAACYXc.jpeg"
+          ]
+        }
       ]
     },
     {
       "key": "twitter:799228235296829440",
       "platform": "twitter",
       "id": "799228235296829440",
-      "status": "alive",
       "publishedAt": "2016-11-17T12:30:34.894Z",
-      "originalLanguage": "ja",
-      "description": {
-        "ja": "【絵柄のまったく違う絵師達が、ポケットモンスター サン・ムーンを描いてみた】\n★ア・メリカ\n★げみ\n★さいとうなおき\n★たるたる\n★どむ\n★ヒョーゴノスケ\n★ヘスン"
-      },
-      "legacyAutoLink": true,
-      "media": [
-        "artwork-0219/v01/m01"
+      "versions": [
+        {
+          "status": "alive",
+          "originalLanguage": "ja",
+          "description": {
+            "ja": "【絵柄のまったく違う絵師達が、ポケットモンスター サン・ムーンを描いてみた】\n★ア・メリカ\n★げみ\n★さいとうなおき\n★たるたる\n★どむ\n★ヒョーゴノスケ\n★ヘスン"
+          },
+          "media": [
+            "twitter/799228235296829440_CxdrJ_UVQAAAgBQ.png"
+          ]
+        }
       ]
     },
     {
       "key": "twitter:814496337655758850",
       "platform": "twitter",
       "id": "814496337655758850",
-      "status": "alive",
       "publishedAt": "2016-12-29T15:40:34.164Z",
-      "originalLanguage": "ja",
-      "description": {
-        "ja": "12/1発売の『ILLUSTRATION 2017』に掲載させて頂きました、 十人十色の個性溢れる人達が詰まった素敵な本。お見かけの際はぜひよろしくお願いします。　{https://shoeisha.co.jp/book/preview/9784798147567|https://shoeisha.co.jp/book/preview/9784798147567}"
-      },
-      "legacyAutoLink": true,
-      "media": [
-        "artwork-0241/v01/m01"
+      "versions": [
+        {
+          "status": "alive",
+          "originalLanguage": "ja",
+          "description": {
+            "ja": "12/1発売の『ILLUSTRATION 2017』に掲載させて頂きました、 十人十色の個性溢れる人達が詰まった素敵な本。お見かけの際はぜひよろしくお願いします。　{https://shoeisha.co.jp/book/preview/9784798147567|https://shoeisha.co.jp/book/preview/9784798147567}"
+          },
+          "media": [
+            "twitter/814496337655758850_C02pmy9UAAA9uEP.jpeg"
+          ]
+        }
       ]
     },
     {
       "key": "twitter:1073163955281907712",
       "platform": "twitter",
       "id": "1073163955281907712",
-      "status": "alive",
       "publishedAt": "2018-12-13T10:33:20.018Z",
-      "originalLanguage": "ja",
-      "description": {
-        "ja": "まとめ作品を除くと全部ミクちゃん、ほんと好き。\n{#自分のPixivブクマTOP3をあげる|https://twitter.com/hashtag/自分のPixivブクマTOP3をあげる}"
-      },
-      "legacyAutoLink": true,
-      "media": [
-        "artwork-0099/v05/m01",
-        "artwork-0155/v04/m01",
-        "artwork-0162/v01/m01"
+      "versions": [
+        {
+          "status": "alive",
+          "originalLanguage": "ja",
+          "description": {
+            "ja": "まとめ作品を除くと全部ミクちゃん、ほんと好き。\n{#自分のPixivブクマTOP3をあげる|https://twitter.com/hashtag/自分のPixivブクマTOP3をあげる}"
+          },
+          "media": [
+            "pixiv/54283685_p0.png",
+            "pixiv/46952854_p0.png",
+            "twitter/1073163955281907712_DuSkgFBVsAEdUG5.png"
+          ]
+        }
       ]
     },
     {
       "key": "twitter:1444237624500129795",
       "platform": "twitter",
       "id": "1444237624500129795",
-      "status": "alive",
       "publishedAt": "2021-10-02T09:47:36.975Z",
-      "originalLanguage": "ja",
-      "description": {
-        "ja": "構成"
-      },
-      "legacyAutoLink": true,
-      "media": [
-        "artwork-0226/v01/m01"
+      "versions": [
+        {
+          "status": "alive",
+          "originalLanguage": "ja",
+          "description": {
+            "ja": "構成"
+          },
+          "media": [
+            "tumblr/663928878095564800_81746b7d17edaffe02348c705a697cf095085ec2.png"
+          ]
+        }
       ]
     },
     {
       "key": "twitter:1444600677578067969",
       "platform": "twitter",
       "id": "1444600677578067969",
-      "status": "alive",
       "publishedAt": "2021-10-03T09:50:15.574Z",
-      "originalLanguage": "ja",
-      "description": {
-        "ja": "鼓動"
-      },
-      "legacyAutoLink": true,
-      "media": [
-        "artwork-0132/v03/m01"
+      "versions": [
+        {
+          "status": "alive",
+          "originalLanguage": "ja",
+          "description": {
+            "ja": "鼓動"
+          },
+          "media": [
+            "tumblr/709544231144947712_218ebe5ecb4b1d4922eaa0f949305f9627ed09ba.png"
+          ]
+        }
       ]
     },
     {
       "key": "twitter:1626858807279390720",
       "platform": "twitter",
       "id": "1626858807279390720",
-      "status": "alive",
       "publishedAt": "2023-02-18T08:18:59.887Z",
-      "originalLanguage": "ja",
-      "description": {
-        "ja": "軌道"
-      },
-      "legacyAutoLink": true,
-      "media": [
-        "artwork-0228/v02/m01"
+      "versions": [
+        {
+          "status": "alive",
+          "originalLanguage": "ja",
+          "description": {
+            "ja": "軌道"
+          },
+          "media": [
+            "twitter/1626858807279390720_FpPDdhAaMAETO1A.png"
+          ]
+        }
       ]
     },
     {
       "key": "twitter:1627242952576876547",
       "platform": "twitter",
       "id": "1627242952576876547",
-      "status": "alive",
       "publishedAt": "2023-02-19T09:45:27.263Z",
-      "originalLanguage": "ja",
-      "description": {
-        "ja": "ミク"
-      },
-      "legacyAutoLink": true,
-      "media": [
-        "artwork-0131/v04/m01"
+      "versions": [
+        {
+          "status": "alive",
+          "originalLanguage": "ja",
+          "description": {
+            "ja": "ミク"
+          },
+          "media": [
+            "twitter/1627242952576876547_FpUgVWMaYAA43tb.png"
+          ]
+        }
       ]
     },
     {
       "key": "twitter:1628683582561562628",
       "platform": "twitter",
       "id": "1628683582561562628",
-      "status": "alive",
       "publishedAt": "2023-02-23T09:10:00.217Z",
-      "originalLanguage": "ja",
-      "description": {
-        "ja": "ぐったり"
-      },
-      "legacyAutoLink": true,
-      "media": [
-        "artwork-0229/v01/m01"
+      "versions": [
+        {
+          "status": "alive",
+          "originalLanguage": "ja",
+          "description": {
+            "ja": "ぐったり"
+          },
+          "media": [
+            "tumblr/710217462683172864_6f59784573dcbc4d99165444c6c5e0d5bbd7fc8f.png"
+          ]
+        }
       ]
     },
     {
       "key": "twitter:1919748300133011553",
       "platform": "twitter",
       "id": "1919748300133011553",
-      "status": "alive",
       "publishedAt": "2025-05-06T13:37:16.607Z",
-      "originalLanguage": "ja",
-      "description": {
-        "ja": "じー"
-      },
-      "legacyAutoLink": true,
-      "media": [
-        "artwork-0232/v01/m01"
+      "versions": [
+        {
+          "status": "alive",
+          "originalLanguage": "ja",
+          "description": {
+            "ja": "じー"
+          },
+          "media": [
+            "twitter/1919748300133011553_GqRQtbsacAAiVln.png"
+          ]
+        }
       ]
     },
     {
       "key": "twitter:2012145323582595126",
       "platform": "twitter",
       "id": "2012145323582595126",
-      "status": "alive",
       "publishedAt": "2026-01-16T12:50:03.651Z",
-      "originalLanguage": "ja",
-      "description": {
-        "ja": "ゆらぎ"
-      },
-      "legacyAutoLink": true,
-      "media": [
-        "artwork-0233/v01/m01"
+      "versions": [
+        {
+          "status": "alive",
+          "originalLanguage": "ja",
+          "description": {
+            "ja": "ゆらぎ"
+          },
+          "media": [
+            "tumblr/805953449568157696_f6007e0a87aa29b59b3df10a2c06dd3e6fb542cf.png"
+          ]
+        }
       ]
     },
     {
       "key": "twitter:2012457846886334907",
       "platform": "twitter",
       "id": "2012457846886334907",
-      "status": "alive",
       "publishedAt": "2026-01-17T09:31:55.013Z",
-      "originalLanguage": "ja",
-      "description": {
-        "ja": "ごろん"
-      },
-      "legacyAutoLink": true,
-      "media": [
-        "artwork-0048/v05/m01"
+      "versions": [
+        {
+          "status": "alive",
+          "originalLanguage": "ja",
+          "description": {
+            "ja": "ごろん"
+          },
+          "media": [
+            "tumblr/806000851033456640_eba8736e9dacf17be929d57f0371f94a19737731.png"
+          ]
+        }
       ]
     },
     {
       "key": "twitter:2017534570459971939",
       "platform": "twitter",
       "id": "2017534570459971939",
-      "status": "alive",
       "publishedAt": "2026-01-31T09:45:00.234Z",
-      "originalLanguage": "ja",
-      "description": {
-        "ja": "ミク"
-      },
-      "legacyAutoLink": true,
-      "media": [
-        "artwork-0234/v01/m01"
+      "versions": [
+        {
+          "status": "alive",
+          "originalLanguage": "ja",
+          "description": {
+            "ja": "ミク"
+          },
+          "media": [
+            "tumblr/808543229379313664_79aa541c0e519d42f10d60c47eb1de4753d3a87c.png"
+          ]
+        }
       ]
     },
     {
       "key": "twitter:2017897137342926901",
       "platform": "twitter",
       "id": "2017897137342926901",
-      "status": "alive",
       "publishedAt": "2026-02-01T09:45:42.915Z",
-      "originalLanguage": "ja",
-      "description": {
-        "ja": "鬼"
-      },
-      "legacyAutoLink": true,
-      "media": [
-        "artwork-0235/v01/m01"
+      "versions": [
+        {
+          "status": "alive",
+          "originalLanguage": "ja",
+          "description": {
+            "ja": "鬼"
+          },
+          "media": [
+            "tumblr/807351584863485952_7870f2fb92df6a246af0d8849980c86b6dea640f.png"
+          ]
+        }
       ]
     },
     {
       "key": "twitter:2022603498349826424",
       "platform": "twitter",
       "id": "2022603498349826424",
-      "status": "alive",
       "publishedAt": "2026-02-14T09:27:06.819Z",
-      "originalLanguage": "ja",
-      "description": {
-        "ja": "△"
-      },
-      "legacyAutoLink": true,
-      "media": [
-        "artwork-0236/v01/m01"
+      "versions": [
+        {
+          "status": "alive",
+          "originalLanguage": "ja",
+          "description": {
+            "ja": "△"
+          },
+          "media": [
+            "tumblr/808543242321903616_5db54f603f6be9e305c9fab93bc04b5781a5e22b.png"
+          ]
+        }
       ]
     },
     {
       "key": "twitter:2024641088326361472",
       "platform": "twitter",
       "id": "2024641088326361472",
-      "status": "alive",
       "publishedAt": "2026-02-20T00:23:46.126Z",
-      "originalLanguage": "ja",
-      "legacyAutoLink": true,
-      "media": [
-        "artwork-0048/v06/m01",
-        "artwork-0132/v04/m01",
-        "artwork-0226/v03/m01"
+      "versions": [
+        {
+          "status": "alive",
+          "originalLanguage": "ja",
+          "media": [
+            "tumblr/809079143597768704_29674e06cd848a6954e54e43bfecfa4458997cf6.png",
+            "tumblr/809079143597768704_df1f3bddd48a471b13d4de6c09217a39883e7b97.png",
+            "tumblr/809079143597768704_f123fa39bc5859d51246feec21a10ed8ff061f0b.png"
+          ]
+        }
       ]
     },
     {
       "key": "twitter:2078406837687455778",
       "platform": "twitter",
       "id": "2078406837687455778",
-      "status": "alive",
       "publishedAt": "2026-07-18T09:09:39.693Z",
-      "originalLanguage": "ja",
-      "description": {
-        "ja": "ふわり"
-      },
-      "legacyAutoLink": true,
-      "media": [
-        "artwork-0239/v01/m01"
+      "versions": [
+        {
+          "status": "alive",
+          "originalLanguage": "ja",
+          "description": {
+            "ja": "ふわり"
+          },
+          "media": [
+            "twitter/2078406837687455778_HNf71eZbgAAUtI2.png"
+          ]
+        }
       ]
     },
     {
       "key": "twitter:2078768563939414075",
       "platform": "twitter",
       "id": "2078768563939414075",
-      "status": "alive",
       "publishedAt": "2026-07-19T09:07:01.952Z",
-      "originalLanguage": "ja",
-      "description": {
-        "ja": "和"
-      },
-      "legacyAutoLink": true,
-      "media": [
-        "artwork-0084/v02/m01"
+      "versions": [
+        {
+          "status": "alive",
+          "originalLanguage": "ja",
+          "description": {
+            "ja": "和"
+          },
+          "media": [
+            "twitter/2078768563939414075_HNlE917aUAETN8l.png"
+          ]
+        }
       ]
     },
     {
       "key": "twitter:414774255033675779",
       "platform": "twitter",
       "id": "414774255033675779",
-      "account": "otumamin",
-      "status": "alive",
       "publishedAt": "2013-12-22T15:07:43.190Z",
-      "originalLanguage": "ja",
-      "description": {
-        "ja": "冬コミ告知です！！【２日目東コ-54b】、bigburnで頒布される合同誌に金剛比叡の漫画７ページ描きました！一冊400円で頒布予定です～！当日はスペースに居ますので来られる方はぜひぜひお会いしましょう！"
-      },
-      "legacyAutoLink": true,
-      "media": [
-        "artwork-0087/v01/m01"
+      "versions": [
+        {
+          "account": "otumamin",
+          "status": "alive",
+          "originalLanguage": "ja",
+          "description": {
+            "ja": "冬コミ告知です！！【２日目東コ-54b】、bigburnで頒布される合同誌に金剛比叡の漫画７ページ描きました！一冊400円で頒布予定です～！当日はスペースに居ますので来られる方はぜひぜひお会いしましょう！"
+          },
+          "media": [
+            "twitter/414774255033675779_BcGS_MYCcAAJj09.png"
+          ]
+        }
       ]
     },
     {
       "key": "twitter:611514892709855232",
       "platform": "twitter",
       "id": "611514892709855232",
-      "account": "hatrangam",
-      "status": "alive",
       "publishedAt": "2015-06-18T12:44:46.476Z",
-      "originalLanguage": "ja",
-      "description": {
-        "ja": "15AWコラボレーターの {@stairs2line|https://twitter.com/stairs2line} 先生に描き下ろしてもらったモノです"
-      },
-      "legacyAutoLink": true,
-      "media": [
-        "artwork-0169/v01/m01"
+      "versions": [
+        {
+          "account": "hatrangam",
+          "status": "alive",
+          "originalLanguage": "ja",
+          "description": {
+            "ja": "15AWコラボレーターの {@stairs2line|https://twitter.com/stairs2line} 先生に描き下ろしてもらったモノです"
+          },
+          "media": [
+            "twitter/611514892709855232_CHyJFpdWsAAuuUb.png"
+          ]
+        }
       ]
     },
     {
       "key": "twitter:787963630520184833",
       "platform": "twitter",
       "id": "787963630520184833",
-      "account": "hatra_official",
-      "status": "alive",
       "publishedAt": "2016-10-17T10:29:03.829Z",
-      "originalLanguage": "ja",
-      "description": {
-        "ja": "HATRA SS17 TOKYO SHOWROOM\n{https://hatra.tumblr.com/post/151922372697/hatra-ss17-tokyo-showroom-date-1019wed|https://hatra.tumblr.com/post/151922372697/hatra-ss17-tokyo-showroom-date-1019wed}"
-      },
-      "legacyAutoLink": true,
-      "media": [
-        "artwork-0218/v01/m01"
+      "versions": [
+        {
+          "account": "hatra_official",
+          "status": "alive",
+          "originalLanguage": "ja",
+          "description": {
+            "ja": "HATRA SS17 TOKYO SHOWROOM\n{https://hatra.tumblr.com/post/151922372697/hatra-ss17-tokyo-showroom-date-1019wed|https://hatra.tumblr.com/post/151922372697/hatra-ss17-tokyo-showroom-date-1019wed}"
+          },
+          "media": [
+            "twitter/787963630520184833_Cu9ouuIUMAAlHkG.jpeg"
+          ]
+        }
       ]
     },
     {
       "key": "twitter:835063184520204289",
       "platform": "twitter",
       "id": "835063184520204289",
-      "account": "hatra_official",
-      "status": "alive",
       "publishedAt": "2017-02-24T09:45:52.570Z",
-      "originalLanguage": "ja",
-      "description": {
-        "ja": "in stock {@Bonita_kanazawa|https://twitter.com/Bonita_kanazawa}\n{#HATRA|https://twitter.com/hashtag/HATRA} {#ハトラ|https://twitter.com/hashtag/ハトラ} {#SS17|https://twitter.com/hashtag/SS17}"
-      },
-      "legacyAutoLink": true,
-      "media": [
-        "artwork-0218/v02/m01",
-        "artwork-0218/v03/m01"
+      "versions": [
+        {
+          "account": "hatra_official",
+          "status": "alive",
+          "originalLanguage": "ja",
+          "description": {
+            "ja": "in stock {@Bonita_kanazawa|https://twitter.com/Bonita_kanazawa}\n{#HATRA|https://twitter.com/hashtag/HATRA} {#ハトラ|https://twitter.com/hashtag/ハトラ} {#SS17|https://twitter.com/hashtag/SS17}"
+          },
+          "media": [
+            "twitter/835063184520204289_C5a9id6U0AARcvt.jpeg",
+            "twitter/835063184520204289_C5a9hwvUYAA072w.jpeg"
+          ]
+        }
       ]
     },
     {
       "key": "twitter:1014082314396024832",
       "platform": "twitter",
       "id": "1014082314396024832",
-      "account": "cfm_snowmiku",
-      "status": "alive",
       "publishedAt": "2018-07-03T09:43:59.147Z",
-      "originalLanguage": "ja",
-      "description": {
-        "ja": "続いてパーカーです！！せんたっきさんのイラストはドット調を起用していて、\n最高にスタイリッシュです！！プリントもこだわりのハイクオリティー！！\n裏地はパイル地で通気性も抜群！男性女性どちらも普段使いにおすすめ☆\n{#雪ミクスカイタウン|https://twitter.com/hashtag/雪ミクスカイタウン} {#雪ミク|https://twitter.com/hashtag/雪ミク} {#初音ミク|https://twitter.com/hashtag/初音ミク}"
-      },
-      "legacyAutoLink": true,
-      "media": [
-        "artwork-0223/v08/m01",
-        "artwork-0223/v09/m01",
-        "artwork-0223/v10/m01"
+      "versions": [
+        {
+          "account": "cfm_snowmiku",
+          "status": "alive",
+          "originalLanguage": "ja",
+          "description": {
+            "ja": "続いてパーカーです！！せんたっきさんのイラストはドット調を起用していて、\n最高にスタイリッシュです！！プリントもこだわりのハイクオリティー！！\n裏地はパイル地で通気性も抜群！男性女性どちらも普段使いにおすすめ☆\n{#雪ミクスカイタウン|https://twitter.com/hashtag/雪ミクスカイタウン} {#雪ミク|https://twitter.com/hashtag/雪ミク} {#初音ミク|https://twitter.com/hashtag/初音ミク}"
+          },
+          "media": [
+            "twitter/1014082314396024832_DhK-YbdV4AA9Srl.jpeg",
+            "twitter/1014082314396024832_DhK-ak4UwAACuxk.jpeg",
+            "twitter/1014082314396024832_DhK-ak1VAAAhl-f.jpeg"
+          ]
+        }
       ]
     },
     {
       "key": "twitter:1085028359120142337",
       "platform": "twitter",
       "id": "1085028359120142337",
-      "account": "hiraizm",
-      "status": "alive",
       "publishedAt": "2019-01-15T04:18:14.323Z",
-      "originalLanguage": "ja",
-      "description": {
-        "ja": "{#ILLUSTRATION2019|https://twitter.com/hashtag/ILLUSTRATION2019} ではドット絵で表現するピクセルアートスタイルの作家として、YACOYONさんとヘルミッペさんのお二方がいます🎮\n\nシリーズの既刊には豊井さんやせんたっき（たるたる）さんも、ドット絵（GIF）やそれに近しいスタイル（2値ペン）の作家さんかと思います■"
-      },
-      "legacyAutoLink": true,
-      "media": [
-        "artwork-0225/v01/m01"
+      "versions": [
+        {
+          "account": "hiraizm",
+          "status": "alive",
+          "originalLanguage": "ja",
+          "description": {
+            "ja": "{#ILLUSTRATION2019|https://twitter.com/hashtag/ILLUSTRATION2019} ではドット絵で表現するピクセルアートスタイルの作家として、YACOYONさんとヘルミッペさんのお二方がいます🎮\n\nシリーズの既刊には豊井さんやせんたっき（たるたる）さんも、ドット絵（GIF）やそれに近しいスタイル（2値ペン）の作家さんかと思います■"
+          },
+          "media": [
+            "twitter/1085028359120142337_Dw7LiXYUwAAJ9nd.jpeg"
+          ]
+        }
       ]
     },
     {
       "key": "twitter:583667739211898880",
       "platform": "twitter",
       "id": "583667739211898880",
-      "status": "deleted",
       "publishedAt": "2015-04-02T16:30:07.707Z",
-      "originalLanguage": "ja",
-      "description": {
-        "ja": "修正ながもん"
-      },
-      "legacyAutoLink": true,
-      "media": [
-        "artwork-0149/v03/m01"
+      "versions": [
+        {
+          "status": "deleted",
+          "originalLanguage": "ja",
+          "description": {
+            "ja": "修正ながもん"
+          },
+          "media": [
+            "twitter/583667739211898880_CBmatzXUEAAHQ60.png"
+          ]
+        }
       ]
     },
     {
       "key": "twitter:607461159269105664",
       "platform": "twitter",
       "id": "607461159269105664",
-      "status": "deleted",
       "publishedAt": "2015-06-07T08:16:41.109Z",
-      "originalLanguage": "ja",
-      "description": {
-        "ja": "パラリ"
-      },
-      "legacyAutoLink": true,
-      "media": [
-        "artwork-0132/v02/m01"
+      "versions": [
+        {
+          "status": "deleted",
+          "originalLanguage": "ja",
+          "description": {
+            "ja": "パラリ"
+          },
+          "media": [
+            "tumblr/126578508869_tumblr_nt0ld5znZ21s4v84ho6_400.png"
+          ]
+        }
       ]
     },
     {
       "key": "twitter:623040653585321984",
       "platform": "twitter",
       "id": "623040653585321984",
-      "status": "deleted",
       "publishedAt": "2015-07-20T08:04:02.007Z",
-      "originalLanguage": "ja",
-      "description": {
-        "ja": "まとめ"
-      },
-      "legacyAutoLink": true,
-      "media": [
-        "artwork-0048/v03/m01",
-        "artwork-0136/v05/m01",
-        "artwork-0139/v02/m01",
-        "artwork-0162/v03/m01"
+      "versions": [
+        {
+          "status": "deleted",
+          "originalLanguage": "ja",
+          "description": {
+            "ja": "まとめ"
+          },
+          "media": [
+            "twitter/623040653585321984_CKV8LBnUAAA57nu.png",
+            "twitter/623040653585321984_CKV8LDKUsAAEazq.png",
+            "twitter/623040653585321984_CKV8LDSUwAAtud4.png",
+            "twitter/623040653585321984_CKV8LDSUMAAjMUb.png"
+          ]
+        }
       ]
     },
     {
       "key": "twitter:673434455864832000",
       "platform": "twitter",
       "id": "673434455864832000",
-      "status": "deleted",
       "publishedAt": "2015-12-06T09:31:00.742Z",
-      "originalLanguage": "ja",
-      "description": {
-        "ja": "1pxの線"
-      },
-      "legacyAutoLink": true,
-      "media": [
-        "artwork-0137/v04/m01"
+      "versions": [
+        {
+          "status": "deleted",
+          "originalLanguage": "ja",
+          "description": {
+            "ja": "1pxの線"
+          },
+          "media": [
+            "twitter/673434455864832000_CViFEaWUAAAe5hj.png"
+          ]
+        }
       ]
     },
     {
       "key": "twitter:687855074966507521",
       "platform": "twitter",
       "id": "687855074966507521",
-      "status": "deleted",
       "publishedAt": "2016-01-15T04:33:24.258Z",
-      "originalLanguage": "ja",
-      "description": {
-        "ja": "It's not 3D"
-      },
-      "legacyAutoLink": true,
-      "media": [
-        "artwork-0095/v01/m01",
-        "artwork-0193/v01/m01"
+      "versions": [
+        {
+          "status": "deleted",
+          "originalLanguage": "ja",
+          "description": {
+            "ja": "It's not 3D"
+          },
+          "media": [
+            "twitter/687855074966507521_687855074966507521.mp4"
+          ]
+        }
       ]
     },
     {
       "key": "twitter:701021001526579200",
       "platform": "twitter",
       "id": "701021001526579200",
-      "status": "deleted",
       "publishedAt": "2016-02-20T12:30:05.761Z",
-      "originalLanguage": "ja",
-      "description": {
-        "ja": "【絵柄がまったく違う絵師達がロケット団を描いてみた】さいとうなおき({@_NaokiSaito|https://twitter.com/_NaokiSaito})たるたる({@stairs2line|https://twitter.com/stairs2line})どむ（{@10domu08|https://twitter.com/10domu08}）ヒョーゴノスケ（{@hyogonosuke|https://twitter.com/hyogonosuke})"
-      },
-      "legacyAutoLink": true,
-      "media": [
-        "artwork-0202/v01/m01"
+      "versions": [
+        {
+          "status": "deleted",
+          "originalLanguage": "ja",
+          "description": {
+            "ja": "【絵柄がまったく違う絵師達がロケット団を描いてみた】さいとうなおき({@_NaokiSaito|https://twitter.com/_NaokiSaito})たるたる({@stairs2line|https://twitter.com/stairs2line})どむ（{@10domu08|https://twitter.com/10domu08}）ヒョーゴノスケ（{@hyogonosuke|https://twitter.com/hyogonosuke})"
+          },
+          "media": [
+            "twitter/701021001526579200_CbqG4ruUUAArDUg.png"
+          ]
+        }
       ]
     },
     {
       "key": "twitter:704683561182318592",
       "platform": "twitter",
       "id": "704683561182318592",
-      "status": "deleted",
       "publishedAt": "2016-03-01T15:03:48.030Z",
-      "originalLanguage": "ja",
-      "description": {
-        "ja": "おやすみ"
-      },
-      "legacyAutoLink": true,
-      "media": [
-        "artwork-0205/v01/m01"
+      "versions": [
+        {
+          "status": "deleted",
+          "originalLanguage": "ja",
+          "description": {
+            "ja": "おやすみ"
+          },
+          "media": [
+            "twitter/704683561182318592_CceJ9umUYAM2puX.png"
+          ]
+        }
       ]
     },
     {
       "key": "twitter:784692392053977088",
       "platform": "twitter",
       "id": "784692392053977088",
-      "status": "deleted",
       "publishedAt": "2016-10-08T09:50:19.802Z",
-      "originalLanguage": "ja",
-      "description": {
-        "ja": "静"
-      },
-      "legacyAutoLink": true,
-      "media": [
-        "artwork-0216/v01/m01"
+      "versions": [
+        {
+          "status": "deleted",
+          "originalLanguage": "ja",
+          "description": {
+            "ja": "静"
+          },
+          "media": [
+            "twitter/784692392053977088_CuPJhyaVMAA31f9.png"
+          ]
+        }
       ]
     },
     {
       "key": "twitter:814496801692581888",
       "platform": "twitter",
       "id": "814496801692581888",
-      "status": "deleted",
       "publishedAt": "2016-12-29T15:42:24.799Z",
-      "originalLanguage": "ja",
-      "description": {
-        "ja": "去年は線を考える1年でしたが、今年はバランスを考える1年でした。\n{#2016自分が選ぶ今年の4枚|https://twitter.com/search?q=2016自分が選ぶ今年の4枚}"
-      },
-      "legacyAutoLink": true,
-      "media": [
-        "artwork-0212/v02/m01",
-        "artwork-0214/v02/m01",
-        "artwork-0201/v04/m01",
-        "artwork-0206/v02/m01"
+      "versions": [
+        {
+          "status": "deleted",
+          "originalLanguage": "ja",
+          "description": {
+            "ja": "去年は線を考える1年でしたが、今年はバランスを考える1年でした。\n{#2016自分が選ぶ今年の4枚|https://twitter.com/search?q=2016自分が選ぶ今年の4枚}"
+          },
+          "media": [
+            "twitter/814496801692581888_C02mUyRUUAAToST.png",
+            "twitter/814496801692581888_C02mVVWUAAAlZCc.png",
+            "twitter/814496801692581888_C02mV6hUoAEYuuC.png",
+            "twitter/814496801692581888_C02mULWUAAUQFVM.png"
+          ]
+        }
       ]
     },
-	{
+    {
       "key": "twitter:855751421391589377",
       "platform": "twitter",
       "id": "855751421391589377",
-      "account": "stairs2line",
-      "status": "deleted",
       "publishedAt": "2017-04-22T11:53:32.609Z",
-      "href": "https://twitter.com/stairs2line/status/855751421391589377",
-      "originalLanguage": "ja",
-      "title": {},
-      "description": {
-        "ja": "反射"
-      },
-      "media": [
-        "artwork-0220/v01/m01"
+      "versions": [
+        {
+          "account": "stairs2line",
+          "status": "deleted",
+          "href": "https://twitter.com/stairs2line/status/855751421391589377",
+          "originalLanguage": "ja",
+          "description": {
+            "ja": "反射"
+          },
+          "media": [
+            "twitter/855751421391589377_C-A9XNYUIAA2dG1.png"
+          ]
+        }
       ]
     },
     {
       "key": "twitter:942696559136800768",
       "platform": "twitter",
       "id": "942696559136800768",
-      "status": "deleted",
       "publishedAt": "2017-12-18T10:02:28.810Z",
-      "originalLanguage": "ja",
-      "legacyAutoLink": true,
-      "media": [
-        "artwork-0150/v02/m01",
-        "artwork-0160/v03/m01",
-        "artwork-0161/v03/m01",
-        "artwork-0201/v05/m01"
+      "versions": [
+        {
+          "status": "deleted",
+          "originalLanguage": "ja",
+          "media": [
+            "twitter/942696559136800768_DRUe0rsVQAAqo1W.png",
+            "twitter/942696559136800768_DRUezh5VwAA_mGw.png",
+            "twitter/942696559136800768_DRUe1tqUEAAW51r.png",
+            "twitter/942696559136800768_DRUeyyiVAAAoO86.png"
+          ]
+        }
       ]
     },
     {
       "key": "twitter:942758747167866880",
       "platform": "twitter",
       "id": "942758747167866880",
-      "status": "deleted",
       "publishedAt": "2017-12-18T14:09:35.592Z",
-      "originalLanguage": "ja",
-      "description": {
-        "ja": "隙間"
-      },
-      "legacyAutoLink": true,
-      "media": [
-        "artwork-0221/v01/m01"
+      "versions": [
+        {
+          "status": "deleted",
+          "originalLanguage": "ja",
+          "description": {
+            "ja": "隙間"
+          },
+          "media": [
+            "twitter/942758747167866880_DRVYXFkU8AARzg-.png"
+          ]
+        }
       ]
     },
     {
       "key": "twitter:1071381965645869056",
       "platform": "twitter",
       "id": "1071381965645869056",
-      "status": "deleted",
       "publishedAt": "2018-12-08T12:32:20.581Z",
-      "originalLanguage": "ja",
-      "description": {
-        "ja": "上下反転"
-      },
-      "legacyAutoLink": true,
-      "media": [
-        "artwork-0224/v01/m01"
+      "versions": [
+        {
+          "status": "deleted",
+          "originalLanguage": "ja",
+          "description": {
+            "ja": "上下反転"
+          },
+          "media": [
+            "twitter/1071381965645869056_Dt5QLQlVAAA_81r.png"
+          ]
+        }
       ]
     },
     {
       "key": "twitter:1444589381948379139",
       "platform": "twitter",
       "id": "1444589381948379139",
-      "status": "deleted",
       "publishedAt": "2021-10-03T09:05:22.486Z",
-      "originalLanguage": "ja",
-      "description": {
-        "ja": "「………」\n「あっ」"
-      },
-      "legacyAutoLink": true,
-      "media": [
-        "artwork-0227/v01/m01",
-        "artwork-0227/v02/m01"
+      "versions": [
+        {
+          "status": "deleted",
+          "originalLanguage": "ja",
+          "description": {
+            "ja": "「………」\n「あっ」"
+          },
+          "media": [
+            "twitter/1444589381948379139_FAw2CdzVcAEXlnl.png",
+            "twitter/1444589381948379139_FAw2B5MVkAAacYd.png"
+          ]
+        }
       ]
     },
     {
       "key": "twitter:1449658930657849347",
       "platform": "twitter",
       "id": "1449658930657849347",
-      "status": "deleted",
       "publishedAt": "2021-10-17T08:49:57.086Z",
-      "originalLanguage": "ja",
-      "description": {
-        "ja": "朝が早い"
-      },
-      "legacyAutoLink": true,
-      "media": [
-        "artwork-0227/v03/m01"
+      "versions": [
+        {
+          "status": "deleted",
+          "originalLanguage": "ja",
+          "description": {
+            "ja": "朝が早い"
+          },
+          "media": [
+            "twitter/1449658930657849347_FB45GDaUYAMk9_8.png"
+          ]
+        }
       ]
     },
     {
       "key": "twitter:1919315718937416068",
       "platform": "twitter",
       "id": "1919315718937416068",
-      "status": "deleted",
       "publishedAt": "2025-05-05T08:58:21.213Z",
-      "originalLanguage": "ja",
-      "legacyAutoLink": true,
-      "media": [
-        "artwork-0231/v01/m01"
+      "versions": [
+        {
+          "status": "deleted",
+          "originalLanguage": "ja",
+          "media": [
+            "tumblr/783086275245867008_cb8cdd33be3747b560fb797aa41ad2b143f70391.png"
+          ]
+        }
       ]
     }
   ]

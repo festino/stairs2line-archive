@@ -49,6 +49,26 @@ public sealed class Stairs2lineArchiveFileValidator
             .Where(filePath => filePath.Length > 0 && !filePath.StartsWith("assets/placeholders/", StringComparison.Ordinal))
             .ToHashSet(StringComparer.Ordinal);
 
+        if (document.RootElement.TryGetProperty("posts", out var postsNode))
+        {
+            foreach (var post in postsNode.EnumerateArray())
+            {
+                if (!post.TryGetProperty("versions", out var versionsNode)) continue;
+                foreach (var version in versionsNode.EnumerateArray())
+                {
+                    if (!version.TryGetProperty("mediaFiles", out var mediaFilesNode)) continue;
+                    foreach (var mediaFile in mediaFilesNode.EnumerateArray())
+                    {
+                        var filePath = Normalize(mediaFile.GetString() ?? string.Empty);
+                        if (filePath.Length > 0 && !filePath.StartsWith("assets/placeholders/", StringComparison.Ordinal))
+                        {
+                            declaredFiles.Add(filePath);
+                        }
+                    }
+                }
+            }
+        }
+
         var diskFiles = MediaDirectories
             .SelectMany(directoryName => EnumerateDirectory(mediaRoot, directoryName))
             .Select(path => Normalize(Path.GetRelativePath(mediaRoot, path)))

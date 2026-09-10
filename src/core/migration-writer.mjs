@@ -17,8 +17,8 @@ export async function writeMigratedSource(outputRoot, migration) {
 
   await writeJson(
     path.join(outputRoot, 'site.jsonc'),
-    DEFAULT_SITE,
-    'Human-editable archive configuration. Code comments must remain in English.'
+    { ...DEFAULT_SITE, schemaVersion: 1 },
+    'Legacy migration intermediate. The resolve step upgrades posts to schema version 2 and filename media references.'
   );
   await writeJson(
     path.join(outputRoot, 'platforms.jsonc'),
@@ -35,7 +35,7 @@ export async function writeMigratedSource(outputRoot, migration) {
     await writeJson(
       path.join(outputRoot, 'posts', `${platform}.jsonc`),
       { posts: posts.map(publicPost) },
-      `Migrated ${platform} posts. Status is stored on every post.`
+      `Migrated ${platform} posts. This is a legacy intermediate; resolve converts mutable post fields into versions and media IDs into file paths.`
     );
   }
 

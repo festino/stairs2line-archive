@@ -96,13 +96,17 @@
     const post = data.posts.find((item) => item.key === key);
     byId('post-platform').value = post?.platform ?? '';
     byId('post-id').value = post?.id ?? '';
-    byId('post-account').value = post?.account ?? '';
-    byId('post-status').value = post?.declaredStatus ?? post?.status ?? 'alive';
     byId('post-date').value = post?.publishedAt ?? '';
-    byId('post-href').value = post?.href ?? '';
-    byId('post-media').value = post?.mediaIds?.join('\n') ?? '';
-    setLocalizedInputs('post-title', post?.title);
-    setLocalizedInputs('post-description', post?.description);
+    byId('post-versions').value = JSON.stringify(post?.versions?.map((version) => ({
+      status: version.declaredStatus ?? version.status ?? 'alive',
+      account: version.account || undefined,
+      href: version.href || undefined,
+      originalLanguage: version.originalLanguage || undefined,
+      title: version.title && Object.keys(version.title).length > 0 ? version.title : undefined,
+      description: version.description && Object.keys(version.description).length > 0 ? version.description : undefined,
+      media: version.mediaFiles ?? [],
+      layout: version.layout || undefined
+    })) ?? [{ status: 'alive', originalLanguage: 'ja', media: [] }], null, 2);
   }
 
   function loadArtwork(id) {
@@ -132,18 +136,20 @@
     const platform = byId('post-platform').value.trim();
     const id = byId('post-id').value.trim();
     const publishedAt = byId('post-date').value.trim() || (platform === 'twitter' ? twitterPostDate(id) : null);
+    let versions;
+    try {
+      versions = JSON.parse(byId('post-versions').value);
+      if (!Array.isArray(versions) || versions.length === 0) throw new Error('Versions must be a non-empty array.');
+    } catch (error) {
+      byId('post-output').textContent = `Invalid versions JSON: ${error.message}`;
+      return;
+    }
     const result = {
       key: `${platform}:${id}`,
       platform,
       id,
-      account: byId('post-account').value.trim() || undefined,
-      status: byId('post-status').value,
       publishedAt: publishedAt || undefined,
-      href: byId('post-href').value.trim() || undefined,
-      originalLanguage: 'ja',
-      title: localizedInputs('post-title'),
-      description: localizedInputs('post-description'),
-      media: byId('post-media').value.split(/\r?\n/).map((value) => value.trim()).filter(Boolean)
+      versions
     };
     byId('post-output').textContent = JSON.stringify(result, null, 2);
   }

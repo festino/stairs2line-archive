@@ -1,20 +1,23 @@
-// Resolved physical file paths and explicit media relationships.
+// Versioned posts. Media entries are physical file paths relative to the archive media root.
 {
   "posts": [
     {
       "key": "snowmiku.com:cfm_snowmiku_skytown_st10th_message.html_post1869918372462506421",
       "platform": "snowmiku.com",
       "id": "cfm_snowmiku_skytown_st10th_message.html_post1869918372462506421",
-      "status": "alive",
       "publishedAt": "2024-12-20T01:30:56.000Z",
-      "href": "https://snowmiku.com/skytown/st10th/message.html",
-      "originalLanguage": "ja",
-      "description": {
-        "ja": "スカイタウンの10周年に際し、\nスカイタウンにゆかりのある作家の皆さまに\n色紙をお贈りいただきました！"
-      },
-      "legacyAutoLink": true,
-      "media": [
-        "artwork-0230/v02/m01"
+      "versions": [
+        {
+          "status": "alive",
+          "href": "https://snowmiku.com/skytown/st10th/message.html",
+          "originalLanguage": "ja",
+          "description": {
+            "ja": "スカイタウンの10周年に際し、\nスカイタウンにゆかりのある作家の皆さまに\n色紙をお贈りいただきました！"
+          },
+          "media": [
+            "other/2024-12-20_cfm_snowmiku_skytown_st10th_message.html_post1869918372462506421.jpg"
+          ]
+        }
       ]
     }
   ]

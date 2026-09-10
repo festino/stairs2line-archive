@@ -1,59 +1,71 @@
-// Resolved physical file paths and explicit media relationships.
+// Versioned posts. Media entries are physical file paths relative to the archive media root.
 {
   "posts": [
     {
       "key": "instagram:sENMiFJpci",
       "platform": "instagram",
       "id": "sENMiFJpci",
-      "status": "alive",
       "publishedAt": "2014-08-24T03:20:38.000Z",
-      "href": "https://www.instagram.com/p/sENMiFJpci",
-      "originalLanguage": "ja",
-      "legacyAutoLink": true,
-      "media": [
-        "artwork-0144/v01/m01"
+      "versions": [
+        {
+          "status": "alive",
+          "href": "https://www.instagram.com/p/sENMiFJpci",
+          "originalLanguage": "ja",
+          "media": [
+            "other/sENMiFJpci.jpg"
+          ]
+        }
       ]
     },
     {
       "key": "instagram:BAE8QEnppWX",
       "platform": "instagram",
       "id": "BAE8QEnppWX",
-      "status": "alive",
       "publishedAt": "2016-01-03T12:39:41.000Z",
-      "href": "https://www.instagram.com/p/BAE8QEnppWX",
-      "originalLanguage": "ja",
-      "description": {
-        "ja": "ちっちゃい！"
-      },
-      "legacyAutoLink": true,
-      "media": [
-        "artwork-0190/v01/m01"
+      "versions": [
+        {
+          "status": "alive",
+          "href": "https://www.instagram.com/p/BAE8QEnppWX",
+          "originalLanguage": "ja",
+          "description": {
+            "ja": "ちっちゃい！"
+          },
+          "media": [
+            "other/2016-01-03_BAE8QEnppWX.jpg"
+          ]
+        }
       ]
     },
     {
       "key": "instagram:BL22lBzFl4s",
       "platform": "instagram",
       "id": "BL22lBzFl4s",
-      "status": "alive",
       "publishedAt": "2016-10-22T07:37:29.000Z",
-      "href": "https://www.instagram.com/p/BL22lBzFl4s",
-      "originalLanguage": "ja",
-      "legacyAutoLink": true,
-      "media": [
-        "artwork-0218/v04/m01"
+      "versions": [
+        {
+          "status": "alive",
+          "href": "https://www.instagram.com/p/BL22lBzFl4s",
+          "originalLanguage": "ja",
+          "media": [
+            "other/BL22lBzFl4s.jpg"
+          ]
+        }
       ]
     },
     {
       "key": "instagram:BL23kSdlQJX",
       "platform": "instagram",
       "id": "BL23kSdlQJX",
-      "status": "alive",
       "publishedAt": "2016-10-22T07:46:07.000Z",
-      "href": "https://www.instagram.com/p/BL23kSdlQJX",
-      "originalLanguage": "ja",
-      "legacyAutoLink": true,
-      "media": [
-        "artwork-0218/v05/m01"
+      "versions": [
+        {
+          "status": "alive",
+          "href": "https://www.instagram.com/p/BL23kSdlQJX",
+          "originalLanguage": "ja",
+          "media": [
+            "other/BL23kSdlQJX.jpg"
+          ]
+        }
       ]
     }
   ]

@@ -34,15 +34,9 @@
           </label>
           <label>Platform <input id="post-platform" required></label>
           <label>External ID <input id="post-id" required></label>
-          <label>Account <input id="post-account"></label>
-          <label>Status
-            <select id="post-status"><option value="alive">alive</option><option value="deleted">deleted</option></select>
-          </label>
           <label>Published at <input id="post-date" placeholder="2026-01-17T12:00:00Z"></label>
-          <label>Source URL <input id="post-href" type="url"></label>
-          <fieldset data-language-fields="post-title"><legend>Title</legend></fieldset>
-          <fieldset data-language-fields="post-description"><legend>Description</legend></fieldset>
-          <label>Media IDs, one per line <textarea id="post-media" rows="6"></textarea></label>
+          <label>Versions JSON <textarea id="post-versions" rows="22" spellcheck="false"></textarea></label>
+          <p>Version objects contain every mutable field, including status, account, URL, localized text, physical media file paths, and Tumblr layout.</p>
           <div class="actions">
             <button type="submit">Generate</button>
             <button type="button" data-download="post-output">Download JSON</button>

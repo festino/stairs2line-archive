@@ -56,7 +56,11 @@
     "activity": "Активность",
     "publicationCount": "Публикаций: {count}",
     "lessActivity": "Меньше",
-    "moreActivity": "Больше"
+    "moreActivity": "Больше",
+    "firstRebloggedAt": "Самый ранний известный репост:",
+    "savedReblogs": "Сохранившиеся репосты:",
+    "noKnownReblogDate": "дата неизвестна",
+    "noSavedReblogs": "нет"
   },
   "validation": {
     "title": "Проверка архива",

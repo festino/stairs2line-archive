@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
@@ -7,6 +7,7 @@ import test from 'node:test';
 import { compileArchive, resolveSourceFiles } from '../src/core/compiler.mjs';
 import { DEFAULT_LOCALES } from '../src/core/default-data.mjs';
 import { buildFileCatalog, extractLegacyMediaId, extractPostIdFromFile } from '../src/core/file-catalog.mjs';
+import { parseJsonc } from '../src/core/jsonc.mjs';
 import { parseLegacyArchive } from '../src/core/legacy-parser.mjs';
 import { buildStaticSite } from '../src/core/site-builder.mjs';
 import { upgradeSourcePosts } from '../src/core/source-upgrader.mjs';
@@ -30,6 +31,16 @@ function fakePng(width, height, extraBytes = 0) {
   buffer.writeUInt32BE(width, 16);
   buffer.writeUInt32BE(height, 20);
   return buffer;
+}
+
+function localeLeafKeys(value, prefix = '') {
+  const keys = [];
+  for (const [key, item] of Object.entries(value ?? {})) {
+    const fullKey = prefix ? `${prefix}.${key}` : key;
+    if (typeof item === 'string') keys.push(fullKey);
+    else if (item && typeof item === 'object') keys.push(...localeLeafKeys(item, fullKey));
+  }
+  return keys.sort();
 }
 
 const TWITTER_EPOCH_MS = 1288834974657n;
@@ -323,6 +334,36 @@ test('missing translation warnings are deduplicated by entity', async () => {
     title: ['en', 'ru'],
     description: ['en', 'ru']
   });
+});
+
+test('source locales and generated defaults cover every site UI locale key', async () => {
+  const siteBuilder = await fs.readFile(new URL('../src/core/site-builder.mjs', import.meta.url), 'utf8');
+  const literalKeys = new Set(
+    [...siteBuilder.matchAll(/localeText\(\s*manifest\.locales\s*,\s*language\s*,\s*['"]([^'"]+)['"]/g)]
+      .map((match) => match[1])
+  );
+  for (const key of [
+    'common.alive',
+    'common.deleted',
+    'common.lost',
+    'common.versions',
+    'artworks.popular',
+    'artworks.major',
+    'artworks.versions',
+    'artworks.all'
+  ]) literalKeys.add(key);
+
+  for (const language of ['en', 'ru', 'ja']) {
+    const localePath = new URL(`../data/source/locales/${language}.jsonc`, import.meta.url);
+    const localeTextSource = await fs.readFile(localePath, 'utf8');
+    const locale = parseJsonc(localeTextSource, localePath.pathname);
+    const sourceKeys = localeLeafKeys(locale);
+    const defaultKeys = localeLeafKeys(DEFAULT_LOCALES[language]);
+    assert.deepEqual(sourceKeys, defaultKeys, `${language} source/default locale keys differ`);
+    for (const key of literalKeys) {
+      assert.ok(sourceKeys.includes(key), `${language} is missing used locale key ${key}`);
+    }
+  }
 });
 
 test('an alive post without a date is compiled as deleted', async () => {
@@ -922,6 +963,43 @@ test('MediaViewer uses full hoverable side navigation zones, human dates, inacti
   assert.match(css, /\.media-viewer-post-link\.is-empty/);
   assert.equal(viewerIndex.viewerStrings.en.noKnownPosts, 'No known posts use this image.');
   assert.match(artworkHtml, /No known posts use this image\./);
+  assert.match(js, /new PageMediaProvider\('\[data-paged-list\], \.post-version-list'\)/);
+  assert.match(js, /for \(const root of document\.querySelectorAll\(this\.rootSelector\)\)/);
+});
+
+test('individual Piapro Blog post pages expose every post image to MediaViewer navigation', async () => {
+  const mediaRoot = await createMediaFixture();
+  const source = fixtureSource();
+  source.platforms.platforms.push({
+    id: 'piapro',
+    label: { default: 'Piapro Blog' },
+    versions: [{ sourceUrl: 'https://blog.piapro.net/' }]
+  });
+  source.posts = [{
+    key: 'piapro:NK-test',
+    platform: 'piapro',
+    id: 'NK-test',
+    status: 'alive',
+    publishedAt: '2018-06-28T08:00:09.000Z',
+    versions: [{
+      href: 'https://blog.piapro.net/example.html',
+      title: { en: 'Piapro multi-image post' },
+      media: [TWITTER_FILE, PIXIV_FILE]
+    }],
+    __source: '/source/posts/piapro.jsonc'
+  }];
+  source.artworks[0].versions[0].media = [
+    { id: 'artwork-0001/v01/m01', files: [TWITTER_FILE] },
+    { id: 'artwork-0001/v01/m02', files: [PIXIV_FILE] }
+  ];
+
+  const compilation = await compileArchive(source, { mediaRoot });
+  const output = await fs.mkdtemp(path.join(os.tmpdir(), 'stairs2line-piapro-viewer-'));
+  await buildStaticSite(compilation, source, output, { mediaRoot });
+  const html = await fs.readFile(path.join(output, 'en', 'posts', 'piapro', 'NK-test', 'index.html'), 'utf8');
+  const mediaCount = [...html.matchAll(/data-viewer-media/g)].length;
+  assert.equal(mediaCount, 2);
+  assert.match(html, /class="post-version-list"/);
 });
 
 test('orphan Twitter media with a decodable media timestamp is shown as an approximate lost post', async () => {
@@ -1113,6 +1191,9 @@ test('canonical post status is top-level and Tumblr versions preserve reblog evi
   assert.match(detailHtml, /Earliest known reblog:/);
   assert.match(detailHtml, /September 29, 2014/);
   assert.match(detailHtml, /Preserved reblogs:/);
+  assert.match(detailHtml, /class="post-reblog-details"/);
+  assert.match(detailHtml, /<summary[^>]+aria-label="Preserved reblogs: 1"/);
+  assert.match(detailHtml, /class="post-reblog-panel"/);
   assert.match(detailHtml, /https:\/\/www\.tumblr\.com\/tessreblawgs\/98743112708/);
   assert.match(detailHtml, />@tessreblawgs</);
 
@@ -1130,4 +1211,138 @@ test('upgrade moves legacy per-version post status to the original post', () => 
   assert.equal(Object.hasOwn(upgraded.posts[0].versions[0], 'status'), false);
   assert.equal(upgraded.posts[1].status, 'alive');
   assert.equal(Object.hasOwn(upgraded.posts[1].versions[0], 'status'), false);
+});
+
+test('Tumblr importer dates versions from reblogs only, preserves old status, and reports version changes', async () => {
+  const input = await fs.mkdtemp(path.join(os.tmpdir(), 'stairs2line-tumblr-import-'));
+  const rootId = '100';
+  const image = {
+    type: 'image',
+    media: [{
+      url: 'https://64.media.tumblr.com/hash/tumblr_example_1280.pnj',
+      type: 'image/png',
+      width: 800,
+      height: 600
+    }]
+  };
+  const rootContent = [image, { type: 'text', text: 'same text' }];
+  const original = {
+    id: rootId,
+    id_string: rootId,
+    timestamp: 1000,
+    blog_name: 'artist',
+    blog: { name: 'artist' },
+    content: rootContent,
+    layout: []
+  };
+  const makeReblog = (id, blog, timestamp, layout) => ({
+    id,
+    id_string: id,
+    timestamp,
+    blog_name: blog,
+    blog: { name: blog },
+    reblogged_root_id: rootId,
+    trail: [{
+      post: { id: rootId, timestamp: 1000 },
+      content: rootContent,
+      layout
+    }]
+  });
+  await fs.writeFile(path.join(input, 'original.json'), JSON.stringify(original));
+  await fs.writeFile(path.join(input, 'later-same.json'), JSON.stringify(makeReblog('200', 'later', 2000, [])));
+  await fs.writeFile(path.join(input, 'earlier-same.json'), JSON.stringify(makeReblog('201', 'earlier', 1500, [])));
+  await fs.writeFile(path.join(input, 'layout-edit.json'), JSON.stringify(makeReblog('202', 'edited', 3000, [{ type: 'rows', display: [{ blocks: [0] }] }])));
+
+  const oldPosts = path.join(input, 'old.jsonc');
+  await fs.writeFile(oldPosts, JSON.stringify({
+    posts: [{
+      key: 'tumblr:100',
+      platform: 'tumblr',
+      id: '100',
+      status: 'deleted',
+      publishedAt: '1970-01-01T00:16:40.000Z',
+      versions: [{
+        firstRebloggedAt: '1970-01-01T00:25:00.000Z',
+        reblogs: [{ blog: 'earlier', id: '201' }],
+        description: { ja: 'same text' },
+        originalLanguage: 'ja',
+        media: ['tumblr/100_tumblr_example_1280.png']
+      }]
+    }]
+  }));
+
+  const script = new URL('../tools/tumblr_posts_to_v2.py', import.meta.url);
+  const result = spawnSync('python3', [script.pathname, oldPosts, input], { encoding: 'utf8' });
+  assert.equal(result.status, 0, result.stderr);
+  const imported = JSON.parse(result.stdout);
+  assert.equal(imported.posts.length, 1);
+  const post = imported.posts[0];
+  assert.equal(post.status, 'deleted');
+  assert.equal(post.publishedAt, '1970-01-01T00:16:40.000Z');
+  assert.equal(post.versions.length, 2);
+  assert.equal(Object.hasOwn(post.versions[0], 'status'), false);
+  assert.equal(post.versions[0].firstRebloggedAt, '1970-01-01T00:25:00.000Z');
+  assert.deepEqual(post.versions[0].reblogs, [
+    { blog: 'earlier', id: '201' },
+    { blog: 'later', id: '200' }
+  ]);
+  assert.deepEqual(post.versions[0].media, ['tumblr/100_tumblr_example_1280.png']);
+  assert.equal(post.versions[1].firstRebloggedAt, '1970-01-01T00:50:00.000Z');
+  assert.deepEqual(post.versions[1].reblogs, [{ blog: 'edited', id: '202' }]);
+  assert.deepEqual(post.versions[1].layout, [{ type: 'rows', display: [{ blocks: [0] }] }]);
+  assert.match(result.stderr, /Posts added: 0/);
+  assert.match(result.stderr, /Posts removed: 0/);
+  assert.match(result.stderr, /Versions added: 1/);
+  assert.match(result.stderr, /Versions removed: 0/);
+  assert.match(result.stderr, /Existing versions with changed reblog evidence: 1/);
+  assert.match(result.stderr, /New media filenames not present in the old post file: 0/);
+});
+
+test('Tumblr importer maps archived suffixes, defaults new posts alive, and reports removed posts/new media', async () => {
+  const input = await fs.mkdtemp(path.join(os.tmpdir(), 'stairs2line-tumblr-import-diff-'));
+  const oldPosts = path.join(input, 'old.jsonc');
+  await fs.writeFile(oldPosts, JSON.stringify({
+    posts: [{
+      key: 'tumblr:999',
+      platform: 'tumblr',
+      id: '999',
+      status: 'deleted',
+      publishedAt: '1970-01-01T00:01:00.000Z',
+      versions: [{ firstRebloggedAt: null, reblogs: [], media: ['tumblr/999_old.jpg'] }]
+    }]
+  }));
+  const fresh = {
+    id: '300',
+    id_string: '300',
+    timestamp: 4000,
+    blog_name: 'artist',
+    blog: { name: 'artist' },
+    content: [
+      { type: 'image', media: [{ url: 'https://64.media.tumblr.com/hash/animated.gifv', type: 'image/webp' }] },
+      { type: 'image', media: [{ url: 'https://64.media.tumblr.com/hash/photo.jpg', type: 'image/webp' }] }
+    ],
+    layout: []
+  };
+  await fs.writeFile(path.join(input, 'fresh.json'), JSON.stringify(fresh));
+
+  const script = new URL('../tools/tumblr_posts_to_v2.py', import.meta.url);
+  const result = spawnSync('python3', [script.pathname, oldPosts, input], { encoding: 'utf8' });
+  assert.equal(result.status, 0, result.stderr);
+  const imported = JSON.parse(result.stdout);
+  assert.equal(imported.posts.length, 1);
+  assert.equal(imported.posts[0].id, '300');
+  assert.equal(imported.posts[0].status, 'alive');
+  assert.deepEqual(imported.posts[0].versions[0].media, [
+    'tumblr/300_animated.gif',
+    'tumblr/300_photo.jpg'
+  ]);
+  assert.match(result.stderr, /Posts added: 1/);
+  assert.match(result.stderr, /\+ 300 \(status: alive\)/);
+  assert.match(result.stderr, /Posts removed: 1/);
+  assert.match(result.stderr, /- 999/);
+  assert.match(result.stderr, /Versions added: 1/);
+  assert.match(result.stderr, /Versions removed: 1/);
+  assert.match(result.stderr, /New media filenames not present in the old post file: 2/);
+  assert.match(result.stderr, /tumblr\/300_animated\.gif/);
+  assert.match(result.stderr, /tumblr\/300_photo\.jpg/);
 });

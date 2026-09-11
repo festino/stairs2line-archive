@@ -90,9 +90,17 @@ The legacy `migrate` command remains an intermediate schema-v1 import because it
 
 ### Tumblr snapshot/reblog importer
 
-`tools/tumblr_posts_to_v2.py <directory> -o data/source/posts/tumblr.jsonc` groups Tumblr API JSON files by root post, fingerprints the complete `description + media + layout`, and emits every unique version. Versions are ordered by the earliest reblog that preserves them. A direct JSON snapshot of the original/root post participates in content deduplication but never supplies `firstRebloggedAt`; a root-only version with no reblog evidence sorts after dated reblog versions. `--status alive|deleted` sets only the outer original-post availability.
+`tools/tumblr_posts_to_v2.py <old-posts.jsonc> <directory> -o data/source/posts/tumblr.jsonc` regenerates the complete Tumblr post file from all API JSON snapshots/reblogs in `<directory>`. The old post file is used only as authoritative existing metadata for root availability and for the end-of-run change report: matching post ids keep their old `alive`/`deleted` status, while newly discovered root posts default to `alive`. Posts or versions that are no longer represented by the supplied JSON set are not silently retained; they disappear from the generated output and are explicitly listed in the report, so an incomplete snapshot directory is visible before replacing the source file.
 
-For each version the importer always writes a chronologically ordered `reblogs` list of Tumblr blog nickname + reblog id pairs. Duplicate input snapshots of the same reblog are collapsed. The earliest timestamp among those reblogs is written as `firstRebloggedAt`.
+The importer fingerprints the complete `description + media + layout` and emits every unique version. Versions are ordered by the earliest reblog that preserves them. A direct JSON snapshot of the original/root post participates in content deduplication but never supplies `firstRebloggedAt`; a root-only version with no reblog evidence sorts after dated reblog versions. For each version the importer always writes a chronologically ordered `reblogs` list of Tumblr blog nickname + reblog id pairs. Duplicate input snapshots of the same reblog are collapsed. The earliest timestamp among those reblogs is written as `firstRebloggedAt`.
+
+After generation, stderr reports added/removed root posts, added/removed content versions, existing versions whose reblog evidence changed, publication-time changes, and a separate list of media filenames that occur in the new generated file but nowhere in the old post file. This media list is intended as the checklist for newly introduced post media that may need to be connected to artwork entities before the normal archive validation/build succeeds.
+
+Tumblr URL suffixes are converted according to how this archive stores originals rather than according to Tumblr's response MIME type. `.pnj` is stored as `.png`, `.gifv` is stored as `.gif`, and every other URL extension is kept as-is. This avoids the old `.webp` false positives caused by Tumblr advertising GIF preview variants as WebP.
+
+On an individual Tumblr post page, the earliest known reblog date stays visible in the compact version metadata row. The potentially long preserved-reblog list is collapsed behind a small list button next to that date and opens as a bounded scrolling popover, so a heavily reblogged post does not make every version card much taller by default.
+
+All source locale files are expected to expose the same leaf-key set as `DEFAULT_LOCALES`. Tests also audit every literal `localeText(...)` key used by the site builder, so adding a new UI string without adding it to `en`, `ru`, `ja`, and the generated defaults fails the test suite instead of silently rendering the key name.
 
 ## Build and page behavior
 
@@ -145,9 +153,11 @@ When `viewerAnchor` is absent, MediaViewer behaves as though the two points were
 
 These coordinates are used only on an individual artwork page while moving among that artwork's version media; normal post viewing is unaffected. The displayed object remains a regular `<img>`/`<video>` rather than being redrawn to a canvas, so normal browser image actions remain available.
 
-MediaViewer reserves a separate scrollable row for metadata, so a tall portrait can no longer push the text below the viewport. Dates in the post-reference row are formatted through the browser locale rather than exposing raw ISO timestamps. The current post is kept in that row as a disabled `aria-current` item instead of being emitted a second time as a link.
+MediaViewer reserves a separate scrollable row for metadata, so a tall portrait can no longer push the text below the viewport. Dates in the post-reference row are formatted through the browser locale rather than exposing raw ISO timestamps. The current post is kept in that row as a disabled `aria-current` item instead of being emitted a second time as a link. The post-reference strip always reserves one fixed-height row; media with no known linked posts show a localized “no known posts” placeholder there instead of omitting the row. This keeps the artwork alignment stage at the same height while switching between sourced and unsourced versions, so registered pixels do not jump vertically merely because one image has no preserved publication reference.
 
 The entire empty side area directly to the left of the displayed full-size media is the previous-media hit target when one exists, and the entire corresponding area on the right is the next-media target. Hovering anywhere in either hit target highlights that whole side zone and brightens its larger dimmed thumbnail, so the visual affordance matches the clickable area instead of existing only around the thumbnail. Other empty backdrop space closes the viewer. The side targets end above the metadata row and automatically follow the rendered media bounds, so they do not cover the image. Touch devices can also move between media with a horizontal swipe; gestures beginning within 28 CSS pixels of a screen edge are deliberately ignored to avoid competing with browser/system back-forward gestures. Keyboard arrows and wheel navigation remain supported.
+
+MediaViewer navigation gathers media from paged listing containers and, on individual post pages, from `.post-version-list`. This keeps previous/next navigation available for multi-image standalone posts such as the Piapro Blog entries instead of opening only the clicked image with no neighbours.
 
 ## Admin artwork alignment editor
 

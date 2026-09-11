@@ -116,6 +116,7 @@ export const DEFAULT_LOCALES = {
       knownNotAfter: 'Известно не позднее {date}',
       firstPost: 'Первая известная публикация: {date}',
       noKnownPosts: 'Известных публикаций с этим изображением нет.',
+      artworkVersions: 'Версии работы',
       genericDescription: 'Artwork stairs2line: {versions} версий, {media} медиафайлов.'
     },
     posts: {
@@ -184,6 +185,7 @@ export const DEFAULT_LOCALES = {
       knownNotAfter: 'Known no later than {date}',
       firstPost: 'First known post: {date}',
       noKnownPosts: 'No known posts use this image.',
+      artworkVersions: 'Artwork versions',
       genericDescription: 'A stairs2line artwork with {versions} versions and {media} media items.'
     },
     posts: {
@@ -252,6 +254,7 @@ export const DEFAULT_LOCALES = {
       knownNotAfter: '{date}以前に存在',
       firstPost: '最初に確認された投稿: {date}',
       noKnownPosts: 'この画像を含む既知の投稿はありません。',
+      artworkVersions: '作品バージョン',
       genericDescription: 'stairs2line の作品。{versions}バージョン、{media}メディア。'
     },
     posts: {

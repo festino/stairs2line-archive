@@ -6,7 +6,16 @@
     }
 
     getItems() {
-      return [...document.querySelectorAll(`${this.rootSelector} ${this.mediaSelector}`)];
+      const items = [];
+      const seen = new Set();
+      for (const root of document.querySelectorAll(this.rootSelector)) {
+        for (const item of root.querySelectorAll(this.mediaSelector)) {
+          if (seen.has(item)) continue;
+          seen.add(item);
+          items.push(item);
+        }
+      }
+      return items;
     }
 
     getNext(element, callback) {
@@ -749,7 +758,11 @@
     const modal = createModal();
     if (!modal) return;
 
-    const provider = new PageMediaProvider('[data-paged-list]');
+    // Feed/listing pages expose their media through data-paged-list. Individual
+    // post pages use post-version-list instead; without that fallback a
+    // multi-image post (notably the Piapro Blog entries) could open the viewer
+    // but had no previous/next items to navigate to.
+    const provider = new PageMediaProvider('[data-paged-list], .post-version-list');
     let viewer;
 
     viewer = new MediaViewer('#mediaModal', (element) => {

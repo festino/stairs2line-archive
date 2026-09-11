@@ -56,7 +56,11 @@
     "activity": "アクティビティ",
     "publicationCount": "投稿: {count}",
     "lessActivity": "少ない",
-    "moreActivity": "多い"
+    "moreActivity": "多い",
+    "firstRebloggedAt": "最も早く確認されたリブログ:",
+    "savedReblogs": "保存されているリブログ:",
+    "noKnownReblogDate": "日付不明",
+    "noSavedReblogs": "なし"
   },
   "validation": {
     "title": "アーカイブ検証",

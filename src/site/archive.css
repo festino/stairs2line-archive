@@ -243,6 +243,14 @@ h2 {
   contain-intrinsic-size: 650px;
 }
 
+/* Version evidence on a standalone post may open a small popover outside the
+   card. Detail pages only render a handful of version cards, so they do not
+   need the feed-only paint containment that would clip that popover. */
+.post-detail-page .post-card {
+  overflow: visible;
+  content-visibility: visible;
+}
+
 .post-header,
 .post-footer {
   justify-content: space-between;
@@ -1844,8 +1852,9 @@ h2 {
 
 /* Tumblr version provenance on individual post pages. */
 .post-version-evidence {
+  position: relative;
   margin: 0.8rem 0 0;
-  padding: 0.7rem 0.85rem;
+  padding: 0.55rem 0.75rem;
   border: 1px solid var(--border);
   border-radius: 0.65rem;
   background: color-mix(in srgb, var(--surface) 92%, transparent);
@@ -1854,12 +1863,16 @@ h2 {
   line-height: 1.45;
 }
 
-.post-version-evidence p {
-  margin: 0;
+.post-version-evidence-row {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-width: 0;
+  white-space: nowrap;
 }
 
-.post-version-evidence p + p {
-  margin-top: 0.3rem;
+.post-version-evidence time {
+  color: CanvasText;
 }
 
 .post-version-evidence a {
@@ -1873,7 +1886,80 @@ h2 {
   height: 0.85em;
 }
 
+.post-reblog-details {
+  display: inline-block;
+  flex: 0 0 auto;
+}
+
+.post-reblog-details > summary {
+  display: inline-grid;
+  width: 1.65rem;
+  height: 1.65rem;
+  margin: -0.15rem 0;
+  padding: 0;
+  place-items: center;
+  border: 1px solid transparent;
+  border-radius: 0.38rem;
+  color: var(--muted);
+  cursor: pointer;
+  list-style: none;
+}
+
+.post-reblog-details > summary::-webkit-details-marker {
+  display: none;
+}
+
+.post-reblog-details > summary:hover,
+.post-reblog-details > summary:focus-visible,
+.post-reblog-details[open] > summary {
+  border-color: var(--border);
+  background: color-mix(in srgb, var(--surface) 76%, var(--accent) 24%);
+  color: CanvasText;
+}
+
+.post-reblog-details > summary svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.post-reblog-panel {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 0.35rem);
+  left: 0;
+  right: 0;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 0.65rem;
+  background: var(--surface);
+  box-shadow: 0 0.55rem 1.5rem rgb(0 0 0 / 0.18);
+  white-space: normal;
+}
+
+.post-reblog-panel-label {
+  margin-bottom: 0.35rem;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.post-reblog-list {
+  max-height: min(14rem, 42dvh);
+  overflow: auto;
+  line-height: 1.65;
+}
+
 .post-reblog-separator,
 .post-reblog-empty {
   color: var(--muted);
+}
+
+.post-reblog-empty {
+  margin-left: 0.15rem;
+}
+
+@media (max-width: 620px) {
+  .post-version-evidence-row {
+    flex-wrap: wrap;
+    white-space: normal;
+  }
 }

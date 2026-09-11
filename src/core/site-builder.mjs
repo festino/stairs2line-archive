@@ -364,20 +364,26 @@ function renderPostVersionEvidence(manifest, post, version, language) {
     ? formatDate(version.firstRebloggedAt, language, { includeTime: true })
     : null;
   const firstLine = firstRebloggedAt
-    ? `<p><span>${escapeHtml(localeText(manifest.locales, language, 'posts.firstRebloggedAt'))}</span> <time datetime="${escapeAttribute(version.firstRebloggedAt)}">${escapeHtml(firstRebloggedAt)}</time></p>`
-    : `<p><span>${escapeHtml(localeText(manifest.locales, language, 'posts.firstRebloggedAt'))}</span> ${escapeHtml(localeText(manifest.locales, language, 'posts.noKnownReblogDate'))}</p>`;
+    ? `<span>${escapeHtml(localeText(manifest.locales, language, 'posts.firstRebloggedAt'))}</span> <time datetime="${escapeAttribute(version.firstRebloggedAt)}">${escapeHtml(firstRebloggedAt)}</time>`
+    : `<span>${escapeHtml(localeText(manifest.locales, language, 'posts.firstRebloggedAt'))}</span> ${escapeHtml(localeText(manifest.locales, language, 'posts.noKnownReblogDate'))}`;
   const reblogs = (version.reblogs ?? []).map((reblog) => {
     const label = `@${reblog.blog}`;
     return reblog.href
       ? `<a href="${escapeAttribute(reblog.href)}" target="_blank" rel="noreferrer" title="${escapeAttribute(`${reblog.blog}/${reblog.id}`)}">${escapeHtml(label)}${externalLinkIcon()}</a>`
       : `<span title="${escapeAttribute(`${reblog.blog}/${reblog.id}`)}">${escapeHtml(label)}</span>`;
   });
-  const reblogList = reblogs.length > 0
-    ? reblogs.join('<span class="post-reblog-separator"> · </span>')
+  const savedReblogsLabel = localeText(manifest.locales, language, 'posts.savedReblogs');
+  const reblogDetails = reblogs.length > 0
+    ? `<details class="post-reblog-details">
+        <summary title="${escapeAttribute(savedReblogsLabel)}" aria-label="${escapeAttribute(`${savedReblogsLabel} ${reblogs.length}`)}">${savedReblogsIcon()}</summary>
+        <div class="post-reblog-panel">
+          <div class="post-reblog-panel-label">${escapeHtml(savedReblogsLabel)}</div>
+          <div class="post-reblog-list">${reblogs.join('<span class="post-reblog-separator"> · </span>')}</div>
+        </div>
+      </details>`
     : `<span class="post-reblog-empty">${escapeHtml(localeText(manifest.locales, language, 'posts.noSavedReblogs'))}</span>`;
   return `<div class="post-version-evidence">
-    ${firstLine}
-    <p><span>${escapeHtml(localeText(manifest.locales, language, 'posts.savedReblogs'))}</span> ${reblogList}</p>
+    <div class="post-version-evidence-row">${firstLine}${reblogDetails}</div>
   </div>`;
 }
 
@@ -432,6 +438,10 @@ function layersIcon() {
 
 function externalLinkIcon() {
   return `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6h-2V7.41l-8.29 8.3-1.42-1.42 8.3-8.29H14V4ZM5 5h6v2H7v10h10v-4h2v6H5V5Z" fill="currentColor"/></svg>`;
+}
+
+function savedReblogsIcon() {
+  return `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM9 6h10v2H9V6ZM5 10.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM9 11h10v2H9v-2ZM5 15.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM9 16h10v2H9v-2Z" fill="currentColor"/></svg>`;
 }
 
 function compactMediaElement(manifest, mediaRef, alt) {

@@ -56,7 +56,11 @@
     "activity": "Activity",
     "publicationCount": "Posts: {count}",
     "lessActivity": "Less",
-    "moreActivity": "More"
+    "moreActivity": "More",
+    "firstRebloggedAt": "Earliest known reblog:",
+    "savedReblogs": "Preserved reblogs:",
+    "noKnownReblogDate": "date unknown",
+    "noSavedReblogs": "none"
   },
   "validation": {
     "title": "Archive validation",

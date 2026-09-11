@@ -34,6 +34,7 @@
     "created": "{date}に制作",
     "knownNotAfter": "{date}以前に存在",
     "firstPost": "最初に確認された投稿: {date}",
+    "noKnownPosts": "この画像を含む既知の投稿はありません。",
     "artworkVersions": "作品バージョン",
     "genericDescription": "stairs2line の作品。{versions}バージョン、{media}メディア。"
   },

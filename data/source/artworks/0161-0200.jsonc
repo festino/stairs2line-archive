@@ -457,6 +457,37 @@
       },
       "versions": [
         {
+          "id": "v06",
+          "scope": "top",
+          "media": [
+            {
+              "id": "artwork-0166/v06/m01",
+              "legacyIds": [
+                "a5791bae7ad326a04828bebc809b16a57e2ecb7023ce-CMDi3g_fw1200"
+              ],
+              "files": [
+                "other/a5791bae7ad326a04828bebc809b16a57e2ecb7023ce-CMDi3g_fw1200.png"
+              ],
+              "viewerAnchor": {
+                "points": [
+                  {
+                    "x": 198,
+                    "y": 37
+                  },
+                  {
+                    "x": 198,
+                    "y": 647
+                  }
+                ],
+                "flipX": true
+              }
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 6
+          }
+        },
+        {
           "id": "v01",
           "scope": "sketchy",
           "media": [
@@ -607,37 +638,6 @@
           ],
           "migration": {
             "legacyVersionIndex": 5
-          }
-        },
-        {
-          "id": "v06",
-          "scope": "top",
-          "media": [
-            {
-              "id": "artwork-0166/v06/m01",
-              "legacyIds": [
-                "a5791bae7ad326a04828bebc809b16a57e2ecb7023ce-CMDi3g_fw1200"
-              ],
-              "files": [
-                "other/a5791bae7ad326a04828bebc809b16a57e2ecb7023ce-CMDi3g_fw1200.png"
-              ],
-              "viewerAnchor": {
-                "points": [
-                  {
-                    "x": 198,
-                    "y": 37
-                  },
-                  {
-                    "x": 198,
-                    "y": 647
-                  }
-                ],
-                "flipX": true
-              }
-            }
-          ],
-          "migration": {
-            "legacyVersionIndex": 6
           }
         }
       ],

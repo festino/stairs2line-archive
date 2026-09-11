@@ -875,12 +875,20 @@ test('invalid viewer anchor orientation fields are reported and ignored', async 
 test('MediaViewer uses full hoverable side navigation zones, human dates, inactive current posts, and two-point artwork registration', async () => {
   const mediaRoot = await createMediaFixture();
   const source = fixtureSource();
+  const unsourcedFile = 'pixiv/unsourced.png';
+  await fs.writeFile(path.join(mediaRoot, unsourcedFile), fakePng(320, 320, 5));
+  source.artworks[0].versions[0].media.push({
+    id: 'artwork-0001/v01/m02',
+    files: [unsourcedFile]
+  });
   const compilation = await compileArchive(source, { mediaRoot });
   const output = await fs.mkdtemp(path.join(os.tmpdir(), 'stairs2line-viewer-ui-'));
   await buildStaticSite(compilation, source, output, { mediaRoot });
 
   const js = await fs.readFile(path.join(output, 'assets', 'media-viewer-adapter.js'), 'utf8');
   const css = await fs.readFile(path.join(output, 'assets', 'archive.css'), 'utf8');
+  const viewerIndex = JSON.parse(await fs.readFile(path.join(output, 'data', 'viewer-index.json'), 'utf8'));
+  const artworkHtml = await fs.readFile(path.join(output, 'en', 'artworks', compilation.manifest.artworks[0].slug, 'index.html'), 'utf8');
   assert.match(js, /event\.clientX < mediaRect\.left && this\.prev/);
   assert.match(js, /event\.clientX > mediaRect\.right && this\.next/);
   assert.doesNotMatch(js, /image\.addEventListener\('click',[^\n]*viewer\.close/);
@@ -890,6 +898,8 @@ test('MediaViewer uses full hoverable side navigation zones, human dates, inacti
   assert.match(js, /edgeGuard = 28/);
   assert.match(js, /new Intl\.DateTimeFormat\(language/);
   assert.match(js, /aria-current', 'page'/);
+  assert.match(js, /list\.childElementCount === 0/);
+  assert.match(js, /media-viewer-post-link is-empty/);
   assert.match(js, /reference\.span \/ item\.geometry\.span/);
   assert.match(js, /unionWidth/);
   assert.match(js, /function orientationMatrix\(flipX = false, rotation = 0\)/);
@@ -908,6 +918,10 @@ test('MediaViewer uses full hoverable side navigation zones, human dates, inacti
   assert.match(css, /\.media-viewer-switcher-right:hover[\s\S]*?linear-gradient/);
   assert.match(css, /\.media-viewer-switcher-preview\s*\{[\s\S]*?height:\s*clamp\(110px, 26vh, 270px\)/);
   assert.match(css, /\.media-viewer-post-link\.is-current/);
+  assert.match(css, /\.media-viewer-post-list\s*\{[\s\S]*?flex-wrap:\s*nowrap[\s\S]*?height:\s*2rem/);
+  assert.match(css, /\.media-viewer-post-link\.is-empty/);
+  assert.equal(viewerIndex.viewerStrings.en.noKnownPosts, 'No known posts use this image.');
+  assert.match(artworkHtml, /No known posts use this image\./);
 });
 
 test('orphan Twitter media with a decodable media timestamp is shown as an approximate lost post', async () => {

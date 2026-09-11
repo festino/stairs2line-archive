@@ -854,10 +854,11 @@ async function buildArtworkPages(outputRoot, manifest, language) {
             <summary>${escapeHtml(localeText(manifest.locales, language, 'common.files'))}: ${media?.existingFiles.length ?? 0}</summary>
             <ul>${(media?.existingFiles ?? []).map((filePath) => `<li><a href="${escapeAttribute(mediaUrl(manifest, filePath))}">${escapeHtml(filePath)}</a> (${manifest.files[filePath]?.byteLength ?? 0} B)</li>`).join('')}</ul>
           </details>-->
-          ${linkedPosts.length > 0 ? `
           <ul class="artwork-posts">
-            ${linkedPosts.map((post) => `<li><a href="${escapeAttribute(routeUrl(manifest, language, `posts/${encodeURIComponent(post.platform)}/${encodeURIComponent(post.id)}/`))}"><div class="platform-link"><img src="${platformIconUrl(manifest, manifest.platforms.find((item) => item.id === post.platform))}" alt=""></div>${displayPostDate(manifest, post, language, { includeTime: true })}</a></li>`).join('')}
-          </ul>` : ''}
+            ${linkedPosts.length > 0
+              ? linkedPosts.map((post) => `<li><a href="${escapeAttribute(routeUrl(manifest, language, `posts/${encodeURIComponent(post.platform)}/${encodeURIComponent(post.id)}/`))}"><div class="platform-link"><img src="${platformIconUrl(manifest, manifest.platforms.find((item) => item.id === post.platform))}" alt=""></div>${displayPostDate(manifest, post, language, { includeTime: true })}</a></li>`).join('')
+              : `<li class="artwork-posts-empty">${escapeHtml(localeText(manifest.locales, language, 'artworks.noKnownPosts'))}</li>`}
+          </ul>
         </article>`;
       }).join('');
       return mediaHtml;
@@ -1110,6 +1111,9 @@ function adminArtworkSourceFiles(source) {
 
 function buildViewerIndex(manifest) {
   return {
+    viewerStrings: Object.fromEntries(Object.keys(manifest.locales ?? {}).map((language) => [language, {
+      noKnownPosts: localeText(manifest.locales, language, 'artworks.noKnownPosts')
+    }])),
     platforms: Object.fromEntries(manifest.platforms.map((platform) => [platform.id, {
       id: platform.id,
       label: platform.label

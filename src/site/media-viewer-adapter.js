@@ -584,6 +584,12 @@
     return localized(index.platforms?.[platformId]?.label, language) || platformId;
   }
 
+  function viewerString(index, language, key, fallback = '') {
+    return index.viewerStrings?.[language]?.[key]
+      ?? index.viewerStrings?.en?.[key]
+      ?? fallback;
+  }
+
   function postReferenceText(index, post, language, statusOverride = null) {
     const date = formatViewerDate(post.publishedAt, language, post.dateApproximate);
     const platform = viewerPlatformLabel(index, post.platform, language);
@@ -635,31 +641,36 @@
 
       const postIds = [...new Set(media.postIds ?? [])];
       if (currentPost && !postIds.includes(contextId)) postIds.unshift(contextId);
-      if (postIds.length > 0) {
-        const list = document.createElement('div');
-        list.className = 'media-viewer-post-list';
+      const list = document.createElement('div');
+      list.className = 'media-viewer-post-list';
 
-        for (const postId of postIds) {
-          const post = index.posts[postId];
-          if (!post) continue;
-          const isCurrent = Boolean(currentPost && postId === contextId);
-          const status = isCurrent ? currentVersion?.status ?? post.status : post.status;
-          const item = document.createElement(post.href && !isCurrent ? 'a' : 'span');
-          item.className = `media-viewer-post-link${isCurrent ? ' is-current' : ''}`;
-          item.textContent = postReferenceText(index, post, language, status);
+      for (const postId of postIds) {
+        const post = index.posts[postId];
+        if (!post) continue;
+        const isCurrent = Boolean(currentPost && postId === contextId);
+        const status = isCurrent ? currentVersion?.status ?? post.status : post.status;
+        const item = document.createElement(post.href && !isCurrent ? 'a' : 'span');
+        item.className = `media-viewer-post-link${isCurrent ? ' is-current' : ''}`;
+        item.textContent = postReferenceText(index, post, language, status);
 
-          if (item.matches('a')) {
-            item.href = post.href;
-            item.target = '_blank';
-            item.rel = 'noreferrer';
-          } else if (isCurrent) {
-            item.setAttribute('aria-current', 'page');
-          }
-          list.append(item);
+        if (item.matches('a')) {
+          item.href = post.href;
+          item.target = '_blank';
+          item.rel = 'noreferrer';
+        } else if (isCurrent) {
+          item.setAttribute('aria-current', 'page');
         }
-
-        footer.append(list);
+        list.append(item);
       }
+
+      if (list.childElementCount === 0) {
+        const empty = document.createElement('span');
+        empty.className = 'media-viewer-post-link is-empty';
+        empty.textContent = viewerString(index, language, 'noKnownPosts', 'No known posts use this image.');
+        list.append(empty);
+      }
+
+      footer.append(list);
     } catch (error) {
       console.error('Could not render MediaViewer metadata.', error);
     }

@@ -409,15 +409,6 @@ h2 {
   object-fit: contain;
 }
 
-#archive-validation-alert {
-  width: min(var(--page-width), calc(100% - 2rem));
-  margin: 1rem auto 0;
-  padding: 0.8rem 1rem;
-  border: 1px solid #b44;
-  border-radius: 0.7rem;
-  background: color-mix(in srgb, #b44 15%, Canvas);
-}
-
 .feed-loading {
   padding: 1rem;
   text-align: center;
@@ -447,7 +438,7 @@ h2 {
   display: flex;
   align-items: center;
   gap: 0.45rem;
-  width: calc(var(--viewer-side-gutter, 10rem) - 0.65rem);
+  width: 0;
   height: clamp(260px, 70dvh, 640px);
   padding: 0.45rem;
   overflow: hidden;
@@ -464,13 +455,13 @@ h2 {
 }
 
 .media-viewer-switcher-left {
-  left: 0.35rem;
+  left: 0;
   justify-content: flex-end;
   background: linear-gradient(to right, rgb(255 255 255 / 0), rgb(255 255 255 / 0));
 }
 
 .media-viewer-switcher-right {
-  right: 0.35rem;
+  right: 0;
   justify-content: flex-start;
   background: linear-gradient(to left, rgb(255 255 255 / 0), rgb(255 255 255 / 0));
 }
@@ -588,17 +579,13 @@ h2 {
   overscroll-behavior: contain;
 }
 
-#mediaModal {
-  --viewer-side-gutter: clamp(8rem, 15vw, 13rem);
-}
-
 #mediaModal .modal-dialog {
   min-width: 0;
   min-height: 0;
   width: 100%;
   height: 100%;
   margin: 0;
-  padding: clamp(0.75rem, 3vh, 2rem) var(--viewer-side-gutter) 0.75rem;
+  padding: clamp(0.75rem, 3vh, 2rem) clamp(0.75rem, 5vw, 4rem) 0.75rem;
   box-sizing: border-box;
 }
 
@@ -2152,6 +2139,11 @@ h2 {
   background: transparent;
 }
 
+.gallery-item--wide {
+  width: min(var(--gallery-width, 300px), 300px);
+  max-width: 300px;
+}
+
 .gallery-date-divider {
   flex: 0 0 100%;
   width: 100%;
@@ -2199,9 +2191,9 @@ h2 {
   background: transparent;
 }
 
-/* Revisions use the same aligned coordinate system for both preview frames,
-   but the viewBox is the union of the source bounds: no source image is
-   cropped just to force a common intersection. */
+/* Revisions use the same aligned coordinate system for both preview frames.
+   The first version defines the comparison zoom; there is no inner polygon
+   crop, so only the rectangular card frame clips overflowing pixels. */
 .revision-grid {
   display: flex;
   flex-wrap: wrap;
@@ -2362,6 +2354,9 @@ h2 {
 
   .gallery-item--wide {
     grid-column: 1 / -1;
+    justify-self: start;
+    width: min(100%, 300px);
+    max-width: 300px;
     aspect-ratio: var(--gallery-aspect, 3);
   }
 

@@ -170,6 +170,9 @@
       this.ignoreClickUntil = 0;
       this.wheelDelta = 0;
       this.lastWheelSwitch = 0;
+      this.mediaResizeObserver = typeof ResizeObserver === 'function'
+        ? new ResizeObserver(() => requestAnimationFrame(() => this.updateSwitcherPlacement()))
+        : null;
 
       this.leftSwitcher = this.modal.querySelector('.media-viewer-switcher-left');
       this.rightSwitcher = this.modal.querySelector('.media-viewer-switcher-right');
@@ -267,6 +270,7 @@
       this.swipe = null;
       this.wheelDelta = 0;
       this.navigationToken += 1;
+      this.mediaResizeObserver?.disconnect();
 
       this.updateSwitcher(this.leftSwitcher, null, 'prev');
       this.updateSwitcher(this.rightSwitcher, null, 'next');
@@ -418,30 +422,37 @@
       this.renderedMedia = media;
       this.currentElement = sourceElement;
       this.modal.classList.toggle('is-video', media?.matches?.('video') ?? false);
+      this.mediaResizeObserver?.disconnect();
+      if (media) this.mediaResizeObserver?.observe(media);
+
+      // Images and especially videos can change their rendered box after the
+      // viewer opens (video metadata/aspect ratio may arrive a little later).
+      // Recompute the navigation gutters when that happens so the hit areas
+      // still end exactly at the visible media instead of covering it.
+      const refreshPlacement = () => requestAnimationFrame(() => this.updateSwitcherPlacement());
+      media?.addEventListener?.('load', refreshPlacement, { once: true });
+      media?.addEventListener?.('loadedmetadata', refreshPlacement, { once: true });
       this.reflowAlignment();
       requestAnimationFrame(() => this.updateSwitcherPlacement());
     }
 
     updateSwitcherPlacement() {
-      // Navigation lives in fixed side gutters reserved by CSS. Its vertical
-      // band follows the viewer stage, never the dimensions of the current
-      // image/video, so panoramas and portrait media get the same hit area.
       for (const switcher of [this.leftSwitcher, this.rightSwitcher]) {
         switcher?.style.removeProperty('width');
         switcher?.style.removeProperty('height');
         switcher?.style.removeProperty('top');
       }
-      if (window.innerWidth <= 768) return;
+      if (!this.renderedMedia || window.innerWidth <= 768) return;
 
-      const stageRect = this.modal.querySelector('.modal-dialog')?.getBoundingClientRect?.();
-      if (!stageRect || !(stageRect.height > 0)) return;
-      const navigationHeight = Math.min(640, Math.max(260, stageRect.height * 0.78));
-      const navigationCenter = stageRect.top + stageRect.height / 2;
-      for (const switcher of [this.leftSwitcher, this.rightSwitcher]) {
-        if (!switcher) continue;
-        switcher.style.height = `${navigationHeight}px`;
-        switcher.style.top = `${navigationCenter}px`;
-      }
+      // Horizontally the navigation again fills all free space from the edge
+      // of the viewport up to the actual rendered media. Vertically it keeps
+      // the CSS-defined fixed band, independent of image/video height.
+      const rect = this.renderedMedia.getBoundingClientRect?.();
+      if (!rect) return;
+      const leftSpace = Math.max(0, rect.left);
+      const rightSpace = Math.max(0, window.innerWidth - rect.right);
+      if (this.leftSwitcher) this.leftSwitcher.style.width = `${leftSpace}px`;
+      if (this.rightSwitcher) this.rightSwitcher.style.width = `${rightSpace}px`;
     }
 
     reflowAlignment() {

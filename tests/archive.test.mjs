@@ -688,6 +688,7 @@ test('revisions ignore decorative versions, append single-image artworks, and ga
   const css = await fs.readFile(path.join(output, 'assets', 'archive.css'), 'utf8');
   assert.match(css, /\.gallery-grid\s*\{[\s\S]*?display:\s*flex/);
   assert.match(css, /\.gallery-item\s*\{[\s\S]*?width:\s*var\(--gallery-width/);
+  assert.match(css, /\.gallery-item--wide\s*\{[\s\S]*?300px/);
   assert.match(css, /@media \(max-width: 700px\)[\s\S]*?\.gallery-grid\s*\{[\s\S]*?grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/);
   assert.match(css, /\.revision-grid\s*\{[\s\S]*?display:\s*flex/);
   assert.match(css, /\.revision-card--single\s*\{[\s\S]*?max-width:\s*190px/);
@@ -1091,7 +1092,7 @@ test('invalid viewer anchor orientation fields are reported and ignored', async 
   assert.ok(issue.details.some((detail) => detail.includes('rotation')));
 });
 
-test('MediaViewer uses bounded navigation, internal post links, viewer autoplay, and artwork-only alignment', async () => {
+test('MediaViewer uses media-edge navigation, internal post links, viewer autoplay, and artwork-only alignment', async () => {
   const mediaRoot = await createMediaFixture();
   const source = fixtureSource();
   const unsourcedFile = 'pixiv/unsourced.png';
@@ -1150,11 +1151,13 @@ test('MediaViewer uses bounded navigation, internal post links, viewer autoplay,
   assert.match(js, /width \/ 2, y: height/);
   assert.match(css, /\.modal\s*\{[\s\S]*?grid-template-rows:\s*minmax\(0, 1fr\) auto/);
   assert.match(css, /\.modal-subtext\s*\{[\s\S]*?max-height:\s*min\(24dvh, 12rem\)[\s\S]*?overflow:\s*auto/);
-  assert.doesNotMatch(js, /const leftSpace = Math\.max\(0, rect\.left\)/);
-  assert.doesNotMatch(js, /const bandHeight = Math\.min\(/);
-  assert.match(js, /Navigation lives in fixed side gutters reserved by CSS/);
+  assert.match(js, /const leftSpace = Math\.max\(0, rect\.left\)/);
+  assert.match(js, /const rightSpace = Math\.max\(0, window\.innerWidth - rect\.right\)/);
+  assert.match(js, /new ResizeObserver/);
+  assert.match(js, /loadedmetadata/);
+  assert.match(js, /Vertically it keeps[\s\S]*?independent of image\/video height/);
   assert.match(js, /switcher\?\.style\.removeProperty\('width'\)/);
-  assert.match(css, /#mediaModal\s*\{[\s\S]*?--viewer-side-gutter:\s*clamp\(8rem, 15vw, 13rem\)/);
+  assert.doesNotMatch(css, /--viewer-side-gutter/);
   assert.match(css, /\.media-viewer-switcher\s*\{[\s\S]*?position:\s*fixed[\s\S]*?height:\s*clamp\(260px, 70dvh, 640px\)/);
   assert.match(css, /\.media-viewer-switcher-left:hover[\s\S]*?linear-gradient/);
   assert.match(css, /\.media-viewer-switcher-right:hover[\s\S]*?linear-gradient/);
@@ -1171,6 +1174,7 @@ test('MediaViewer uses bounded navigation, internal post links, viewer autoplay,
   assert.equal(viewerIndex.viewerStrings.en.originalPost, 'Open original post');
   assert.equal(viewerIndex.posts['twitter:123456789012345678'].id, '123456789012345678');
   assert.match(artworkHtml, /No known posts use this image\./);
+  assert.doesNotMatch(artworkHtml, /archive-validation/);
   assert.match(artworkHtml, /data-viewer-align="artwork"/);
   assert.doesNotMatch(galleryHtml, /data-viewer-align="artwork"/);
   assert.match(galleryHtml, /data-gallery-static-gif="true"/);

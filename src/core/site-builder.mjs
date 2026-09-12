@@ -400,10 +400,12 @@ function alignedRevisionPreview(manifest, artwork, versions, language) {
     };
   });
 
-  // Use the union of the aligned source bounds rather than their intersection.
-  // This preserves the useful relative positioning/orientation while ensuring
-  // every source image remains fully visible inside its comparison frame.
-  const corners = placements.flatMap((placement) => placement.corners);
+  // Keep the alignment/zoom defined by the first (earliest) preview version.
+  // Other versions are transformed into that same coordinate system, but we
+  // deliberately do not add an inner clipPath. The only clipping is the
+  // rectangular preview frame itself, which keeps the useful comparison zoom
+  // without cutting every image down to the common intersection polygon.
+  const corners = placements[0].corners;
   const xs = corners.map((point) => point.x);
   const ys = corners.map((point) => point.y);
   const minX = Math.min(...xs);
@@ -493,13 +495,13 @@ function renderGalleryItem(manifest, artwork, version, language, index, options 
   const file = manifest.files[media.displayFile];
   const title = displayTitle(artwork, language, manifest.defaultLanguage) ?? artwork.id;
   const ratio = file?.width > 0 && file?.height > 0 ? file.width / file.height : 1;
-  const baseHeight = 168;
+  const baseHeight = 184;
   const isWide = ratio > 2;
   // Regular images share one visual height. Panoramas are the exception:
   // cap their width and reduce their row height proportionally rather than
   // blowing them up into long strips or letterboxing them inside a tall box.
   const targetWidth = isWide
-    ? Math.max(72, Math.min(340, baseHeight * ratio))
+    ? Math.max(72, Math.min(300, baseHeight * ratio))
     : Math.max(72, baseHeight * ratio);
   const targetHeight = isWide ? targetWidth / ratio : baseHeight;
   const separator = options.startsUndatedGroup ? '<div class="gallery-date-divider" aria-hidden="true"></div>' : '';
@@ -1035,13 +1037,11 @@ function layout(manifest, language, relative, options) {
     </nav>
     <nav class="language-nav">${languageNav.map((item) => `<a class="${item.language === language ? 'active' : ''}" href="${escapeAttribute(item.href)}">${escapeHtml(item.language.toUpperCase())}</a>`).join('')}</nav>
   </header>
-  <div id="archive-validation-alert" hidden></div>
   <main>
     ${options.body}
   </main>
   <script src="${escapeAttribute(joinUrl(manifest.site.basePath, 'assets/feed.js'))}" defer></script>
   <script src="${escapeAttribute(joinUrl(manifest.site.basePath, 'assets/media-viewer-adapter.js'))}" defer></script>
-  <script src="${escapeAttribute(joinUrl(manifest.site.basePath, 'assets/aspnet-validation-alert.js'))}" defer></script>
 </body>
 </html>`;
 }

@@ -464,23 +464,30 @@ function revisionIntervalMs(artwork, versions = artwork.versions) {
 }
 
 function revisionPreviewVersions(artwork, versions = artwork.versions) {
-  const ordered = revisionVersionOrder(artwork, versions);
-  const dated = ordered.filter((item) => !Number.isNaN(item.time));
-  const first = dated[0]?.version ?? ordered[0]?.version ?? null;
-  const last = dated.at(-1)?.version ?? ordered.at(-1)?.version ?? null;
+  // Card imagery follows the source artwork version order, not chronology.
+  // `versions` has already been filtered to eligible non-decorative versions
+  // while preserving artwork.versions[] order. Dates remain a separate concern
+  // used only for the interval shown under the card and for card sorting.
+  const first = versions[0] ?? null;
+  const last = versions.at(-1) ?? null;
   if (!first || !last) return [];
-  if (first.key === last.key) {
-    const alternative = ordered.find((item) => item.version.key !== first.key)?.version;
-    return alternative ? [first, alternative] : [first];
+  return first.key === last.key ? [first] : [first, last];
+}
+
+function revisionEndpointDateText(manifest, version, language) {
+  if (!version?.sortAt) return null;
+  const date = formatDate(version.sortAt, language, { includeTime: false });
+  if (version.dateSource === 'knownNotAfter') {
+    return localeText(manifest.locales, language, 'artworks.knownNotAfter', { date });
   }
-  return [first, last];
+  return date;
 }
 
 function revisionDateRangeText(manifest, artwork, language, versions = artwork.versions) {
   const { earliest, latest } = revisionDateBounds(artwork, versions);
   if (!earliest?.sortAt && !latest?.sortAt) return localeText(manifest.locales, language, 'common.unknownDate');
-  const first = earliest?.sortAt ? formatDate(earliest.sortAt, language, { includeTime: false }) : null;
-  const last = latest?.sortAt ? formatDate(latest.sortAt, language, { includeTime: false }) : null;
+  const first = revisionEndpointDateText(manifest, earliest, language);
+  const last = revisionEndpointDateText(manifest, latest, language);
   if (!first || !last || first === last) return first ?? last ?? localeText(manifest.locales, language, 'common.unknownDate');
   return `${first} — ${last}`;
 }
@@ -698,6 +705,27 @@ function renderPostCard(manifest, post, language, index, options = {}) {
   const externalHint = originalHref
     ? `<span class="post-original-link-icon" title="${escapeAttribute(localeText(manifest.locales, language, 'posts.originalPost'))}" aria-label="${escapeAttribute(localeText(manifest.locales, language, 'posts.originalPost'))}">${externalLinkIcon()}</span>`
     : '';
+  const titleMarkup = title ? `<h2>${escapeHtml(title)}</h2>` : '';
+  const descriptionMarkup = description
+    ? `<div class="post-text" lang="${escapeAttribute(version.originalLanguage)}">${linkify(description).replaceAll('\n', '<br>')}</div>`
+    : '';
+  const lostMarkup = isRecoveredMediaOnly(post)
+    ? `<p class="lost-post-note">${escapeHtml(localeText(manifest.locales, language, 'posts.lostMediaOnly'))}</p>`
+    : '';
+  const textMarkup = `${titleMarkup}${descriptionMarkup}${lostMarkup}`;
+  const evidenceMarkup = options.showVersionEvidence ? renderPostVersionEvidence(manifest, post, version, language) : '';
+  const mediaMarkup = renderPostMedia(manifest, post, version, language, index);
+
+  // Tumblr and pixiv conventionally place captions/descriptions below media.
+  // Tumblr reblog evidence is archive/system metadata rather than post content,
+  // so it must precede every part of the post itself, including media.
+  // Other platforms retain the existing text-above-media layout.
+  const bodyMarkup = post.platform === 'tumblr'
+    ? `${evidenceMarkup}${mediaMarkup}${textMarkup}`
+    : post.platform === 'pixiv'
+      ? `${mediaMarkup}${textMarkup}`
+      : `${evidenceMarkup}${textMarkup}${mediaMarkup}`;
+
   return `<article class="post-card post-card--${escapeAttribute(post.platform)}" data-list-item data-post-id="${escapeAttribute(post.key)}" data-post-version="${version.index ?? 0}">
     ${versionLabel}
     <header class="post-header">
@@ -710,11 +738,7 @@ function renderPostCard(manifest, post, language, index, options = {}) {
       <a class="post-version-count" href="${escapeAttribute(href)}">${versionCount} ${escapeHtml(localeText(manifest.locales, language, `common.versions`))}</a>
     </header>
     <div class="post-body">
-      ${title ? `<h2>${escapeHtml(title)}</h2>` : ''}
-      ${description ? `<div class="post-text" lang="${escapeAttribute(version.originalLanguage)}">${linkify(description).replaceAll('\n', '<br>')}</div>` : ''}
-      ${isRecoveredMediaOnly(post) ? `<p class="lost-post-note">${escapeHtml(localeText(manifest.locales, language, 'posts.lostMediaOnly'))}</p>` : ''}
-      ${options.showVersionEvidence ? renderPostVersionEvidence(manifest, post, version, language) : ''}
-      ${renderPostMedia(manifest, post, version, language, index)}
+      ${bodyMarkup}
     </div>
     <!--<footer class="post-footer">
       <a href="${escapeAttribute(href)}">${escapeHtml(localeText(manifest.locales, language, 'common.open'))}</a>
@@ -1251,6 +1275,10 @@ async function buildArtworkPages(outputRoot, manifest, language) {
       const mediaHtml = version.mediaIds.map((mediaId) => {
         const media = manifest.media[mediaId];
         const linkedPosts = (media?.postIds ?? []).map((postId) => postsById.get(postId)).filter(Boolean);
+        const hasPostDate = linkedPosts.some((post) => Boolean(post.publishedAt));
+        const versionDateNote = !hasPostDate && version.sortAt && version.dateSource !== 'post'
+          ? `<p class="artwork-version-date">${escapeHtml(artworkDateText(manifest, version, language))}</p>`
+          : '';
         return `<article class="artwork-media" data-list-item id="${escapeAttribute(version.id)}">
           ${mediaElement(manifest, media, language, title, 'artworkVersion', version.key, { viewerAlignGroup: artwork.id })}
           <!--${media ? renderPlatformLinks(manifest, media, language) : ''}
@@ -1258,6 +1286,7 @@ async function buildArtworkPages(outputRoot, manifest, language) {
             <summary>${escapeHtml(localeText(manifest.locales, language, 'common.files'))}: ${media?.existingFiles.length ?? 0}</summary>
             <ul>${(media?.existingFiles ?? []).map((filePath) => `<li><a href="${escapeAttribute(mediaUrl(manifest, filePath))}">${escapeHtml(filePath)}</a> (${manifest.files[filePath]?.byteLength ?? 0} B)</li>`).join('')}</ul>
           </details>-->
+          ${versionDateNote}
           <ul class="artwork-posts">
             ${linkedPosts.length > 0
               ? linkedPosts.map((post) => `<li><a href="${escapeAttribute(routeUrl(manifest, language, `posts/${encodeURIComponent(post.platform)}/${encodeURIComponent(post.id)}/`))}"><div class="platform-link"><img src="${platformIconUrl(manifest, manifest.platforms.find((item) => item.id === post.platform))}" alt=""></div>${displayPostDate(manifest, post, language, { includeTime: true })}</a></li>`).join('')
@@ -1483,23 +1512,38 @@ function adminArtworkSourceFiles(source) {
 }
 
 function buildViewerIndex(manifest) {
+  const versionByMediaId = new Map();
+  for (const artwork of manifest.artworks) {
+    for (const version of artwork.versions ?? []) {
+      for (const mediaId of version.mediaIds ?? []) versionByMediaId.set(mediaId, version);
+    }
+  }
+
   return {
     viewerStrings: Object.fromEntries(Object.keys(manifest.locales ?? {}).map((language) => [language, {
       noKnownPosts: localeText(manifest.locales, language, 'artworks.noKnownPosts'),
-      originalPost: localeText(manifest.locales, language, 'posts.originalPost')
+      originalPost: localeText(manifest.locales, language, 'posts.originalPost'),
+      versionCreated: localeText(manifest.locales, language, 'artworks.created', { date: '{date}' }),
+      versionKnownNotAfter: localeText(manifest.locales, language, 'artworks.knownNotAfter', { date: '{date}' }),
+      versionFirstPost: localeText(manifest.locales, language, 'artworks.firstPost', { date: '{date}' })
     }])),
     platforms: Object.fromEntries(manifest.platforms.map((platform) => [platform.id, {
       id: platform.id,
       label: platform.label
     }])),
-    media: Object.fromEntries(Object.values(manifest.media).map((media) => [media.id, {
-      displayFile: media.displayFile,
-      files: media.existingFiles,
-      postIds: media.postIds,
-      artworkId: media.artworkId,
-      versionId: media.versionId,
-      viewerAnchor: media.viewerAnchor ?? null
-    }])),
+    media: Object.fromEntries(Object.values(manifest.media).map((media) => {
+      const version = versionByMediaId.get(media.id) ?? null;
+      return [media.id, {
+        displayFile: media.displayFile,
+        files: media.existingFiles,
+        postIds: media.postIds,
+        artworkId: media.artworkId,
+        versionId: media.versionId,
+        versionDate: version?.sortAt ?? null,
+        versionDateSource: version?.dateSource ?? null,
+        viewerAnchor: media.viewerAnchor ?? null
+      }];
+    })),
     posts: Object.fromEntries(manifest.posts.map((post) => [post.key, {
       key: post.key,
       id: post.id,

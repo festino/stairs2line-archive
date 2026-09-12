@@ -672,10 +672,42 @@ test('revisions ignore decorative versions, append single-image artworks, and ga
   assert.match(shortestHtml, /Longest interval first/);
   assert.ok(shortestHtml.indexOf('data-artwork-id="artwork-0001"') < shortestHtml.indexOf('data-artwork-id="artwork-long-interval"'), 'alternate revision order is shortest interval first');
 
-  const previewStart = revisionsHtml.indexOf('class="revision-preview-link"');
-  const earlyVersionImage = revisionsHtml.indexOf('/twitter/revision-early.png', previewStart);
-  const lateVersionImage = revisionsHtml.indexOf('/pixiv/999_p0.png', previewStart);
-  assert.ok(earlyVersionImage >= 0 && lateVersionImage > earlyVersionImage, 'preview order follows version dates rather than version IDs');
+  const mainCardStart = revisionsHtml.indexOf('data-artwork-id="artwork-0001"');
+  const mainCardEnd = revisionsHtml.indexOf('</article>', mainCardStart);
+  const mainCardHtml = revisionsHtml.slice(mainCardStart, mainCardEnd);
+  const firstVersionImage = mainCardHtml.indexOf('/pixiv/999_p0.png');
+  const lastVersionImage = mainCardHtml.indexOf('/twitter/revision-undated.png');
+  assert.ok(firstVersionImage >= 0 && lastVersionImage > firstVersionImage, 'revision previews use the first and last eligible versions in source versions[] order');
+  assert.doesNotMatch(mainCardHtml, /revision-early\.png/, 'dated middle versions do not replace undated source-order endpoints in the preview');
+
+  const approximateFile = 'twitter/revision-approximate.png';
+  await fs.writeFile(path.join(mediaRoot, approximateFile), fakePng(320, 480, 20));
+  const approximateSource = fixtureSource();
+  approximateSource.artworks = [{
+    id: 'artwork-approximate-date',
+    title: { en: 'Approximate date artwork' },
+    versions: [{
+      id: 'v01',
+      scope: 'major',
+      knownNotAfter: '2016-02-22',
+      media: [{ id: 'artwork-approximate-date/v01/m01', files: [approximateFile] }]
+    }],
+    __source: '/source/artworks/approximate.jsonc'
+  }];
+  approximateSource.posts = [];
+  const approximateCompilation = await compileArchive(approximateSource, { mediaRoot });
+  const approximateOutput = await fs.mkdtemp(path.join(os.tmpdir(), 'stairs2line-approximate-version-'));
+  await buildStaticSite(approximateCompilation, approximateSource, approximateOutput, { mediaRoot });
+  const approximateDetail = await fs.readFile(path.join(approximateOutput, 'en', 'artworks', 'artwork-approximate-date', 'index.html'), 'utf8');
+  assert.match(approximateDetail, /Published no later than February 22, 2016/);
+  assert.match(approximateDetail, /No known posts use this image\./);
+  assert.ok(approximateDetail.indexOf('Published no later than February 22, 2016') < approximateDetail.indexOf('No known posts use this image.'), 'approximate non-post dates are shown before the empty post list');
+  const approximateRevisions = await fs.readFile(path.join(approximateOutput, 'en', 'artworks', 'index.html'), 'utf8');
+  assert.match(approximateRevisions, /Published no later than February 22, 2016/, 'revision cards preserve the upper-bound semantics instead of rendering knownNotAfter as an exact date');
+  const approximateViewerIndex = JSON.parse(await fs.readFile(path.join(approximateOutput, 'data', 'viewer-index.json'), 'utf8'));
+  assert.equal(approximateViewerIndex.media['artwork-approximate-date/v01/m01'].versionDate, '2016-02-22');
+  assert.equal(approximateViewerIndex.media['artwork-approximate-date/v01/m01'].versionDateSource, 'knownNotAfter');
+  assert.equal(approximateViewerIndex.viewerStrings.en.versionKnownNotAfter, 'Published no later than {date}');
 
   const popularGallery = await fs.readFile(path.join(output, 'en', 'gallery', 'index.html'), 'utf8');
   const allGallery = await fs.readFile(path.join(output, 'en', 'gallery', 'all', 'index.html'), 'utf8');
@@ -1173,6 +1205,9 @@ test('MediaViewer uses media-edge navigation, internal post links, viewer autopl
   assert.match(css, /\.media-viewer-play-button\s*\{/);
   assert.match(css, /\.media-viewer-post-link\.is-current/);
   assert.match(css, /\.media-viewer-post-list\s*\{[\s\S]*?flex-wrap:\s*nowrap[\s\S]*?height:\s*2rem/);
+  assert.match(css, /\.modal-subtext\.media-viewer-footer--artwork-version\s*\{[\s\S]*?height:\s*calc\(5rem \+ env\(safe-area-inset-bottom\)\)/);
+  assert.match(js, /artworkVersionDateText/);
+  assert.doesNotMatch(js, /localized\(artwork\.title/);
   assert.match(css, /\.media-viewer-post-link\.is-empty/);
   assert.equal(viewerIndex.viewerStrings.en.noKnownPosts, 'No known posts use this image.');
   assert.equal(viewerIndex.viewerStrings.en.originalPost, 'Open original post');
@@ -1372,6 +1407,80 @@ test('media already linked to a known Twitter post is not duplicated as a recove
   assert.equal(compilation.manifest.posts.some((post) => post.recovery?.kind === 'media-only'), false);
 });
 
+
+test('post body ordering follows platform conventions and Tumblr evidence precedes text', async () => {
+  const mediaRoot = await createMediaFixture();
+  const source = fixtureSource();
+  source.posts = [
+    {
+      key: 'twitter:111',
+      platform: 'twitter',
+      id: '111',
+      status: 'alive',
+      publishedAt: '2020-01-01T00:00:00Z',
+      versions: [{
+        originalLanguage: 'en',
+        title: { en: 'Twitter title' },
+        description: { en: 'Twitter description' },
+        media: [TWITTER_FILE]
+      }],
+      __source: '/source/posts/twitter.jsonc'
+    },
+    {
+      key: 'pixiv:222',
+      platform: 'pixiv',
+      id: '222',
+      status: 'alive',
+      publishedAt: '2020-01-02T00:00:00Z',
+      versions: [{
+        originalLanguage: 'en',
+        title: { en: 'Pixiv title' },
+        description: { en: 'Pixiv description' },
+        media: [PIXIV_FILE]
+      }],
+      __source: '/source/posts/pixiv.jsonc'
+    },
+    {
+      key: 'tumblr:333',
+      platform: 'tumblr',
+      id: '333',
+      status: 'alive',
+      publishedAt: '2020-01-03T00:00:00Z',
+      versions: [{
+        originalLanguage: 'en',
+        description: { en: 'Tumblr description' },
+        firstRebloggedAt: '2020-01-04T00:00:00Z',
+        reblogs: [],
+        media: [PIXIV_FILE]
+      }],
+      __source: '/source/posts/tumblr.jsonc'
+    }
+  ];
+
+  const compilation = await compileArchive(source, { mediaRoot });
+  const output = await fs.mkdtemp(path.join(os.tmpdir(), 'stairs2line-post-order-'));
+  await buildStaticSite(compilation, source, output, { mediaRoot });
+
+  const twitterHtml = await fs.readFile(path.join(output, 'en', 'posts', 'twitter', '111', 'index.html'), 'utf8');
+  const twitterBody = twitterHtml.indexOf('class="post-body"');
+  const twitterText = twitterHtml.indexOf('class="post-text"', twitterBody);
+  const twitterMedia = twitterHtml.indexOf('class="post-media-grid', twitterBody);
+  assert.ok(twitterText >= 0 && twitterText < twitterMedia, 'other platforms keep text above media');
+
+  const pixivHtml = await fs.readFile(path.join(output, 'en', 'posts', 'pixiv', '222', 'index.html'), 'utf8');
+  const pixivBody = pixivHtml.indexOf('class="post-body"');
+  const pixivMedia = pixivHtml.indexOf('class="post-media-grid', pixivBody);
+  const pixivTitle = pixivHtml.indexOf('<h2>Pixiv title</h2>', pixivBody);
+  const pixivText = pixivHtml.indexOf('class="post-text"', pixivBody);
+  assert.ok(pixivMedia >= 0 && pixivMedia < pixivTitle && pixivMedia < pixivText, 'pixiv title and description are below media');
+
+  const tumblrHtml = await fs.readFile(path.join(output, 'en', 'posts', 'tumblr', '333', 'index.html'), 'utf8');
+  const tumblrBody = tumblrHtml.indexOf('class="post-body"');
+  const tumblrMedia = tumblrHtml.indexOf('class="post-media-grid', tumblrBody);
+  const tumblrEvidence = tumblrHtml.indexOf('Earliest known reblog:', tumblrBody);
+  const tumblrText = tumblrHtml.indexOf('class="post-text"', tumblrBody);
+  assert.ok(tumblrEvidence >= 0 && tumblrEvidence < tumblrMedia && tumblrMedia < tumblrText, 'Tumblr reblog evidence precedes every part of the post content, then media, then text');
+});
 
 test('canonical post status is top-level and Tumblr versions preserve reblog evidence', async () => {
   const mediaRoot = await createMediaFixture();

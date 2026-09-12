@@ -609,6 +609,41 @@
       ?? fallback;
   }
 
+  function viewerStringWithDate(index, language, key, date, fallback = '{date}') {
+    return viewerString(index, language, key, fallback).replaceAll('{date}', date);
+  }
+
+  function formatViewerDay(value, language) {
+    if (!value) return '';
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return String(value);
+    try {
+      return new Intl.DateTimeFormat(language, {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        timeZone: 'UTC'
+      }).format(date);
+    } catch {
+      return date.toLocaleDateString();
+    }
+  }
+
+  function artworkVersionDateText(index, media, language) {
+    const date = formatViewerDay(media?.versionDate, language);
+    if (!date) return '';
+    if (media.versionDateSource === 'knownNotAfter') {
+      return viewerStringWithDate(index, language, 'versionKnownNotAfter', date, 'Published no later than {date}');
+    }
+    if (media.versionDateSource === 'createdAt') {
+      return viewerStringWithDate(index, language, 'versionCreated', date, 'Created {date}');
+    }
+    // When the version date comes from a post, that same publication date is
+    // already visible in the post chips below. Keep this reserved row empty so
+    // artwork alignment never changes just because the metadata source differs.
+    return '';
+  }
+
   function postReferenceText(index, post, language, statusOverride = null) {
     const date = formatViewerDate(post.publishedAt, language, post.dateApproximate);
     const platform = viewerPlatformLabel(index, post.platform, language);
@@ -628,6 +663,7 @@
     const footer = document.querySelector('.modal-subtext');
     if (!footer) return;
     footer.textContent = '';
+    footer.classList.remove('media-viewer-footer--artwork-version');
 
     try {
       const index = await getViewerIndex();
@@ -656,13 +692,13 @@
       }
 
       if (contextType === 'artworkVersion') {
-        const artwork = index.artworks[media.artworkId];
-        if (artwork) {
-          const line = document.createElement('div');
-          line.className = 'media-viewer-context';
-          line.textContent = `${localized(artwork.title, language) || artwork.id} · ${media.versionId}`;
-          footer.append(line);
-        }
+        footer.classList.add('media-viewer-footer--artwork-version');
+        const dateLine = document.createElement('div');
+        dateLine.className = 'media-viewer-artwork-date';
+        const dateText = artworkVersionDateText(index, media, language);
+        dateLine.textContent = dateText || '\u00a0';
+        if (!dateText) dateLine.setAttribute('aria-hidden', 'true');
+        footer.append(dateLine);
       }
 
       const postIds = [...new Set(media.postIds ?? [])];

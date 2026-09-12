@@ -396,6 +396,17 @@ h2 {
   line-height: 1.35;
 }
 
+.artwork-version-date {
+  margin: 0.75rem 0.9rem -0.15rem;
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.35;
+}
+
+.artwork-version-date + .artwork-posts {
+  margin-top: 0.45rem;
+}
+
 .artwork-posts-empty {
   min-height: 1.5rem;
   display: flex;
@@ -2368,4 +2379,26 @@ h2 {
   .gallery-date-divider {
     grid-column: 1 / -1;
   }
+}
+
+/* Artwork-version viewer metadata must reserve the same vertical space for
+   every version. Alignment is computed inside the remaining media stage, so a
+   version with no posts / an approximate date must not resize that stage. */
+.modal-subtext.media-viewer-footer--artwork-version {
+  display: grid;
+  grid-template-rows: 1.25rem 2rem;
+  row-gap: 0.35rem;
+  height: calc(5rem + env(safe-area-inset-bottom));
+  max-height: calc(5rem + env(safe-area-inset-bottom));
+  overflow: hidden;
+}
+
+.media-viewer-artwork-date {
+  min-width: 0;
+  min-height: 1.25rem;
+  overflow: hidden;
+  color: rgb(255 255 255 / 0.72);
+  line-height: 1.25rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }

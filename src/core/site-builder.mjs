@@ -400,14 +400,23 @@ function alignedRevisionPreview(manifest, artwork, versions, language) {
     };
   });
 
-  // Keep the alignment/zoom defined by the first (earliest) preview version.
-  // Other versions are transformed into that same coordinate system, but we
-  // deliberately do not add an inner clipPath. The only clipping is the
-  // rectangular preview frame itself, which keeps the useful comparison zoom
-  // without cutting every image down to the common intersection polygon.
-  const corners = placements[0].corners;
-  const xs = corners.map((point) => point.x);
-  const ys = corners.map((point) => point.y);
+  // Zoom to the area that is actually shared by all compared versions, as the
+  // original revision cards did. Unlike the original implementation, though,
+  // the shared polygon is only used to choose the SVG viewBox: it is NOT used
+  // as a clipPath. This means both images are magnified around the same common
+  // area, while pixels outside that polygon may still remain visible until the
+  // outer rectangular preview frame clips them.
+  let intersection = placements[0].corners;
+  for (const placement of placements.slice(1)) {
+    intersection = intersectConvexPolygons(intersection, placement.corners);
+  }
+  const area = Math.abs(polygonArea(intersection));
+  if (intersection.length < 3 || !(area > 1e-5)) {
+    return `<a class="revision-preview-link revision-preview-link--fallback${singleClass}" href="${escapeAttribute(detailHref)}">${items.map((item) => `<span class="revision-preview-frame">${item.media ? compactMediaElement(manifest, item.media, title) : ''}</span>`).join('')}</a>`;
+  }
+
+  const xs = intersection.map((point) => point.x);
+  const ys = intersection.map((point) => point.y);
   const minX = Math.min(...xs);
   const maxX = Math.max(...xs);
   const minY = Math.min(...ys);
@@ -495,7 +504,7 @@ function renderGalleryItem(manifest, artwork, version, language, index, options 
   const file = manifest.files[media.displayFile];
   const title = displayTitle(artwork, language, manifest.defaultLanguage) ?? artwork.id;
   const ratio = file?.width > 0 && file?.height > 0 ? file.width / file.height : 1;
-  const baseHeight = 184;
+  const baseHeight = 200;
   const isWide = ratio > 2;
   // Regular images share one visual height. Panoramas are the exception:
   // cap their width and reduce their row height proportionally rather than

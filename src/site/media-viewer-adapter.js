@@ -448,9 +448,10 @@
       // of the viewport up to the actual rendered media. Vertically it keeps
       // the CSS-defined fixed band, independent of image/video height.
       const rect = this.renderedMedia.getBoundingClientRect?.();
-      if (!rect) return;
-      const leftSpace = Math.max(0, rect.left);
-      const rightSpace = Math.max(0, window.innerWidth - rect.right);
+      const viewportRect = this.modal.getBoundingClientRect?.();
+      if (!rect || !viewportRect) return;
+      const leftSpace = Math.max(0, rect.left - viewportRect.left);
+      const rightSpace = Math.max(0, viewportRect.right - rect.right);
       if (this.leftSwitcher) this.leftSwitcher.style.width = `${leftSpace}px`;
       if (this.rightSwitcher) this.rightSwitcher.style.width = `${rightSpace}px`;
     }

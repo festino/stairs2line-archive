@@ -2125,7 +2125,7 @@ h2 {
 .gallery-grid {
   display: flex;
   flex-wrap: wrap;
-  align-items: flex-start;
+  align-items: center;
   gap: 2px;
 }
 
@@ -2192,8 +2192,8 @@ h2 {
 }
 
 /* Revisions use the same aligned coordinate system for both preview frames.
-   The first version defines the comparison zoom; there is no inner polygon
-   crop, so only the rectangular card frame clips overflowing pixels. */
+   The shared visible area defines the comparison zoom, but it is not used as
+   an inner polygon crop: only the rectangular card frame clips overflow. */
 .revision-grid {
   display: flex;
   flex-wrap: wrap;

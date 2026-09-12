@@ -652,6 +652,7 @@ test('revisions ignore decorative versions, append single-image artworks, and ga
   assert.match(revisionsHtml, /class="revision-preview-link"/);
   assert.doesNotMatch(revisionsHtml, /<clipPath id="revision-clip-/);
   assert.match(revisionsHtml, /transform="matrix\(/);
+  assert.match(revisionsHtml, /<svg viewBox="[^"]+"/);
   assert.match(revisionsHtml, /class="revision-section-heading"[^>]*>Single known versions/);
   assert.match(revisionsHtml, /revision-card revision-card--single/);
   assert.match(revisionsHtml, /revision-preview-link revision-preview-link--single/);
@@ -687,8 +688,10 @@ test('revisions ignore decorative versions, append single-image artworks, and ga
 
   const css = await fs.readFile(path.join(output, 'assets', 'archive.css'), 'utf8');
   assert.match(css, /\.gallery-grid\s*\{[\s\S]*?display:\s*flex/);
+  assert.match(css, /\.gallery-grid\s*\{[\s\S]*?align-items:\s*center/);
   assert.match(css, /\.gallery-item\s*\{[\s\S]*?width:\s*var\(--gallery-width/);
   assert.match(css, /\.gallery-item--wide\s*\{[\s\S]*?300px/);
+  assert.match(allGallery, /--gallery-height:200px/);
   assert.match(css, /@media \(max-width: 700px\)[\s\S]*?\.gallery-grid\s*\{[\s\S]*?grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/);
   assert.match(css, /\.revision-grid\s*\{[\s\S]*?display:\s*flex/);
   assert.match(css, /\.revision-card--single\s*\{[\s\S]*?max-width:\s*190px/);
@@ -1151,8 +1154,9 @@ test('MediaViewer uses media-edge navigation, internal post links, viewer autopl
   assert.match(js, /width \/ 2, y: height/);
   assert.match(css, /\.modal\s*\{[\s\S]*?grid-template-rows:\s*minmax\(0, 1fr\) auto/);
   assert.match(css, /\.modal-subtext\s*\{[\s\S]*?max-height:\s*min\(24dvh, 12rem\)[\s\S]*?overflow:\s*auto/);
-  assert.match(js, /const leftSpace = Math\.max\(0, rect\.left\)/);
-  assert.match(js, /const rightSpace = Math\.max\(0, window\.innerWidth - rect\.right\)/);
+  assert.match(js, /const viewportRect = this\.modal\.getBoundingClientRect\?\.\(\)/);
+  assert.match(js, /const leftSpace = Math\.max\(0, rect\.left - viewportRect\.left\)/);
+  assert.match(js, /const rightSpace = Math\.max\(0, viewportRect\.right - rect\.right\)/);
   assert.match(js, /new ResizeObserver/);
   assert.match(js, /loadedmetadata/);
   assert.match(js, /Vertically it keeps[\s\S]*?independent of image\/video height/);

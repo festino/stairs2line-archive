@@ -138,7 +138,9 @@
       },
       "icon": "misc/blog-piapro_favicon.ico",
       "versions": [
-        {}
+        {
+          "banner": null
+        }
       ]
     },
     {
@@ -148,7 +150,9 @@
       },
       "icon": "misc/snowmiku_favicon.ico",
       "versions": [
-        {}
+        {
+          "banner": null
+        }
       ]
     },
     {

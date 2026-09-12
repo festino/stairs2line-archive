@@ -96,7 +96,7 @@ export const DEFAULT_LOCALES = {
       projectDescription: 'Визуальный архив stairs2line: работы и их ревизии, публикации в соцсетях и связанная с ними хронология.',
       galleryDescription: 'Плотная галерея без подписей с фильтрацией по scope.',
       socialsDescription: 'Профили и архив публикаций, сгруппированные по соцсетям.',
-      revisionsDescription: 'Работы с несколькими известными версиями, совмещёнными для сравнения.'
+      revisionsDescription: 'Недекоративные версии работ: несколько версий совмещены для сравнения, одиночные изображения собраны в конце.'
     },
     gallery: {
       pageTitle: 'Галерея',
@@ -134,7 +134,7 @@ export const DEFAULT_LOCALES = {
       artworkVersions: 'Версии работы',
       genericDescription: 'Artwork stairs2line: {versions} версий, {media} медиафайлов.',
       revisionsTitle: 'Ревизии работ',
-      revisionsDescription: 'Работы с несколькими известными версиями, совмещёнными по общей видимой области.'
+      revisionsDescription: 'Недекоративные версии работ: несколько версий совмещаются по общей видимой области, одиночные изображения собраны в конце.'
     },
     posts: {
       pageTitle: 'Посты stairs2line',
@@ -184,7 +184,7 @@ export const DEFAULT_LOCALES = {
       projectDescription: 'A visual archive of stairs2line: artworks and their revisions, posts across social platforms, and the chronology connecting them.',
       galleryDescription: 'A dense image-only gallery with scope filters.',
       socialsDescription: 'Profiles and archived posts grouped by social platform.',
-      revisionsDescription: 'Artworks with multiple known versions, aligned for direct comparison.'
+      revisionsDescription: 'Non-decorative artwork versions, aligned for comparison when several are known; single images are kept at the end.'
     },
     gallery: {
       pageTitle: 'Gallery',
@@ -222,7 +222,7 @@ export const DEFAULT_LOCALES = {
       artworkVersions: 'Artwork versions',
       genericDescription: 'A stairs2line artwork with {versions} versions and {media} media items.',
       revisionsTitle: 'Artwork revisions',
-      revisionsDescription: 'Artwork groups with multiple known versions, aligned to their shared visible area.'
+      revisionsDescription: 'Non-decorative artwork versions: multi-version groups are aligned to their shared visible area, with single images collected at the end.'
     },
     posts: {
       pageTitle: 'stairs2line posts',
@@ -272,7 +272,7 @@ export const DEFAULT_LOCALES = {
       projectDescription: 'stairs2line の作品、改訂版、SNS 投稿、それらをつなぐ時系列をまとめたビジュアルアーカイブです。',
       galleryDescription: 'scope で絞り込める、キャプションなしの画像ギャラリーです。',
       socialsDescription: 'SNS ごとのプロフィールと保存済み投稿を閲覧できます。',
-      revisionsDescription: '複数の既知バージョンがある作品を、位置を合わせて比較できます。'
+      revisionsDescription: '装飾用を除いた既知のバージョンを、複数ある場合は位置を合わせて比較し、単独版は末尾にまとめます。'
     },
     gallery: {
       pageTitle: 'ギャラリー',
@@ -310,7 +310,7 @@ export const DEFAULT_LOCALES = {
       artworkVersions: '作品バージョン',
       genericDescription: 'stairs2line の作品。{versions}バージョン、{media}メディア。',
       revisionsTitle: '作品の改訂履歴',
-      revisionsDescription: '複数の既知バージョンを持つ作品を、共通して見える領域に合わせて表示します。'
+      revisionsDescription: '装飾用を除いた既知のバージョンを表示します。複数版は共通の表示領域で比較し、単独版は末尾にまとめます。'
     },
     posts: {
       pageTitle: 'stairs2line 投稿',

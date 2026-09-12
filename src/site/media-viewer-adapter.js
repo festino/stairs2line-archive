@@ -173,12 +173,14 @@
 
       this.leftSwitcher = this.modal.querySelector('.media-viewer-switcher-left');
       this.rightSwitcher = this.modal.querySelector('.media-viewer-switcher-right');
+      this.closeButton = this.modal.querySelector('.media-viewer-close');
 
       this.onKeyDown = this.onKeyDown.bind(this);
       this.onWheel = this.onWheel.bind(this);
       this.onBackdropClick = this.onBackdropClick.bind(this);
       this.onLeftClick = this.onClick.bind(this, 'prev');
       this.onRightClick = this.onClick.bind(this, 'next');
+      this.onCloseClick = this.onCloseClick.bind(this);
       this.onPointerDown = this.onPointerDown.bind(this);
       this.onPointerUp = this.onPointerUp.bind(this);
       this.onPointerCancel = this.onPointerCancel.bind(this);
@@ -247,7 +249,10 @@
     close() {
       if (!this.modal || this.modal.getAttribute('aria-hidden') === 'true') return;
 
+      for (const video of this.modal.querySelectorAll('video')) video.pause?.();
+
       this.modal.classList.remove('show');
+      this.modal.classList.remove('is-video');
       this.modal.hidden = true;
       this.modal.setAttribute('aria-hidden', 'true');
 
@@ -268,6 +273,7 @@
       for (const switcher of [this.leftSwitcher, this.rightSwitcher]) {
         switcher?.style.removeProperty('width');
         switcher?.style.removeProperty('height');
+        switcher?.style.removeProperty('top');
       }
     }
 
@@ -285,6 +291,7 @@
       window.addEventListener('resize', this.onResize);
       this.leftSwitcher?.addEventListener('click', this.onLeftClick);
       this.rightSwitcher?.addEventListener('click', this.onRightClick);
+      this.closeButton?.addEventListener('click', this.onCloseClick);
     }
 
     unsubscribe() {
@@ -297,25 +304,19 @@
       window.removeEventListener('resize', this.onResize);
       this.leftSwitcher?.removeEventListener('click', this.onLeftClick);
       this.rightSwitcher?.removeEventListener('click', this.onRightClick);
+      this.closeButton?.removeEventListener('click', this.onCloseClick);
     }
 
     onBackdropClick(event) {
       if (Date.now() < this.ignoreClickUntil || !this.canSwitch()) return;
-      if (event.target.closest('.media-viewer-current, .modal-subtext, .media-viewer-switcher')) return;
-
-      const mediaRect = this.renderedMedia?.getBoundingClientRect?.();
-      if (mediaRect) {
-        if (event.clientX < mediaRect.left && this.prev) {
-          this.switchDirection('prev');
-          return;
-        }
-        if (event.clientX > mediaRect.right && this.next) {
-          this.switchDirection('next');
-          return;
-        }
-      }
+      if (event.target.closest('.media-viewer-current, .modal-subtext, .media-viewer-switcher, .media-viewer-close, .media-viewer-play-button')) return;
 
       this.close();
+    }
+
+    onCloseClick(event) {
+      event.stopPropagation();
+      if (this.canSwitch()) this.close();
     }
 
     onKeyDown(event) {
@@ -416,6 +417,7 @@
     setRenderedMedia(media, sourceElement) {
       this.renderedMedia = media;
       this.currentElement = sourceElement;
+      this.modal.classList.toggle('is-video', media?.matches?.('video') ?? false);
       this.reflowAlignment();
       requestAnimationFrame(() => this.updateSwitcherPlacement());
     }
@@ -424,6 +426,7 @@
       for (const switcher of [this.leftSwitcher, this.rightSwitcher]) {
         switcher?.style.removeProperty('width');
         switcher?.style.removeProperty('height');
+        switcher?.style.removeProperty('top');
       }
       if (!this.renderedMedia || window.innerWidth <= 768) return;
 
@@ -431,19 +434,29 @@
       const stageRect = this.modal.querySelector('.modal-dialog')?.getBoundingClientRect?.();
       if (!rect) return;
 
-      // Match the visual hover target to the actual side-click target exactly:
-      // every backdrop pixel left/right of the rendered media is the previous/
-      // next button, while the metadata row remains outside the hit zone.
       const leftSpace = Math.max(0, rect.left);
       const rightSpace = Math.max(0, window.innerWidth - rect.right);
-      const stageHeight = Math.max(0, stageRect?.bottom ?? window.innerHeight);
+      const stageTop = Math.max(0, stageRect?.top ?? 0);
+      const stageBottom = Math.min(window.innerHeight, stageRect?.bottom ?? window.innerHeight);
+      const maxBandHeight = Math.max(0, stageBottom - stageTop);
+      const bandHeight = Math.min(
+        Math.max(96, rect.height * 0.58),
+        Math.max(0, rect.height),
+        Math.max(0, window.innerHeight * 0.56),
+        520,
+        maxBandHeight
+      );
+      const desiredTop = rect.top + (rect.height - bandHeight) / 2;
+      const bandTop = Math.min(Math.max(stageTop, desiredTop), Math.max(stageTop, stageBottom - bandHeight));
       if (this.leftSwitcher) {
         this.leftSwitcher.style.width = `${leftSpace}px`;
-        this.leftSwitcher.style.height = `${stageHeight}px`;
+        this.leftSwitcher.style.height = `${bandHeight}px`;
+        this.leftSwitcher.style.top = `${bandTop}px`;
       }
       if (this.rightSwitcher) {
         this.rightSwitcher.style.width = `${rightSpace}px`;
-        this.rightSwitcher.style.height = `${stageHeight}px`;
+        this.rightSwitcher.style.height = `${bandHeight}px`;
+        this.rightSwitcher.style.top = `${bandTop}px`;
       }
     }
 
@@ -553,6 +566,7 @@
   }
 
   const scriptUrl = document.currentScript?.src ?? document.baseURI;
+  const archiveRootUrl = new URL('../', scriptUrl);
   const viewerIndexUrl = new URL('../data/viewer-index.json', scriptUrl);
   let viewerIndexPromise = null;
 
@@ -607,6 +621,13 @@
     return `${date} · ${platform}${suffix}`;
   }
 
+  function internalPostUrl(post, language) {
+    return new URL(
+      `${encodeURIComponent(language)}/posts/${encodeURIComponent(post.platform)}/${encodeURIComponent(post.id)}/`,
+      archiveRootUrl
+    ).href;
+  }
+
   async function updateFooter(element) {
     const footer = document.querySelector('.modal-subtext');
     if (!footer) return;
@@ -658,18 +679,28 @@
         if (!post) continue;
         const isCurrent = Boolean(currentPost && postId === contextId);
         const status = isCurrent ? currentVersion?.status ?? post.status : post.status;
-        const item = document.createElement(post.href && !isCurrent ? 'a' : 'span');
+        const reference = document.createElement('span');
+        reference.className = 'media-viewer-post-reference';
+        const item = document.createElement('a');
         item.className = `media-viewer-post-link${isCurrent ? ' is-current' : ''}`;
         item.textContent = postReferenceText(index, post, language, status);
+        item.href = internalPostUrl(post, language);
 
-        if (item.matches('a')) {
-          item.href = post.href;
-          item.target = '_blank';
-          item.rel = 'noreferrer';
-        } else if (isCurrent) {
-          item.setAttribute('aria-current', 'page');
+        if (isCurrent) item.setAttribute('aria-current', 'page');
+        reference.append(item);
+
+        if (post.href) {
+          const original = document.createElement('a');
+          original.className = 'media-viewer-post-original';
+          original.href = post.href;
+          original.target = '_blank';
+          original.rel = 'noreferrer';
+          original.textContent = '↗';
+          original.title = viewerString(index, language, 'originalPost', 'Open original post');
+          original.setAttribute('aria-label', original.title);
+          reference.append(original);
         }
-        list.append(item);
+        list.append(reference);
       }
 
       if (list.childElementCount === 0) {
@@ -688,9 +719,11 @@
   function tryPixelateImage(image) {
     if (!image?.matches?.('img')) return;
     const update = () => {
-      const pixelate =
-        image.naturalWidth <= image.clientWidth / 2 &&
-        image.naturalHeight <= image.clientHeight / 2;
+      const tinySource = image.naturalWidth <= 512 || image.naturalHeight <= 512;
+      const stronglyUpscaled =
+        image.clientWidth >= image.naturalWidth * 1.75 &&
+        image.clientHeight >= image.naturalHeight * 1.75;
+      const pixelate = tinySource && stronglyUpscaled;
 
       image.classList.toggle('pixelated', pixelate);
     };
@@ -713,17 +746,37 @@
       ? [media]
       : [...media.querySelectorAll('video')];
 
-    for (const video of videos) {
-      video.autoplay = true;
-      video.play?.().catch(() => {
-        // Browsers may block autoplay when the video is not muted.
-      });
-    }
-
     const container = document.querySelector('#mediaModalContent');
     if (!container) return;
 
+    for (const oldVideo of container.querySelectorAll('video')) oldVideo.pause?.();
     container.replaceChildren(media);
+
+    for (const video of videos) {
+      video.autoplay = false;
+      video.removeAttribute('autoplay');
+      video.controls = true;
+      video.pause?.();
+
+      const playButton = document.createElement('button');
+      playButton.type = 'button';
+      playButton.className = 'media-viewer-play-button';
+      playButton.setAttribute('aria-label', 'Play video');
+      playButton.textContent = '▶';
+      const syncPlayButton = () => {
+        playButton.hidden = !video.paused && !video.ended;
+      };
+      playButton.addEventListener('click', (event) => {
+        event.stopPropagation();
+        if (video.paused || video.ended) video.play?.().catch(() => {});
+        else video.pause?.();
+      });
+      video.addEventListener('play', syncPlayButton);
+      video.addEventListener('pause', syncPlayButton);
+      video.addEventListener('ended', syncPlayButton);
+      container.append(playButton);
+      syncPlayButton();
+    }
 
     const image = media.matches('img') ? media : media.querySelector('img');
     if (image) tryPixelateImage(image);
@@ -740,6 +793,7 @@
           <div id="mediaModalContent" class="fullsize-media fit-media fit-media-copyable"></div>
         </div>
         <div class="modal-subtext"></div>
+        <button type="button" class="media-viewer-close" aria-label="Close media viewer">×</button>
         <button type="button" class="media-viewer-switcher media-viewer-switcher-left hidden" aria-label="Previous media">
           <span class="media-viewer-switcher-chevron" aria-hidden="true">‹</span>
           <span class="media-viewer-switcher-preview" aria-hidden="true"></span>
@@ -778,6 +832,12 @@
       event.preventDefault();
       viewer.show(media, provider);
     });
+
+    const pixelateSources = () => {
+      for (const image of document.querySelectorAll('img[data-viewer-media]')) tryPixelateImage(image);
+    };
+    pixelateSources();
+    document.addEventListener('archive:feed-appended', pixelateSources);
 
     window.MediaViewer = MediaViewer;
     window.showFullSizeCopy = (sourceElement) => showFullSizeCopy(sourceElement, viewer);

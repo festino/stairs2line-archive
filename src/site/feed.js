@@ -1,4 +1,13 @@
 (() => {
+  for (const details of document.querySelectorAll('details.activity-month')) {
+    details.addEventListener('toggle', () => {
+      if (!details.open) return;
+      for (const other of document.querySelectorAll('details.activity-month[open]')) {
+        if (other !== details) other.open = false;
+      }
+    });
+  }
+
   const STORAGE_KEY = 'stairs2line.archive.listMode';
   const list = document.querySelector('[data-paged-list]');
   const pagination = document.querySelector('[data-pagination]');

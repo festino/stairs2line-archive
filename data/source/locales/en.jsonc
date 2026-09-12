@@ -42,7 +42,7 @@
     "artworkVersions": "Artwork versions",
     "genericDescription": "A stairs2line artwork with {versions} versions and {media} media items.",
     "revisionsTitle": "Artwork revisions",
-    "revisionsDescription": "Artwork groups with multiple known versions, aligned to their shared visible area."
+    "revisionsDescription": "Non-decorative artwork versions: multi-version groups are aligned to their shared visible area, with single images collected at the end."
   },
   "posts": {
     "pageTitle": "stairs2line posts",
@@ -80,7 +80,7 @@
     "projectDescription": "A visual archive of stairs2line: artworks and their revisions, posts across social platforms, and the chronology connecting them.",
     "galleryDescription": "A dense image-only gallery with scope filters.",
     "socialsDescription": "Profiles and archived posts grouped by social platform.",
-    "revisionsDescription": "Artworks with multiple known versions, aligned for direct comparison."
+    "revisionsDescription": "Non-decorative artwork versions, aligned for comparison when several are known; single images are kept at the end."
   },
   "gallery": {
     "pageTitle": "Gallery",

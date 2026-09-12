@@ -42,7 +42,7 @@
     "artworkVersions": "作品バージョン",
     "genericDescription": "stairs2line の作品。{versions}バージョン、{media}メディア。",
     "revisionsTitle": "作品の改訂履歴",
-    "revisionsDescription": "複数の既知バージョンを持つ作品を、共通して見える領域に合わせて表示します。"
+    "revisionsDescription": "装飾用を除いた既知のバージョンを表示します。複数版は共通の表示領域で比較し、単独版は末尾にまとめます。"
   },
   "posts": {
     "pageTitle": "stairs2line 投稿",
@@ -80,7 +80,7 @@
     "projectDescription": "stairs2line の作品、改訂版、SNS 投稿、それらをつなぐ時系列をまとめたビジュアルアーカイブです。",
     "galleryDescription": "scope で絞り込める、キャプションなしの画像ギャラリーです。",
     "socialsDescription": "SNS ごとのプロフィールと保存済み投稿を閲覧できます。",
-    "revisionsDescription": "複数の既知バージョンがある作品を、位置を合わせて比較できます。"
+    "revisionsDescription": "装飾用を除いた既知のバージョンを、複数ある場合は位置を合わせて比較し、単独版は末尾にまとめます。"
   },
   "gallery": {
     "pageTitle": "ギャラリー",

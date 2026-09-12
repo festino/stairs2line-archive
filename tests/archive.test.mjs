@@ -420,6 +420,7 @@ test('static pages use the logical media display file and expose paged/feed cont
 
   const homeHtml = await fs.readFile(path.join(output, 'en', 'index.html'), 'utf8');
   assert.match(homeHtml, /<body class="home-page"/);
+  assert.doesNotMatch(homeHtml, /<nav class="site-nav">[\s\S]*?>Home<\/a>/);
   assert.match(homeHtml, /class="home-section-link" href="\/repo\/en\/gallery\/"/);
   assert.match(homeHtml, /class="post-activity"/);
   assert.match(homeHtml, /class="activity-popover"/);
@@ -500,6 +501,9 @@ test('post index uses month activity cells with post thumbnails and no artwork/v
 
   const css = await fs.readFile(path.join(output, 'assets', 'archive.css'), 'utf8');
   assert.match(css, /\.activity-popover\s*\{[\s\S]*?display:\s*block/);
+  const feedJs = await fs.readFile(path.join(output, 'assets', 'feed.js'), 'utf8');
+  assert.match(feedJs, /details\.activity-month\[open\]/);
+  assert.match(feedJs, /if \(other !== details\) other\.open = false/);
 });
 
 test('platform directory uses bounded two-column cards with thumbnail previews', async () => {
@@ -561,26 +565,49 @@ test('platform creation dates support approximate legacy values and appear at th
   assert.ok(oldestCreatedIndex >= 0 && oldestCreatedIndex < oldestPostIndex, 'oldest mode prepends creation before the first post on the first page');
 });
 
-test('revisions show only multi-version artworks, sort date bounds by version dates, and align first/last dated crops', async () => {
+test('revisions ignore decorative versions, append single-image artworks, and gallery separates undated items', async () => {
   const mediaRoot = await createMediaFixture();
+  const earlyFile = 'twitter/revision-early.png';
+  const decorativeFile = 'twitter/revision-decorative.png';
+  const undatedFile = 'twitter/revision-undated.png';
+  await fs.writeFile(path.join(mediaRoot, earlyFile), fakePng(500, 400, 20));
+  await fs.writeFile(path.join(mediaRoot, decorativeFile), fakePng(400, 500, 20));
+  await fs.writeFile(path.join(mediaRoot, undatedFile), fakePng(300, 300, 20));
   const source = fixtureSource();
   source.artworks[0].versions[0].createdAt = '2022-01-01T00:00:00Z';
   source.artworks[0].versions[0].media[0].viewerAnchor = {
     points: [{ x: 200, y: 0 }, { x: 200, y: 400 }]
   };
   source.artworks[0].versions.push({
-    id: 'v99',
-    scope: 'decorative',
+    id: 'v02',
+    scope: 'major',
     createdAt: '2020-01-01T00:00:00Z',
     media: [{
-      id: 'artwork-0001/v99/m01',
-      files: [TWITTER_FILE],
+      id: 'artwork-0001/v02/m01',
+      files: [earlyFile],
       viewerAnchor: {
-        points: [{ x: 200, y: 0 }, { x: 200, y: 400 }],
+        points: [{ x: 250, y: 0 }, { x: 250, y: 400 }],
         flipX: true,
         rotation: 90
       }
     }]
+  });
+  source.artworks[0].versions.push({
+    id: 'v99',
+    scope: 'decorative',
+    createdAt: '2018-01-01T00:00:00Z',
+    media: [{
+      id: 'artwork-0001/v99/m01',
+      files: [decorativeFile],
+      viewerAnchor: {
+        points: [{ x: 200, y: 0 }, { x: 200, y: 500 }]
+      }
+    }]
+  });
+  source.artworks[0].versions.push({
+    id: 'v-undated',
+    scope: 'sketchy',
+    media: [{ id: 'artwork-0001/v-undated/m01', files: [undatedFile] }]
   });
 
   const singleVersionArtwork = structuredClone(source.artworks[0]);
@@ -588,6 +615,12 @@ test('revisions show only multi-version artworks, sort date bounds by version da
   singleVersionArtwork.versions = [structuredClone(singleVersionArtwork.versions[0])];
   singleVersionArtwork.versions[0].media[0].id = 'artwork-single-version/v01/m01';
   source.artworks.push(singleVersionArtwork);
+
+  const decorativeOnlyArtwork = structuredClone(source.artworks[0]);
+  decorativeOnlyArtwork.id = 'artwork-decorative-only';
+  decorativeOnlyArtwork.versions = [structuredClone(source.artworks[0].versions.find((version) => version.id === 'v99'))];
+  decorativeOnlyArtwork.versions[0].media[0].id = 'artwork-decorative-only/v99/m01';
+  source.artworks.push(decorativeOnlyArtwork);
 
   const compilation = await compileArchive(source, { mediaRoot });
   const output = await fs.mkdtemp(path.join(os.tmpdir(), 'stairs2line-revisions-'));
@@ -599,11 +632,17 @@ test('revisions show only multi-version artworks, sort date bounds by version da
   assert.match(revisionsHtml, /class="revision-preview-link"/);
   assert.match(revisionsHtml, /<clipPath id="revision-clip-/);
   assert.match(revisionsHtml, /transform="matrix\(/);
-  assert.doesNotMatch(revisionsHtml, /data-artwork-id="artwork-single-version"/);
+  assert.match(revisionsHtml, /data-artwork-id="artwork-single-version"/);
+  assert.doesNotMatch(revisionsHtml, /data-artwork-id="artwork-decorative-only"/);
+  assert.doesNotMatch(revisionsHtml, /revision-decorative\.png/);
   assert.doesNotMatch(revisionsHtml, /class="tab-list"/);
 
+  const mainArtworkIndex = revisionsHtml.indexOf('data-artwork-id="artwork-0001"');
+  const singleArtworkIndex = revisionsHtml.indexOf('data-artwork-id="artwork-single-version"');
+  assert.ok(mainArtworkIndex >= 0 && singleArtworkIndex > mainArtworkIndex, 'single non-decorative images are appended after real revision groups');
+
   const previewStart = revisionsHtml.indexOf('class="revision-preview-link"');
-  const earlyVersionImage = revisionsHtml.indexOf('/twitter/123456789012345678_ABCDEF123456789.png', previewStart);
+  const earlyVersionImage = revisionsHtml.indexOf('/twitter/revision-early.png', previewStart);
   const lateVersionImage = revisionsHtml.indexOf('/pixiv/999_p0.png', previewStart);
   assert.ok(earlyVersionImage >= 0 && lateVersionImage > earlyVersionImage, 'preview order follows version dates rather than version IDs');
 
@@ -611,10 +650,15 @@ test('revisions show only multi-version artworks, sort date bounds by version da
   const allGallery = await fs.readFile(path.join(output, 'en', 'gallery', 'all', 'index.html'), 'utf8');
   assert.doesNotMatch(popularGallery, /data-version-id="artwork-0001\/v99"/);
   assert.match(allGallery, /data-version-id="artwork-0001\/v99"/);
+  assert.doesNotMatch(allGallery, /data-version-id="artwork-decorative-only\/v99"/);
+  assert.match(allGallery, /class="gallery-date-divider"/);
+  assert.ok(allGallery.indexOf('class="gallery-date-divider"') < allGallery.indexOf('data-version-id="artwork-0001\/v-undated"'));
+  assert.doesNotMatch(allGallery, /data-viewer-align="artwork"/);
 
   const css = await fs.readFile(path.join(output, 'assets', 'archive.css'), 'utf8');
   assert.match(css, /\.gallery-grid\s*\{[\s\S]*?display:\s*flex/);
   assert.match(css, /@media \(max-width: 700px\)[\s\S]*?\.gallery-grid\s*\{[\s\S]*?grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/);
+  assert.match(css, /\.artwork-posts\s*\{[\s\S]*?list-style:\s*none/);
 });
 
 test('platform profile snapshots are versioned and the latest snapshot drives the hero', async () => {
@@ -1014,7 +1058,7 @@ test('invalid viewer anchor orientation fields are reported and ignored', async 
   assert.ok(issue.details.some((detail) => detail.includes('rotation')));
 });
 
-test('MediaViewer uses full hoverable side navigation zones, human dates, inactive current posts, and two-point artwork registration', async () => {
+test('MediaViewer uses bounded navigation, internal post links, explicit video playback, and artwork-only alignment', async () => {
   const mediaRoot = await createMediaFixture();
   const source = fixtureSource();
   const unsourcedFile = 'pixiv/unsourced.png';
@@ -1031,14 +1075,21 @@ test('MediaViewer uses full hoverable side navigation zones, human dates, inacti
   const css = await fs.readFile(path.join(output, 'assets', 'archive.css'), 'utf8');
   const viewerIndex = JSON.parse(await fs.readFile(path.join(output, 'data', 'viewer-index.json'), 'utf8'));
   const artworkHtml = await fs.readFile(path.join(output, 'en', 'artworks', compilation.manifest.artworks[0].slug, 'index.html'), 'utf8');
-  assert.match(js, /event\.clientX < mediaRect\.left && this\.prev/);
-  assert.match(js, /event\.clientX > mediaRect\.right && this\.next/);
+  const galleryHtml = await fs.readFile(path.join(output, 'en', 'gallery', 'index.html'), 'utf8');
+  assert.doesNotMatch(js, /event\.clientX < mediaRect\.left && this\.prev/);
+  assert.doesNotMatch(js, /event\.clientX > mediaRect\.right && this\.next/);
   assert.doesNotMatch(js, /image\.addEventListener\('click',[^\n]*viewer\.close/);
   assert.match(js, /media-viewer-switcher-preview/);
+  assert.match(js, /media-viewer-close/);
+  assert.match(js, /media-viewer-play-button/);
+  assert.match(js, /video\.autoplay = false/);
+  assert.doesNotMatch(js, /video\.autoplay = true/);
   assert.match(js, /pointerdown/);
   assert.match(js, /pointerType !== 'touch'/);
   assert.match(js, /edgeGuard = 28/);
   assert.match(js, /new Intl\.DateTimeFormat\(language/);
+  assert.match(js, /internalPostUrl\(post, language\)/);
+  assert.match(js, /media-viewer-post-original/);
   assert.match(js, /aria-current', 'page'/);
   assert.match(js, /list\.childElementCount === 0/);
   assert.match(js, /media-viewer-post-link is-empty/);
@@ -1054,16 +1105,25 @@ test('MediaViewer uses full hoverable side navigation zones, human dates, inacti
   assert.match(css, /\.modal-subtext\s*\{[\s\S]*?max-height:\s*min\(24dvh, 12rem\)[\s\S]*?overflow:\s*auto/);
   assert.match(js, /const leftSpace = Math\.max\(0, rect\.left\)/);
   assert.match(js, /const rightSpace = Math\.max\(0, window\.innerWidth - rect\.right\)/);
+  assert.match(js, /const bandHeight = Math\.min\(/);
   assert.match(js, /switcher\?\.style\.removeProperty\('width'\)/);
-  assert.match(css, /\.media-viewer-switcher\s*\{[\s\S]*?position:\s*fixed[\s\S]*?width:\s*0[\s\S]*?height:\s*100dvh/);
+  assert.match(css, /\.media-viewer-switcher\s*\{[\s\S]*?position:\s*fixed[\s\S]*?width:\s*0[\s\S]*?height:\s*0/);
   assert.match(css, /\.media-viewer-switcher-left:hover[\s\S]*?linear-gradient/);
   assert.match(css, /\.media-viewer-switcher-right:hover[\s\S]*?linear-gradient/);
   assert.match(css, /\.media-viewer-switcher-preview\s*\{[\s\S]*?height:\s*clamp\(110px, 26vh, 270px\)/);
+  assert.match(css, /\.modal\.is-video \.media-viewer-switcher-preview\s*\{[\s\S]*?display:\s*none/);
+  assert.match(css, /#mediaModalContent img\s*\{[\s\S]*?max-width:\s*min\(90%, 1120px\)/);
+  assert.match(css, /\.media-viewer-close\s*\{/);
+  assert.match(css, /\.media-viewer-play-button\s*\{/);
   assert.match(css, /\.media-viewer-post-link\.is-current/);
   assert.match(css, /\.media-viewer-post-list\s*\{[\s\S]*?flex-wrap:\s*nowrap[\s\S]*?height:\s*2rem/);
   assert.match(css, /\.media-viewer-post-link\.is-empty/);
   assert.equal(viewerIndex.viewerStrings.en.noKnownPosts, 'No known posts use this image.');
+  assert.equal(viewerIndex.viewerStrings.en.originalPost, 'Open original post');
+  assert.equal(viewerIndex.posts['twitter:123456789012345678'].id, '123456789012345678');
   assert.match(artworkHtml, /No known posts use this image\./);
+  assert.match(artworkHtml, /data-viewer-align="artwork"/);
+  assert.doesNotMatch(galleryHtml, /data-viewer-align="artwork"/);
   assert.match(js, /new PageMediaProvider\('\[data-paged-list\], \.post-version-list'\)/);
   assert.match(js, /for \(const root of document\.querySelectorAll\(this\.rootSelector\)\)/);
 });

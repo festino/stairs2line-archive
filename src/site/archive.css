@@ -1963,3 +1963,231 @@ h2 {
     white-space: normal;
   }
 }
+
+/* Home: project summary plus the only cross-platform Activity view. */
+.home-hero {
+  max-width: 74ch;
+  margin-bottom: 1.75rem;
+}
+
+.home-hero > p {
+  margin: 0.65rem 0;
+  font-size: 1.05rem;
+}
+
+.home-sections {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 2.5rem;
+}
+
+.home-section-link {
+  display: grid;
+  gap: 0.35rem;
+  min-height: 8rem;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 0.85rem;
+  background: var(--surface);
+  text-decoration: none;
+}
+
+.home-section-link strong {
+  font-size: 1.1rem;
+}
+
+.home-section-link span {
+  color: var(--muted);
+}
+
+.home-section-link:hover,
+.home-section-link:focus-visible {
+  border-color: color-mix(in srgb, var(--accent) 62%, var(--border));
+}
+
+.home-activity > h2 {
+  margin: 0 0 0.75rem;
+  font-size: clamp(1.35rem, 2.5vw, 2rem);
+}
+
+/* Image-only gallery. Desktop follows the old fixed-height flow; on phones the
+   regular cells become two equal columns, while very wide images get a shorter
+   full-width row. */
+.gallery-page main {
+  --page-width: 1480px;
+}
+
+.gallery-grid {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.gallery-item {
+  flex: 0 0 auto;
+  height: 184px;
+  max-width: 100%;
+  aspect-ratio: var(--gallery-aspect, 1);
+  overflow: hidden;
+  background: transparent;
+}
+
+.gallery-item--wide {
+  height: 118px;
+}
+
+.gallery-item .media-link {
+  display: block;
+  width: 100%;
+  height: 100%;
+  text-decoration: none;
+}
+
+.gallery-item .media-link img,
+.gallery-item .media-link video {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: contain;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+/* Revisions are grouped by artwork. The preview frames intentionally share the
+   same SVG viewBox, so only pixels visible in every aligned crop are shown. */
+.revision-preview-link {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2px;
+  padding: 0;
+  text-decoration: none;
+  background: color-mix(in srgb, Canvas 88%, currentColor 12%);
+}
+
+.revision-preview-frame {
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  aspect-ratio: 1;
+  overflow: hidden;
+  background: Canvas;
+}
+
+.revision-preview-frame svg,
+.revision-preview-frame img,
+.revision-preview-frame video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.revision-card-body {
+  padding: 0.7rem 0.8rem;
+}
+
+.revision-card-body .metadata {
+  margin: 0;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The platform card itself is the primary link. Nested source/post links remain
+   independently clickable above the invisible full-card hit target. */
+.platform-card {
+  position: relative;
+}
+
+.platform-card-hit-area {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: inherit;
+  text-decoration: none;
+}
+
+.platform-card > :not(.platform-card-hit-area) {
+  pointer-events: none;
+}
+
+.platform-card a:not(.platform-card-hit-area) {
+  position: relative;
+  z-index: 3;
+  pointer-events: auto;
+}
+
+.platform-card-hit-area:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.platform-card:has(.platform-card-hit-area:hover) {
+  border-color: color-mix(in srgb, var(--accent) 50%, var(--border));
+}
+
+/* Synthetic timeline entry marking the creation of a social profile/blog. */
+.platform-created-event {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 0.25rem;
+  border-top: 1px dashed var(--border);
+  border-bottom: 1px dashed var(--border);
+  color: var(--muted);
+}
+
+.platform-created-event-icon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 2rem;
+  width: 2rem;
+  height: 2rem;
+}
+
+.platform-created-event-icon img {
+  max-width: 1.4rem;
+  max-height: 1.4rem;
+  object-fit: contain;
+}
+
+.platform-created-event-copy {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 0.6rem;
+}
+
+.platform-created-event-copy strong {
+  color: CanvasText;
+}
+
+@media (max-width: 700px) {
+  .home-sections {
+    grid-template-columns: 1fr;
+  }
+
+  .home-section-link {
+    min-height: 0;
+  }
+
+  .gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2px;
+  }
+
+  .gallery-item {
+    width: 100%;
+    height: auto;
+    max-width: none;
+    aspect-ratio: 1;
+  }
+
+  .gallery-item--wide {
+    grid-column: 1 / -1;
+    aspect-ratio: var(--gallery-aspect, 3);
+  }
+}

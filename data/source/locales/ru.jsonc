@@ -4,7 +4,11 @@
     "artworks": "Работы",
     "posts": "Посты",
     "platforms": "Площадки",
-    "admin": "Редактор"
+    "admin": "Редактор",
+    "home": "Главная",
+    "gallery": "Галерея",
+    "socials": "Соцсети",
+    "revisions": "Ревизии"
   },
   "common": {
     "newest": "Сначала новые",
@@ -36,7 +40,9 @@
     "firstPost": "Первая известная публикация: {date}",
     "noKnownPosts": "Известных публикаций с этим изображением нет.",
     "artworkVersions": "Версии работы",
-    "genericDescription": "Artwork stairs2line: {versions} версий, {media} медиафайлов."
+    "genericDescription": "Artwork stairs2line: {versions} версий, {media} медиафайлов.",
+    "revisionsTitle": "Ревизии работ",
+    "revisionsDescription": "Работы с несколькими известными версиями, совмещёнными по общей видимой области."
   },
   "posts": {
     "pageTitle": "Посты stairs2line",
@@ -60,11 +66,24 @@
     "firstRebloggedAt": "Самый ранний известный репост:",
     "savedReblogs": "Сохранившиеся репосты:",
     "noKnownReblogDate": "дата неизвестна",
-    "noSavedReblogs": "нет"
+    "noSavedReblogs": "нет",
+    "socialsTitle": "Соцсети",
+    "platformCreated": "Создан профиль {platform}"
   },
   "validation": {
     "title": "Проверка архива",
     "errors": "Ошибок: {count}",
     "warnings": "Предупреждений: {count}"
+  },
+  "home": {
+    "sectionsTitle": "Разделы архива",
+    "projectDescription": "Визуальный архив stairs2line: работы и их ревизии, публикации в соцсетях и связанная с ними хронология.",
+    "galleryDescription": "Плотная галерея без подписей с фильтрацией по scope.",
+    "socialsDescription": "Профили и архив публикаций, сгруппированные по соцсетям.",
+    "revisionsDescription": "Работы с несколькими известными версиями, совмещёнными для сравнения."
+  },
+  "gallery": {
+    "pageTitle": "Галерея",
+    "description": "Плотная галерея изображений stairs2line с фильтрацией по scope."
   }
 }

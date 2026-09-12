@@ -4,7 +4,11 @@
     "artworks": "Artworks",
     "posts": "Posts",
     "platforms": "Platforms",
-    "admin": "Editor"
+    "admin": "Editor",
+    "home": "Home",
+    "gallery": "Gallery",
+    "socials": "Socials",
+    "revisions": "Revisions"
   },
   "common": {
     "newest": "Newest first",
@@ -36,7 +40,9 @@
     "firstPost": "First known post: {date}",
     "noKnownPosts": "No known posts use this image.",
     "artworkVersions": "Artwork versions",
-    "genericDescription": "A stairs2line artwork with {versions} versions and {media} media items."
+    "genericDescription": "A stairs2line artwork with {versions} versions and {media} media items.",
+    "revisionsTitle": "Artwork revisions",
+    "revisionsDescription": "Artwork groups with multiple known versions, aligned to their shared visible area."
   },
   "posts": {
     "pageTitle": "stairs2line posts",
@@ -60,11 +66,24 @@
     "firstRebloggedAt": "Earliest known reblog:",
     "savedReblogs": "Preserved reblogs:",
     "noKnownReblogDate": "date unknown",
-    "noSavedReblogs": "none"
+    "noSavedReblogs": "none",
+    "socialsTitle": "Socials",
+    "platformCreated": "{platform} profile created"
   },
   "validation": {
     "title": "Archive validation",
     "errors": "Errors: {count}",
     "warnings": "Warnings: {count}"
+  },
+  "home": {
+    "sectionsTitle": "Archive sections",
+    "projectDescription": "A visual archive of stairs2line: artworks and their revisions, posts across social platforms, and the chronology connecting them.",
+    "galleryDescription": "A dense image-only gallery with scope filters.",
+    "socialsDescription": "Profiles and archived posts grouped by social platform.",
+    "revisionsDescription": "Artworks with multiple known versions, aligned for direct comparison."
+  },
+  "gallery": {
+    "pageTitle": "Gallery",
+    "description": "A dense gallery of stairs2line images, filterable by archive scope."
   }
 }

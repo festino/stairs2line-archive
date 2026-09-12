@@ -3,7 +3,8 @@
   "platforms": [
     {
       "id": "twitter",
-	  "createdAt": 1326635072,
+	  "createdAt": "2012-01-15T13:44:32.000Z",
+	  "dateApproximate": false,
       "label": {
         "default": "Twitter / X"
       },
@@ -54,7 +55,8 @@
     },
     {
       "id": "tumblr",
-	  "createdAt": 1359216801,
+	  "createdAt": "2013-01-26T16:13:21.000Z",
+	  "dateApproximate": false,
       "label": {
         "default": "Tumblr"
       },
@@ -79,7 +81,8 @@
     },
     {
       "id": "pixiv",
-	  "createdBefore": "2013.01.27 02:04:05",
+	  "createdAt": "2013-01-27T02:04:05.000Z",
+	  "dateApproximate": true,
       "label": {
         "default": "pixiv"
       },
@@ -104,7 +107,8 @@
     },
     {
       "id": "instagram",
-	  "createdBefore": "2014-04-12T00:51:28.000Z",
+	  "createdAt": "2014-04-12T00:51:28.000Z",
+	  "dateApproximate": true,
       "label": {
         "default": "Instagram"
       },

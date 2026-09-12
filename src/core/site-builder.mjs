@@ -252,6 +252,242 @@ function renderArtworkCard(manifest, artwork, version, language, index) {
   </article>`;
 }
 
+function orientationMatrix(flipX = false, rotation = 0) {
+  const radians = rotation * Math.PI / 180;
+  const cos = Math.cos(radians);
+  const sin = Math.sin(radians);
+  const mirror = flipX ? -1 : 1;
+  return {
+    a: cos * mirror,
+    b: sin * mirror,
+    c: -sin,
+    d: cos
+  };
+}
+
+function orientPoint(point, width, height, matrix) {
+  const centerX = width / 2;
+  const centerY = height / 2;
+  const x = point.x - centerX;
+  const y = point.y - centerY;
+  return {
+    x: centerX + matrix.a * x + matrix.c * y,
+    y: centerY + matrix.b * x + matrix.d * y
+  };
+}
+
+function revisionPreviewMedia(manifest, version) {
+  const mediaItems = (version?.mediaIds ?? []).map((mediaId) => manifest.media[mediaId]).filter(Boolean);
+  return mediaItems.find((media) => {
+    const file = media?.displayFile ? manifest.files[media.displayFile] : null;
+    return file?.mimeType?.startsWith('image/') && file.width > 0 && file.height > 0;
+  }) ?? mediaItems[0] ?? null;
+}
+
+function revisionGeometry(manifest, media) {
+  const file = media?.displayFile ? manifest.files[media.displayFile] : null;
+  if (!file?.mimeType?.startsWith('image/') || !(file.width > 0) || !(file.height > 0)) return null;
+  const alignment = media.viewerAlignment ?? {};
+  const rawPoints = alignment.points?.length === 2
+    ? alignment.points
+    : [
+      { x: file.width / 2, y: 0 },
+      { x: file.width / 2, y: file.height }
+    ];
+  const matrix = orientationMatrix(Boolean(alignment.flipX), Number(alignment.rotation ?? 0));
+  const points = rawPoints.map((point) => orientPoint(point, file.width, file.height, matrix));
+  const corners = [
+    { x: 0, y: 0 },
+    { x: file.width, y: 0 },
+    { x: file.width, y: file.height },
+    { x: 0, y: file.height }
+  ].map((point) => orientPoint(point, file.width, file.height, matrix));
+  const center = {
+    x: (points[0].x + points[1].x) / 2,
+    y: (points[0].y + points[1].y) / 2
+  };
+  const span = Math.hypot(points[1].x - points[0].x, points[1].y - points[0].y);
+  if (!(span > 0)) return null;
+  return { file, media, width: file.width, height: file.height, points, corners, center, span, matrix };
+}
+
+function polygonArea(points) {
+  let sum = 0;
+  for (let index = 0; index < points.length; index += 1) {
+    const current = points[index];
+    const next = points[(index + 1) % points.length];
+    sum += current.x * next.y - next.x * current.y;
+  }
+  return sum / 2;
+}
+
+function lineIntersection(a, b, c, d) {
+  const r = { x: b.x - a.x, y: b.y - a.y };
+  const s = { x: d.x - c.x, y: d.y - c.y };
+  const denominator = r.x * s.y - r.y * s.x;
+  if (Math.abs(denominator) < 1e-9) return b;
+  const t = ((c.x - a.x) * s.y - (c.y - a.y) * s.x) / denominator;
+  return { x: a.x + t * r.x, y: a.y + t * r.y };
+}
+
+function intersectConvexPolygons(subjectPolygon, clipPolygon) {
+  if (subjectPolygon.length < 3 || clipPolygon.length < 3) return [];
+  let output = subjectPolygon.slice();
+  const orientation = polygonArea(clipPolygon) >= 0 ? 1 : -1;
+  const inside = (a, b, point) => orientation * ((b.x - a.x) * (point.y - a.y) - (b.y - a.y) * (point.x - a.x)) >= -1e-7;
+
+  for (let index = 0; index < clipPolygon.length; index += 1) {
+    const clipStart = clipPolygon[index];
+    const clipEnd = clipPolygon[(index + 1) % clipPolygon.length];
+    const input = output;
+    output = [];
+    if (input.length === 0) break;
+    let previous = input.at(-1);
+    for (const current of input) {
+      const currentInside = inside(clipStart, clipEnd, current);
+      const previousInside = inside(clipStart, clipEnd, previous);
+      if (currentInside) {
+        if (!previousInside) output.push(lineIntersection(previous, current, clipStart, clipEnd));
+        output.push(current);
+      } else if (previousInside) {
+        output.push(lineIntersection(previous, current, clipStart, clipEnd));
+      }
+      previous = current;
+    }
+  }
+  return output;
+}
+
+function alignedRevisionPreview(manifest, artwork, versions, language) {
+  const items = versions.map((version) => ({ version, media: revisionPreviewMedia(manifest, version) }));
+  const geometries = items.map((item) => revisionGeometry(manifest, item.media));
+  const detailHref = routeUrl(manifest, language, `artworks/${artwork.slug}/`);
+  const title = displayTitle(artwork, language, manifest.defaultLanguage) ?? artwork.id;
+
+  if (geometries.some((geometry) => !geometry)) {
+    return `<a class="revision-preview-link revision-preview-link--fallback" href="${escapeAttribute(detailHref)}">${items.map((item) => `<span class="revision-preview-frame">${item.media ? compactMediaElement(manifest, item.media, title) : ''}</span>`).join('')}</a>`;
+  }
+
+  const reference = geometries[0];
+  const placements = geometries.map((geometry) => {
+    const scale = reference.span / geometry.span;
+    const left = reference.center.x - geometry.center.x * scale;
+    const top = reference.center.y - geometry.center.y * scale;
+    const corners = geometry.corners.map((corner) => ({ x: left + corner.x * scale, y: top + corner.y * scale }));
+    const centerX = geometry.width / 2;
+    const centerY = geometry.height / 2;
+    const matrix = geometry.matrix;
+    return {
+      geometry,
+      corners,
+      transform: {
+        a: matrix.a * scale,
+        b: matrix.b * scale,
+        c: matrix.c * scale,
+        d: matrix.d * scale,
+        e: left + scale * (centerX - matrix.a * centerX - matrix.c * centerY),
+        f: top + scale * (centerY - matrix.b * centerX - matrix.d * centerY)
+      }
+    };
+  });
+
+  let intersection = placements[0].corners;
+  for (const placement of placements.slice(1)) intersection = intersectConvexPolygons(intersection, placement.corners);
+  const area = Math.abs(polygonArea(intersection));
+  if (intersection.length < 3 || !(area > 1e-5)) {
+    return `<a class="revision-preview-link revision-preview-link--fallback" href="${escapeAttribute(detailHref)}">${items.map((item) => `<span class="revision-preview-frame">${item.media ? compactMediaElement(manifest, item.media, title) : ''}</span>`).join('')}</a>`;
+  }
+
+  const xs = intersection.map((point) => point.x);
+  const ys = intersection.map((point) => point.y);
+  const minX = Math.min(...xs);
+  const maxX = Math.max(...xs);
+  const minY = Math.min(...ys);
+  const maxY = Math.max(...ys);
+  const width = maxX - minX;
+  const height = maxY - minY;
+  if (!(width > 0) || !(height > 0)) return '';
+  const polygonPoints = intersection.map((point) => `${point.x.toFixed(4)},${point.y.toFixed(4)}`).join(' ');
+  const viewBox = `${minX.toFixed(4)} ${minY.toFixed(4)} ${width.toFixed(4)} ${height.toFixed(4)}`;
+
+  const frames = placements.map((placement, index) => {
+    const file = placement.geometry.file;
+    const src = mediaUrl(manifest, file.path);
+    const clipId = `revision-clip-${stableHash(`${artwork.id}:${versions[index].key}:${index}`)}`;
+    const transform = placement.transform;
+    return `<span class="revision-preview-frame"><svg viewBox="${viewBox}" role="img" aria-label="${escapeAttribute(title)}" preserveAspectRatio="xMidYMid meet">
+      <defs><clipPath id="${clipId}" clipPathUnits="userSpaceOnUse"><polygon points="${polygonPoints}"></polygon></clipPath></defs>
+      <g clip-path="url(#${clipId})"><image href="${escapeAttribute(src)}" width="${placement.geometry.width}" height="${placement.geometry.height}" preserveAspectRatio="none" transform="matrix(${transform.a} ${transform.b} ${transform.c} ${transform.d} ${transform.e} ${transform.f})"></image></g>
+    </svg></span>`;
+  }).join('');
+  return `<a class="revision-preview-link" href="${escapeAttribute(detailHref)}">${frames}</a>`;
+}
+
+function revisionVersionOrder(artwork) {
+  return artwork.versions
+    .map((version, index) => ({ version, index, time: version.sortAt ? Date.parse(version.sortAt) : Number.NaN }))
+    .sort((a, b) => {
+      const aMissing = Number.isNaN(a.time);
+      const bMissing = Number.isNaN(b.time);
+      if (aMissing !== bMissing) return aMissing ? 1 : -1;
+      if (!aMissing && a.time !== b.time) return a.time - b.time;
+      return a.index - b.index;
+    });
+}
+
+function revisionDateBounds(artwork) {
+  const dated = revisionVersionOrder(artwork).filter((item) => !Number.isNaN(item.time));
+  return {
+    earliest: dated[0]?.version ?? null,
+    latest: dated.at(-1)?.version ?? null
+  };
+}
+
+function revisionPreviewVersions(artwork) {
+  const ordered = revisionVersionOrder(artwork);
+  const dated = ordered.filter((item) => !Number.isNaN(item.time));
+  const first = dated[0]?.version ?? ordered[0]?.version ?? null;
+  const last = dated.at(-1)?.version ?? ordered.at(-1)?.version ?? null;
+  if (!first || !last) return [];
+  if (first.key === last.key) {
+    const alternative = ordered.find((item) => item.version.key !== first.key)?.version;
+    return alternative ? [first, alternative] : [first];
+  }
+  return [first, last];
+}
+
+function revisionDateRangeText(manifest, artwork, language) {
+  const { earliest, latest } = revisionDateBounds(artwork);
+  if (!earliest?.sortAt && !latest?.sortAt) return localeText(manifest.locales, language, 'common.unknownDate');
+  const first = earliest?.sortAt ? formatDate(earliest.sortAt, language, { includeTime: false }) : null;
+  const last = latest?.sortAt ? formatDate(latest.sortAt, language, { includeTime: false }) : null;
+  if (!first || !last || first === last) return first ?? last ?? localeText(manifest.locales, language, 'common.unknownDate');
+  return `${first} — ${last}`;
+}
+
+function renderRevisionCard(manifest, artwork, language) {
+  const versions = revisionPreviewVersions(artwork);
+  const href = routeUrl(manifest, language, `artworks/${artwork.slug}/`);
+  const dateRange = revisionDateRangeText(manifest, artwork, language);
+  return `<article class="card revision-card" data-list-item data-artwork-id="${escapeAttribute(artwork.id)}">
+    ${alignedRevisionPreview(manifest, artwork, versions, language)}
+    <div class="card-body revision-card-body">
+      <p class="metadata"><a href="${escapeAttribute(href)}">${escapeHtml(dateRange)}</a></p>
+    </div>
+  </article>`;
+}
+
+function renderGalleryItem(manifest, artwork, version, language, index) {
+  const media = revisionPreviewMedia(manifest, version);
+  if (!media?.displayFile) return '';
+  const file = manifest.files[media.displayFile];
+  const title = displayTitle(artwork, language, manifest.defaultLanguage) ?? artwork.id;
+  const ratio = file?.width > 0 && file?.height > 0 ? file.width / file.height : 1;
+  return `<div class="gallery-item${ratio > 2.25 ? ' gallery-item--wide' : ''}" style="--gallery-aspect:${escapeAttribute(ratio.toFixed(5))}" data-list-item data-version-id="${escapeAttribute(version.key)}">
+    ${mediaElement(manifest, media, language, title, 'artworkVersion', version.key, { eager: index < 4, viewerAlignGroup: artwork.id })}
+  </div>`;
+}
+
 function renderVersionCard(manifest, artwork, version, language, index) {
   const media = manifest.media[version.mediaIds[0]];
   const title = displayTitle(artwork, language, manifest.defaultLanguage);
@@ -283,6 +519,25 @@ function displayPostDate(manifest, post, language, options = {}) {
   return post.dateApproximate
     ? localeText(manifest.locales, language, 'posts.approximateDate', { date })
     : date;
+}
+
+function displayApproximateDate(manifest, value, approximate, language, options = {}) {
+  if (!value) return localeText(manifest.locales, language, 'common.unknownDate');
+  const date = formatDate(value, language, options);
+  return approximate
+    ? localeText(manifest.locales, language, 'posts.approximateDate', { date })
+    : date;
+}
+
+function renderPlatformCreatedEvent(manifest, platform, language) {
+  if (!platform?.createdAt) return '';
+  const icon = platformIconUrl(manifest, platform);
+  const label = platformLabel(platform, language, manifest.defaultLanguage);
+  const date = displayApproximateDate(manifest, platform.createdAt, platform.dateApproximate, language, { includeTime: false });
+  return `<article class="platform-created-event" data-list-item>
+    <span class="platform-created-event-icon">${icon ? `<img src="${escapeAttribute(icon)}" alt="">` : '●'}</span>
+    <span class="platform-created-event-copy"><strong>${escapeHtml(localeText(manifest.locales, language, 'posts.platformCreated', { platform: label }))}</strong><time datetime="${escapeAttribute(platform.createdAt)}">${escapeHtml(date)}</time></span>
+  </article>`;
 }
 
 function fallbackPostTitle(manifest, post, platform, language) {
@@ -581,6 +836,38 @@ function renderPostActivityMap(manifest, posts, language, direction = 'desc') {
   </section>`;
 }
 
+function renderHomeSection(manifest, language, href, titleKey, descriptionKey) {
+  return `<a class="home-section-link" href="${escapeAttribute(routeUrl(manifest, language, href))}">
+    <strong>${escapeHtml(localeText(manifest.locales, language, titleKey))}</strong>
+    <span>${escapeHtml(localeText(manifest.locales, language, descriptionKey))}</span>
+  </a>`;
+}
+
+async function buildHomePage(outputRoot, manifest, language) {
+  const siteTitle = localizedValue(manifest.site.title, language, manifest.defaultLanguage) ?? 'stairs2line';
+  const siteDescription = localizedValue(manifest.site.description, language, manifest.defaultLanguage) ?? '';
+  const body = `<section class="home-hero">
+      <h1>${escapeHtml(siteTitle)}</h1>
+      ${siteDescription ? `<p>${escapeHtml(siteDescription)}</p>` : ''}
+      <p>${escapeHtml(localeText(manifest.locales, language, 'home.projectDescription'))}</p>
+    </section>
+    <section class="home-sections" aria-label="${escapeAttribute(localeText(manifest.locales, language, 'home.sectionsTitle'))}">
+      ${renderHomeSection(manifest, language, 'gallery/', 'nav.gallery', 'home.galleryDescription')}
+      ${renderHomeSection(manifest, language, 'posts/by-platform/', 'nav.socials', 'home.socialsDescription')}
+      ${renderHomeSection(manifest, language, 'artworks/', 'nav.revisions', 'home.revisionsDescription')}
+    </section>
+    <section class="home-activity">
+      <h2>${escapeHtml(localeText(manifest.locales, language, 'posts.activity'))}</h2>
+      ${renderPostActivityMap(manifest, manifest.posts, language, 'desc')}
+    </section>`;
+  await writePage(outputRoot, manifest, language, '', layout(manifest, language, '', {
+    title: `${siteTitle} · ${localeText(manifest.locales, language, 'nav.home')}`,
+    description: siteDescription || localeText(manifest.locales, language, 'home.projectDescription'),
+    bodyClass: 'home-page',
+    body
+  }));
+}
+
 function renderCompactListing(manifest, posts, language, platform) {
   if (platform.id !== 'tumblr') {
     return `<section class="compact-grid compact-grid--${escapeAttribute(platform.id)}" data-paged-list>${posts.map((post) => renderCompactPost(manifest, post, language)).join('')}</section>`;
@@ -648,10 +935,14 @@ function renderPlatformHero(manifest, platform, language, options = {}) {
 function renderToolbar(manifest, language, options) {
   const feedLabel = localeText(manifest.locales, language, 'common.feed');
   const pagesLabel = localeText(manifest.locales, language, 'common.pages');
+  const tabs = options.tabs ?? [];
+  const hasTabs = tabs.length > 0;
+  const hasActions = Boolean(options.sortHref) || options.enableFeed !== false;
+  if (!hasTabs && !hasActions) return '';
   return `<div class="listing-toolbar">
-    <nav class="tab-list" aria-label="View">
-      ${options.tabs.map((tab) => `<a class="${tab.active ? 'active' : ''}" href="${escapeAttribute(tab.href)}">${escapeHtml(tab.label)}</a>`).join('')}
-    </nav>
+    ${hasTabs ? `<nav class="tab-list" aria-label="View">
+      ${tabs.map((tab) => `<a class="${tab.active ? 'active' : ''}" href="${escapeAttribute(tab.href)}">${escapeHtml(tab.label)}</a>`).join('')}
+    </nav>` : '<span></span>'}
     <div class="listing-actions">
       ${options.sortHref ? `<a href="${escapeAttribute(options.sortHref)}">${escapeHtml(options.sortLabel)}</a>` : ''}
       ${options.enableFeed === false ? '' : `<button type="button" data-feed-toggle data-feed-label="${escapeAttribute(feedLabel)}" data-pages-label="${escapeAttribute(pagesLabel)}">${escapeHtml(feedLabel)}</button>`}
@@ -711,11 +1002,12 @@ function layout(manifest, language, relative, options) {
 </head>
 <body${options.bodyClass ? ` class="${escapeAttribute(options.bodyClass)}"` : ''}>
   <header class="site-header">
-    <a class="site-title" href="${escapeAttribute(routeUrl(manifest, language, 'artworks/'))}">${escapeHtml(localizedValue(manifest.site.title, language, manifest.defaultLanguage) ?? 'stairs2line')}</a>
+    <a class="site-title" href="${escapeAttribute(routeUrl(manifest, language, ''))}">${escapeHtml(localizedValue(manifest.site.title, language, manifest.defaultLanguage) ?? 'stairs2line')}</a>
     <nav class="site-nav">
-      <a href="${escapeAttribute(routeUrl(manifest, language, 'artworks/'))}">${escapeHtml(localeText(manifest.locales, language, 'nav.artworks'))}</a>
-      <a href="${escapeAttribute(routeUrl(manifest, language, 'posts/'))}">${escapeHtml(localeText(manifest.locales, language, 'nav.posts'))}</a>
-      <a href="${escapeAttribute(routeUrl(manifest, language, 'posts/by-platform/'))}">${escapeHtml(localeText(manifest.locales, language, 'nav.platforms'))}</a>
+      <a href="${escapeAttribute(routeUrl(manifest, language, ''))}">${escapeHtml(localeText(manifest.locales, language, 'nav.home'))}</a>
+      <a href="${escapeAttribute(routeUrl(manifest, language, 'gallery/'))}">${escapeHtml(localeText(manifest.locales, language, 'nav.gallery'))}</a>
+      <a href="${escapeAttribute(routeUrl(manifest, language, 'posts/by-platform/'))}">${escapeHtml(localeText(manifest.locales, language, 'nav.socials'))}</a>
+      <a href="${escapeAttribute(routeUrl(manifest, language, 'artworks/'))}">${escapeHtml(localeText(manifest.locales, language, 'nav.revisions'))}</a>
     </nav>
     <nav class="language-nav">${languageNav.map((item) => `<a class="${item.language === language ? 'active' : ''}" href="${escapeAttribute(item.href)}">${escapeHtml(item.language.toUpperCase())}</a>`).join('')}</nav>
   </header>
@@ -736,15 +1028,29 @@ async function writePage(outputRoot, manifest, language, relative, html) {
   await fs.writeFile(filePath, html, 'utf8');
 }
 
+async function writeRedirectPage(outputRoot, manifest, language, relative, targetRelative) {
+  const target = routeUrl(manifest, language, targetRelative);
+  await writePage(outputRoot, manifest, language, relative, `<!doctype html><meta charset="utf-8"><meta name="robots" content="noindex,follow"><meta http-equiv="refresh" content="0; url=${escapeAttribute(target)}"><link rel="canonical" href="${escapeAttribute(target)}">`);
+}
+
 async function writePaginatedListing(outputRoot, manifest, language, baseRelative, items, pageSize, renderItem, pageOptions) {
   const pageCount = Math.max(1, Math.ceil(items.length / pageSize));
   for (let page = 1; page <= pageCount; page += 1) {
     const pageItems = items.slice((page - 1) * pageSize, page * pageSize);
     const relative = pageRelative(baseRelative, page);
+    const itemContext = { page, pageCount, pageItems };
+    const beforeItems = typeof pageOptions.beforeItems === 'function'
+      ? pageOptions.beforeItems(itemContext)
+      : (pageOptions.beforeItems ?? '');
+    const afterItems = typeof pageOptions.afterItems === 'function'
+      ? pageOptions.afterItems(itemContext)
+      : (pageOptions.afterItems ?? '');
     const body = `${pageOptions.beforeHeading ?? ''}${pageOptions.heading ? `<h1>${escapeHtml(pageOptions.heading)}</h1>` : ''}
       ${renderToolbar(manifest, language, { ...pageOptions.toolbar, enableFeed: pageCount > 1 })}
       <section class="${escapeAttribute(pageOptions.listClass)}" data-paged-list>
+        ${beforeItems}
         ${pageItems.length > 0 ? pageItems.map((item, index) => renderItem(item, index)).join('\n') : `<p>${escapeHtml(localeText(manifest.locales, language, 'common.noItems'))}</p>`}
+        ${afterItems}
       </section>
       ${renderPagination(manifest, language, baseRelative, page, pageCount)}`;
     const pageTitle = page === 1 ? pageOptions.title : `${pageOptions.title} · ${localeText(manifest.locales, language, 'common.page', { page })}`;
@@ -758,9 +1064,9 @@ async function writePaginatedListing(outputRoot, manifest, language, baseRelativ
   }
 }
 
-function artworkTabs(manifest, language, activeKey, oldest) {
+function galleryTabs(manifest, language, activeKey, oldest) {
   const prefix = (key) => {
-    const segment = key === 'popular' ? 'artworks' : `artworks/${key}`;
+    const segment = key === 'popular' ? 'gallery' : `gallery/${key}`;
     return oldest ? `${segment}/oldest/` : `${segment}/`;
   };
   return Object.keys(SCOPE_FILTERS).map((key) => ({
@@ -775,60 +1081,80 @@ function chooseRepresentativeVersion(artwork, scopes) {
 }
 
 async function buildArtworkListings(outputRoot, manifest, language) {
+  const revisions = manifest.artworks.filter((artwork) => artwork.versions.length > 1);
+  for (const direction of ['desc', 'asc']) {
+    const oldest = direction === 'asc';
+    const baseRelative = oldest ? 'artworks/oldest' : 'artworks';
+    const sorted = [...revisions].sort((a, b) => {
+      const aBounds = revisionDateBounds(a);
+      const bBounds = revisionDateBounds(b);
+      const aDate = direction === 'asc' ? aBounds.earliest?.sortAt : aBounds.latest?.sortAt;
+      const bDate = direction === 'asc' ? bBounds.earliest?.sortAt : bBounds.latest?.sortAt;
+      return compareNullableDates(aDate, bDate, direction) || a.id.localeCompare(b.id);
+    });
+    await writePaginatedListing(
+      outputRoot,
+      manifest,
+      language,
+      baseRelative,
+      sorted,
+      manifest.site.pageSize?.artworks ?? 36,
+      (artwork) => renderRevisionCard(manifest, artwork, language),
+      {
+        heading: localeText(manifest.locales, language, 'artworks.revisionsTitle'),
+        title: `${localeText(manifest.locales, language, 'artworks.revisionsTitle')} · stairs2line`,
+        description: localeText(manifest.locales, language, 'artworks.revisionsDescription'),
+        listClass: 'card-grid revision-grid',
+        bodyClass: 'revisions-page',
+        noindex: oldest,
+        toolbar: {
+          sortHref: routeUrl(manifest, language, oldest ? 'artworks/' : 'artworks/oldest/'),
+          sortLabel: localeText(manifest.locales, language, oldest ? 'common.oldest' : 'common.newest')
+        }
+      }
+    );
+  }
+
+  // The old filtered artwork URLs used the same data model as the gallery.
+  // Keep them as compatibility redirects instead of silently changing meaning.
+  for (const key of ['major', 'versions', 'all']) {
+    await writeRedirectPage(outputRoot, manifest, language, `artworks/${key}`, `gallery/${key}/`);
+    await writeRedirectPage(outputRoot, manifest, language, `artworks/${key}/oldest`, `gallery/${key}/oldest/`);
+  }
+}
+
+async function buildGalleryListings(outputRoot, manifest, language) {
   for (const [filterKey, scopes] of Object.entries(SCOPE_FILTERS)) {
     for (const direction of ['desc', 'asc']) {
       const oldest = direction === 'asc';
-      const baseSegment = filterKey === 'popular' ? 'artworks' : `artworks/${filterKey}`;
+      const baseSegment = filterKey === 'popular' ? 'gallery' : `gallery/${filterKey}`;
       const baseRelative = oldest ? `${baseSegment}/oldest` : baseSegment;
-      const tabs = artworkTabs(manifest, language, filterKey, oldest);
-      const sortHref = routeUrl(manifest, language, oldest ? `${baseSegment}/` : `${baseSegment}/oldest/`);
-      const sortLabel = localeText(manifest.locales, language, oldest ? 'common.oldest' : 'common.newest');
-
-      if (filterKey === 'versions' || filterKey === 'all') {
-        const versions = manifest.artworks.flatMap((artwork) => artwork.versions
-          .filter((version) => scopes.includes(version.scope))
-          .map((version) => ({ artwork, version })))
-          .sort((a, b) => compareNullableDates(a.version.sortAt, b.version.sortAt, direction) || a.version.key.localeCompare(b.version.key));
-        await writePaginatedListing(
-          outputRoot,
-          manifest,
-          language,
-          baseRelative,
-          versions,
-          manifest.site.pageSize?.versions ?? 48,
-          (item, index) => renderVersionCard(manifest, item.artwork, item.version, language, index),
-          {
-            heading: localeText(manifest.locales, language, `artworks.${filterKey}`),
-            title: `${localeText(manifest.locales, language, `artworks.${filterKey}`)} · stairs2line`,
-            description: localizedValue(manifest.site.description, language, manifest.defaultLanguage),
-            listClass: 'card-grid',
-            noindex: oldest,
-            toolbar: { tabs, sortHref, sortLabel }
+      const versions = manifest.artworks.flatMap((artwork) => artwork.versions
+        .filter((version) => scopes.includes(version.scope) && revisionPreviewMedia(manifest, version)?.displayFile)
+        .map((version) => ({ artwork, version })))
+        .sort((a, b) => compareNullableDates(a.version.sortAt, b.version.sortAt, direction) || a.version.key.localeCompare(b.version.key));
+      await writePaginatedListing(
+        outputRoot,
+        manifest,
+        language,
+        baseRelative,
+        versions,
+        manifest.site.pageSize?.versions ?? 48,
+        (item, index) => renderGalleryItem(manifest, item.artwork, item.version, language, index),
+        {
+          heading: null,
+          title: `${localeText(manifest.locales, language, 'gallery.pageTitle')} · stairs2line`,
+          description: localeText(manifest.locales, language, 'gallery.description'),
+          listClass: 'gallery-grid',
+          bodyClass: 'gallery-page',
+          noindex: oldest,
+          toolbar: {
+            tabs: galleryTabs(manifest, language, filterKey, oldest),
+            sortHref: routeUrl(manifest, language, oldest ? `${baseSegment}/` : `${baseSegment}/oldest/`),
+            sortLabel: localeText(manifest.locales, language, oldest ? 'common.oldest' : 'common.newest')
           }
-        );
-      } else {
-        const artworks = manifest.artworks
-          .map((artwork) => ({ artwork, version: chooseRepresentativeVersion(artwork, scopes) }))
-          .filter((item) => item.version)
-          .sort((a, b) => compareNullableDates(a.artwork.sortAt, b.artwork.sortAt, direction) || a.artwork.id.localeCompare(b.artwork.id));
-        await writePaginatedListing(
-          outputRoot,
-          manifest,
-          language,
-          baseRelative,
-          artworks,
-          manifest.site.pageSize?.artworks ?? 36,
-          (item, index) => renderArtworkCard(manifest, item.artwork, item.version, language, index),
-          {
-            heading: localeText(manifest.locales, language, `artworks.${filterKey}`),
-            title: `${localeText(manifest.locales, language, `artworks.${filterKey}`)} · stairs2line`,
-            description: localizedValue(manifest.site.description, language, manifest.defaultLanguage),
-            listClass: 'card-grid',
-            noindex: oldest,
-            toolbar: { tabs, sortHref, sortLabel }
-          }
-        );
-      }
+        }
+      );
     }
   }
 }
@@ -891,42 +1217,7 @@ async function buildArtworkPages(outputRoot, manifest, language) {
   }
 }
 
-function postsTabs(manifest, language, active) {
-  return [
-    {
-      active: active === 'all',
-      href: routeUrl(manifest, language, 'posts/'),
-      label: localeText(manifest.locales, language, 'posts.activity')
-    },
-    {
-      active: active === 'grouped',
-      href: routeUrl(manifest, language, 'posts/by-platform/'),
-      label: localeText(manifest.locales, language, 'posts.grouped')
-    }
-  ];
-}
-
 async function buildPostListings(outputRoot, manifest, language) {
-  for (const direction of ['desc', 'asc']) {
-    const oldest = direction === 'asc';
-    const baseRelative = oldest ? 'posts/oldest' : 'posts';
-    const body = `<h1>${escapeHtml(localeText(manifest.locales, language, 'posts.pageTitle'))}</h1>
-      ${renderToolbar(manifest, language, {
-        tabs: postsTabs(manifest, language, 'all'),
-        sortHref: routeUrl(manifest, language, oldest ? 'posts/' : 'posts/oldest/'),
-        sortLabel: localeText(manifest.locales, language, oldest ? 'common.oldest' : 'common.newest'),
-        enableFeed: false
-      })}
-      ${renderPostActivityMap(manifest, manifest.posts, language, direction)}`;
-    await writePage(outputRoot, manifest, language, baseRelative, layout(manifest, language, `${baseRelative}/`, {
-      title: `${localeText(manifest.locales, language, 'posts.pageTitle')} · stairs2line`,
-      description: localizedValue(manifest.site.description, language, manifest.defaultLanguage),
-      noindex: oldest,
-      bodyClass: 'post-activity-page',
-      body
-    }));
-  }
-
   for (const platform of manifest.platforms) {
     const platformPosts = manifest.posts.filter((post) => post.platform === platform.id);
     if (platformPosts.length === 0) continue;
@@ -941,7 +1232,6 @@ async function buildPostListings(outputRoot, manifest, language) {
       const compactSortHref = routeUrl(manifest, language, oldest ? `${baseSegment}/` : `${baseSegment}/oldest/`);
       const compactBody = `${renderPlatformHero(manifest, platform, language, { oldest, compact: true })}
         ${renderToolbar(manifest, language, {
-          tabs: postsTabs(manifest, language, 'grouped'),
           sortHref: compactSortHref,
           sortLabel: localeText(manifest.locales, language, oldest ? 'common.oldest' : 'common.newest'),
           enableFeed: false
@@ -983,10 +1273,15 @@ async function buildPostListings(outputRoot, manifest, language) {
           bodyClass: `platform-page platform-page--${platform.id} full-platform-page`,
           noindex: oldest,
           toolbar: {
-            tabs: postsTabs(manifest, language, 'grouped'),
             sortHref: routeUrl(manifest, language, oldest ? `${baseSegment}/full/` : `${baseSegment}/full/oldest/`),
             sortLabel: localeText(manifest.locales, language, oldest ? 'common.oldest' : 'common.newest')
-          }
+          },
+          beforeItems: oldest
+            ? ({ page }) => page === 1 ? renderPlatformCreatedEvent(manifest, platform, language) : ''
+            : '',
+          afterItems: !oldest
+            ? ({ page, pageCount }) => page === pageCount ? renderPlatformCreatedEvent(manifest, platform, language) : ''
+            : ''
         }
       );
     }
@@ -1025,11 +1320,12 @@ async function buildPlatformIndex(outputRoot, manifest, language) {
     const href = routeUrl(manifest, language, `posts/platform/${encodeURIComponent(platform.id)}/`);
     const noBanner = platformBannerKnownAbsent(platform);
     return `<article class="platform-card platform-card--${escapeAttribute(platform.id)}${noBanner ? ' platform-card--no-banner' : ''}" data-list-item>
-      <a class="platform-card-banner" href="${escapeAttribute(href)}" aria-label="${escapeAttribute(label)}">${renderPlatformBannerImages(banner)}</a>
+      <a class="platform-card-hit-area" href="${escapeAttribute(href)}" aria-label="${escapeAttribute(label)}"></a>
+      <div class="platform-card-banner">${renderPlatformBannerImages(banner)}</div>
       <div class="platform-card-profile">
-        <a class="platform-card-avatar" href="${escapeAttribute(href)}">${avatar ? `<img src="${escapeAttribute(avatar)}" alt="">` : `<span>${escapeHtml(label.slice(0, 1))}</span>`}${avatar && icon && avatar !== icon ? `<span class="platform-card-platform-icon"><img src="${escapeAttribute(icon)}" alt=""></span>` : ''}</a>
+        <div class="platform-card-avatar">${avatar ? `<img src="${escapeAttribute(avatar)}" alt="">` : `<span>${escapeHtml(label.slice(0, 1))}</span>`}${avatar && icon && avatar !== icon ? `<span class="platform-card-platform-icon"><img src="${escapeAttribute(icon)}" alt=""></span>` : ''}</div>
         <div class="platform-card-copy">
-          <h2><a href="${escapeAttribute(href)}">${escapeHtml(label)}</a></h2>
+          <h2>${escapeHtml(label)}</h2>
           ${account ? `<span class="metadata">${escapeHtml(platform.id === 'twitter' ? `@${account}` : account)}</span>` : ''}
         </div>
         <div class="platform-card-count"><strong>${posts.length}</strong><span>${escapeHtml(localeText(manifest.locales, language, 'common.posts').toLowerCase())}</span></div>
@@ -1040,11 +1336,10 @@ async function buildPlatformIndex(outputRoot, manifest, language) {
       <div class="platform-preview">${previewPosts.map((post) => renderPlatformPreviewPost(manifest, post, language)).join('')}</div>
     </article>`;
   }).join('');
-  const body = `<h1>${escapeHtml(localeText(manifest.locales, language, 'posts.grouped'))}</h1>
-    ${renderToolbar(manifest, language, { tabs: postsTabs(manifest, language, 'grouped'), enableFeed: false })}
+  const body = `<h1>${escapeHtml(localeText(manifest.locales, language, 'posts.socialsTitle'))}</h1>
     <section class="platform-list" data-paged-list>${cards}</section>`;
   await writePage(outputRoot, manifest, language, 'posts/by-platform', layout(manifest, language, 'posts/by-platform/', {
-    title: `${localeText(manifest.locales, language, 'posts.grouped')} · stairs2line`,
+    title: `${localeText(manifest.locales, language, 'posts.socialsTitle')} · stairs2line`,
     description: localizedValue(manifest.site.description, language, manifest.defaultLanguage),
     bodyClass: 'platform-index-page',
     body
@@ -1262,14 +1557,18 @@ export async function buildStaticSite(compilation, source, outputRoot, options =
   }
 
   for (const language of manifest.languages) {
+    await buildHomePage(outputRoot, manifest, language);
+    await buildGalleryListings(outputRoot, manifest, language);
     await buildArtworkListings(outputRoot, manifest, language);
     await buildArtworkPages(outputRoot, manifest, language);
     await buildPostListings(outputRoot, manifest, language);
     await buildPlatformIndex(outputRoot, manifest, language);
     await buildPostPages(outputRoot, manifest, language);
+    await writeRedirectPage(outputRoot, manifest, language, 'posts', '');
+    await writeRedirectPage(outputRoot, manifest, language, 'posts/oldest', '');
   }
 
-  const rootRedirect = `<!doctype html><meta charset="utf-8"><meta http-equiv="refresh" content="0; url=${escapeAttribute(routeUrl(manifest, manifest.defaultLanguage, 'artworks/'))}"><link rel="canonical" href="${escapeAttribute(routeUrl(manifest, manifest.defaultLanguage, 'artworks/'))}">`;
+  const rootRedirect = `<!doctype html><meta charset="utf-8"><meta http-equiv="refresh" content="0; url=${escapeAttribute(routeUrl(manifest, manifest.defaultLanguage, ''))}"><link rel="canonical" href="${escapeAttribute(routeUrl(manifest, manifest.defaultLanguage, ''))}">`;
   await fs.writeFile(path.join(outputRoot, 'index.html'), rootRedirect, 'utf8');
   await writeSitemaps(outputRoot, manifest);
 

@@ -378,6 +378,7 @@ test('static pages use the logical media display file and expose paged/feed cont
   const mediaRoot = await createMediaFixture();
   const source = fixtureSource();
   source.site.pageSize.artworks = 1;
+  source.site.pageSize.versions = 1;
   const secondArtwork = structuredClone(source.artworks[0]);
   secondArtwork.id = 'artwork-0002';
   secondArtwork.versions[0].key = undefined;
@@ -387,11 +388,13 @@ test('static pages use the logical media display file and expose paged/feed cont
   const output = await fs.mkdtemp(path.join(os.tmpdir(), 'stairs2line-site-'));
   await buildStaticSite(compilation, source, output, { mediaRoot, copyMedia: true });
 
-  const artworkHtml = await fs.readFile(path.join(output, 'en', 'artworks', 'index.html'), 'utf8');
-  assert.match(artworkHtml, /<img[^>]+src="\/repo\/media\/stairs2line\/pixiv\/999_p0\.png"/);
-  assert.match(artworkHtml, /data-feed-toggle/);
-  assert.match(artworkHtml, /data-paged-list/);
-  assert.match(artworkHtml, /href="\/repo\/en\/artworks\/oldest\/"/);
+  const galleryHtml = await fs.readFile(path.join(output, 'en', 'gallery', 'index.html'), 'utf8');
+  assert.match(galleryHtml, /<img[^>]+src="\/repo\/media\/stairs2line\/pixiv\/999_p0\.png"/);
+  assert.match(galleryHtml, /data-feed-toggle/);
+  assert.match(galleryHtml, /class="gallery-grid"/);
+  assert.match(galleryHtml, /href="\/repo\/en\/gallery\/oldest\/"/);
+  assert.match(galleryHtml, /href="\/repo\/en\/gallery\/major\/"/);
+  assert.doesNotMatch(galleryHtml, /class="card artwork-card"/);
 
   const twitterHtml = await fs.readFile(path.join(output, 'en', 'posts', 'platform', 'twitter', 'index.html'), 'utf8');
   assert.match(twitterHtml, /compact-grid--twitter/);
@@ -415,11 +418,15 @@ test('static pages use the logical media display file and expose paged/feed cont
   const twitterCompactHtml = await fs.readFile(path.join(output, 'en', 'posts', 'platform', 'twitter', 'compact', 'index.html'), 'utf8');
   assert.match(twitterCompactHtml, /compact-grid--twitter/);
 
+  const homeHtml = await fs.readFile(path.join(output, 'en', 'index.html'), 'utf8');
+  assert.match(homeHtml, /<body class="home-page"/);
+  assert.match(homeHtml, /class="home-section-link" href="\/repo\/en\/gallery\/"/);
+  assert.match(homeHtml, /class="post-activity"/);
+  assert.match(homeHtml, /class="activity-popover"/);
+  assert.doesNotMatch(homeHtml, /class="post-list"/);
+
   const postsHtml = await fs.readFile(path.join(output, 'en', 'posts', 'index.html'), 'utf8');
-  assert.match(postsHtml, /<body class="post-activity-page"/);
-  assert.match(postsHtml, /class="post-activity"/);
-  assert.match(postsHtml, /class="activity-popover"/);
-  assert.doesNotMatch(postsHtml, /class="post-list"/);
+  assert.match(postsHtml, /http-equiv="refresh" content="0; url=\/repo\/en\/"/);
 
   const archiveCss = await fs.readFile(path.join(output, 'assets', 'archive.css'), 'utf8');
   assert.match(archiveCss, /\.platform-page \.post-card \.post-media-item \.media-link img,[\s\S]*?max-height:\s*min\(62dvh, 680px\)/);
@@ -483,7 +490,7 @@ test('post index uses month activity cells with post thumbnails and no artwork/v
   const output = await fs.mkdtemp(path.join(os.tmpdir(), 'stairs2line-activity-site-'));
   await buildStaticSite(compilation, source, output, { mediaRoot });
 
-  const html = await fs.readFile(path.join(output, 'en', 'posts', 'index.html'), 'utf8');
+  const html = await fs.readFile(path.join(output, 'en', 'index.html'), 'utf8');
   assert.match(html, /<section class="activity-year"><h2>2020<\/h2>/);
   assert.match(html, /<details class="activity-month"[^>]*>[\s\S]*?<span class="activity-month-dot" data-activity-level="[1-5]"><span>2<\/span>/);
   assert.match(html, /activity-post-thumbnail/);
@@ -503,7 +510,9 @@ test('platform directory uses bounded two-column cards with thumbnail previews',
   await buildStaticSite(compilation, source, output, { mediaRoot });
 
   const html = await fs.readFile(path.join(output, 'en', 'posts', 'by-platform', 'index.html'), 'utf8');
+  assert.match(html, /<h1>Socials<\/h1>/);
   assert.match(html, /class="platform-list"/);
+  assert.match(html, /class="platform-card-hit-area" href="\/repo\/en\/posts\/platform\/twitter\/"/);
   assert.match(html, /class="platform-preview-post"/);
   assert.match(html, /class="platform-source-link" href="https:\/\/twitter\.com\/stairs2line"[^>]*>Official page/);
   assert.doesNotMatch(html, /<div class="platform-preview"><article class="post-card/);
@@ -514,6 +523,98 @@ test('platform directory uses bounded two-column cards with thumbnail previews',
   const css = await fs.readFile(path.join(output, 'assets', 'archive.css'), 'utf8');
   assert.match(css, /\.platform-list\s*\{[\s\S]*?grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/);
   assert.match(css, /\.platform-card-bio[\s\S]*?-webkit-line-clamp:\s*3/);
+  assert.match(css, /\.platform-card-hit-area\s*\{[\s\S]*?inset:\s*0/);
+});
+
+test('platform creation dates support approximate legacy values and appear at the chronological edge of full listings', async () => {
+  const mediaRoot = await createMediaFixture();
+  const source = fixtureSource();
+  source.site.pageSize.posts = 1;
+  source.platforms.platforms[0].createdBefore = '2019.12.31 10:00:00';
+  source.posts.push({
+    key: 'twitter:123456789012345679',
+    platform: 'twitter',
+    id: '123456789012345679',
+    status: 'alive',
+    publishedAt: '2020-01-02T00:00:00Z',
+    versions: [{ originalLanguage: 'en', title: { en: 'Second post' }, media: [TWITTER_FILE] }],
+    __source: '/source/posts/twitter.jsonc'
+  });
+
+  const compilation = await compileArchive(source, { mediaRoot });
+  const twitter = compilation.manifest.platforms.find((platform) => platform.id === 'twitter');
+  assert.equal(twitter.createdAt, '2019-12-31T10:00:00.000Z');
+  assert.equal(twitter.dateApproximate, true);
+
+  const output = await fs.mkdtemp(path.join(os.tmpdir(), 'stairs2line-platform-created-'));
+  await buildStaticSite(compilation, source, output, { mediaRoot });
+
+  const newestLast = await fs.readFile(path.join(output, 'en', 'posts', 'platform', 'twitter', 'full', 'page', '2', 'index.html'), 'utf8');
+  const newestPostIndex = newestLast.indexOf('class="post-card');
+  const newestCreatedIndex = newestLast.indexOf('class="platform-created-event"');
+  assert.ok(newestPostIndex >= 0 && newestCreatedIndex > newestPostIndex, 'newest mode appends creation after the oldest post on the last page');
+  assert.match(newestLast, /≈ December 31, 2019/);
+
+  const oldestFirst = await fs.readFile(path.join(output, 'en', 'posts', 'platform', 'twitter', 'full', 'oldest', 'index.html'), 'utf8');
+  const oldestPostIndex = oldestFirst.indexOf('class="post-card');
+  const oldestCreatedIndex = oldestFirst.indexOf('class="platform-created-event"');
+  assert.ok(oldestCreatedIndex >= 0 && oldestCreatedIndex < oldestPostIndex, 'oldest mode prepends creation before the first post on the first page');
+});
+
+test('revisions show only multi-version artworks, sort date bounds by version dates, and align first/last dated crops', async () => {
+  const mediaRoot = await createMediaFixture();
+  const source = fixtureSource();
+  source.artworks[0].versions[0].createdAt = '2022-01-01T00:00:00Z';
+  source.artworks[0].versions[0].media[0].viewerAnchor = {
+    points: [{ x: 200, y: 0 }, { x: 200, y: 400 }]
+  };
+  source.artworks[0].versions.push({
+    id: 'v99',
+    scope: 'decorative',
+    createdAt: '2020-01-01T00:00:00Z',
+    media: [{
+      id: 'artwork-0001/v99/m01',
+      files: [TWITTER_FILE],
+      viewerAnchor: {
+        points: [{ x: 200, y: 0 }, { x: 200, y: 400 }],
+        flipX: true,
+        rotation: 90
+      }
+    }]
+  });
+
+  const singleVersionArtwork = structuredClone(source.artworks[0]);
+  singleVersionArtwork.id = 'artwork-single-version';
+  singleVersionArtwork.versions = [structuredClone(singleVersionArtwork.versions[0])];
+  singleVersionArtwork.versions[0].media[0].id = 'artwork-single-version/v01/m01';
+  source.artworks.push(singleVersionArtwork);
+
+  const compilation = await compileArchive(source, { mediaRoot });
+  const output = await fs.mkdtemp(path.join(os.tmpdir(), 'stairs2line-revisions-'));
+  await buildStaticSite(compilation, source, output, { mediaRoot });
+
+  const revisionsHtml = await fs.readFile(path.join(output, 'en', 'artworks', 'index.html'), 'utf8');
+  assert.match(revisionsHtml, /Artwork revisions/);
+  assert.match(revisionsHtml, /January 1, 2020 — January 1, 2022/);
+  assert.match(revisionsHtml, /class="revision-preview-link"/);
+  assert.match(revisionsHtml, /<clipPath id="revision-clip-/);
+  assert.match(revisionsHtml, /transform="matrix\(/);
+  assert.doesNotMatch(revisionsHtml, /data-artwork-id="artwork-single-version"/);
+  assert.doesNotMatch(revisionsHtml, /class="tab-list"/);
+
+  const previewStart = revisionsHtml.indexOf('class="revision-preview-link"');
+  const earlyVersionImage = revisionsHtml.indexOf('/twitter/123456789012345678_ABCDEF123456789.png', previewStart);
+  const lateVersionImage = revisionsHtml.indexOf('/pixiv/999_p0.png', previewStart);
+  assert.ok(earlyVersionImage >= 0 && lateVersionImage > earlyVersionImage, 'preview order follows version dates rather than version IDs');
+
+  const popularGallery = await fs.readFile(path.join(output, 'en', 'gallery', 'index.html'), 'utf8');
+  const allGallery = await fs.readFile(path.join(output, 'en', 'gallery', 'all', 'index.html'), 'utf8');
+  assert.doesNotMatch(popularGallery, /data-version-id="artwork-0001\/v99"/);
+  assert.match(allGallery, /data-version-id="artwork-0001\/v99"/);
+
+  const css = await fs.readFile(path.join(output, 'assets', 'archive.css'), 'utf8');
+  assert.match(css, /\.gallery-grid\s*\{[\s\S]*?display:\s*flex/);
+  assert.match(css, /@media \(max-width: 700px\)[\s\S]*?\.gallery-grid\s*\{[\s\S]*?grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/);
 });
 
 test('platform profile snapshots are versioned and the latest snapshot drives the hero', async () => {

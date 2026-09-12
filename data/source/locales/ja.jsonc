@@ -4,7 +4,11 @@
     "artworks": "作品",
     "posts": "投稿",
     "platforms": "プラットフォーム",
-    "admin": "編集"
+    "admin": "編集",
+    "home": "ホーム",
+    "gallery": "ギャラリー",
+    "socials": "SNS",
+    "revisions": "改訂履歴"
   },
   "common": {
     "newest": "新しい順",
@@ -36,7 +40,9 @@
     "firstPost": "最初に確認された投稿: {date}",
     "noKnownPosts": "この画像を含む既知の投稿はありません。",
     "artworkVersions": "作品バージョン",
-    "genericDescription": "stairs2line の作品。{versions}バージョン、{media}メディア。"
+    "genericDescription": "stairs2line の作品。{versions}バージョン、{media}メディア。",
+    "revisionsTitle": "作品の改訂履歴",
+    "revisionsDescription": "複数の既知バージョンを持つ作品を、共通して見える領域に合わせて表示します。"
   },
   "posts": {
     "pageTitle": "stairs2line 投稿",
@@ -60,11 +66,24 @@
     "firstRebloggedAt": "最も早く確認されたリブログ:",
     "savedReblogs": "保存されているリブログ:",
     "noKnownReblogDate": "日付不明",
-    "noSavedReblogs": "なし"
+    "noSavedReblogs": "なし",
+    "socialsTitle": "SNS",
+    "platformCreated": "{platform} のプロフィールを作成"
   },
   "validation": {
     "title": "アーカイブ検証",
     "errors": "エラー: {count}",
     "warnings": "警告: {count}"
+  },
+  "home": {
+    "sectionsTitle": "アーカイブ",
+    "projectDescription": "stairs2line の作品、改訂版、SNS 投稿、それらをつなぐ時系列をまとめたビジュアルアーカイブです。",
+    "galleryDescription": "scope で絞り込める、キャプションなしの画像ギャラリーです。",
+    "socialsDescription": "SNS ごとのプロフィールと保存済み投稿を閲覧できます。",
+    "revisionsDescription": "複数の既知バージョンがある作品を、位置を合わせて比較できます。"
+  },
+  "gallery": {
+    "pageTitle": "ギャラリー",
+    "description": "scope で絞り込める stairs2line の画像ギャラリーです。"
   }
 }

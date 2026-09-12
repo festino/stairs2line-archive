@@ -1,6 +1,6 @@
 import path from 'node:path';
 import { buildFileCatalog, extractLegacyMediaId } from './file-catalog.mjs';
-import { earliestDate, latestDate, twitterMediaDate } from './dates.mjs';
+import { earliestDate, latestDate, normalizeUnixTime, twitterMediaDate } from './dates.mjs';
 import { localizedValue } from './localization.mjs';
 import { upgradeSourcePosts } from './source-upgrader.mjs';
 import { normalizePath, stableHash, unique } from './util.mjs';
@@ -100,6 +100,34 @@ function buildPostUrl(post, platform) {
 
 function hasOwn(value, key) {
   return value != null && Object.prototype.hasOwnProperty.call(value, key);
+}
+
+function normalizeArchiveDate(value) {
+  if (value === undefined || value === null || value === '') return null;
+  if (typeof value === 'number' || /^\d{9,13}$/.test(String(value))) {
+    return normalizeUnixTime(value);
+  }
+
+  const stringValue = String(value).trim();
+  const legacyMatch = stringValue.match(/^(\d{4})[.](\d{2})[.](\d{2})(?:\s+(\d{2}):(\d{2}):(\d{2}))?$/);
+  if (legacyMatch) {
+    const [, year, month, day, hour = '00', minute = '00', second = '00'] = legacyMatch;
+    return `${year}-${month}-${day}T${hour}:${minute}:${second}.000Z`;
+  }
+
+  const timestamp = Date.parse(stringValue);
+  if (Number.isNaN(timestamp)) return null;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(stringValue)) return stringValue;
+  return new Date(timestamp).toISOString();
+}
+
+function normalizePlatformCreationDate(platform) {
+  const usesLegacyUpperBound = hasOwn(platform, 'createdBefore') && !hasOwn(platform, 'createdAt');
+  const rawValue = hasOwn(platform, 'createdAt') ? platform.createdAt : platform.createdBefore;
+  return {
+    createdAt: normalizeArchiveDate(rawValue),
+    dateApproximate: Boolean(platform.dateApproximate ?? usesLegacyUpperBound)
+  };
 }
 
 function sourcePlatformVersions(platform) {
@@ -209,6 +237,7 @@ function normalizeViewerAnchor(value, declaredFiles, displayFile, filesByPath, i
 
 function compilePlatforms(sourcePlatforms, filesByPath, issues, options) {
   return sourcePlatforms.map((sourcePlatform) => {
+    const creationDate = normalizePlatformCreationDate(sourcePlatform);
     const versions = sourcePlatformVersions(sourcePlatform).map((sourceVersion, index) => {
       const avatar = normalizedOptionalAsset(sourceVersion, 'avatar');
       const banner = normalizedOptionalAsset(sourceVersion, 'banner');
@@ -252,11 +281,16 @@ function compilePlatforms(sourcePlatforms, filesByPath, issues, options) {
       sourceUrl: ignoredSourceUrl,
       avatar: ignoredAvatar,
       banner: ignoredBanner,
+      createdBefore: ignoredCreatedBefore,
+      createdAt: ignoredCreatedAt,
+      dateApproximate: ignoredDateApproximate,
       ...stablePlatform
     } = sourcePlatform;
 
     return {
       ...stripInternal(stablePlatform),
+      createdAt: creationDate.createdAt,
+      dateApproximate: creationDate.dateApproximate,
       versions,
       currentVersionIndex: Math.max(0, versions.length - 1),
       account: currentVersion.account,

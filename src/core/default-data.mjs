@@ -85,7 +85,22 @@ export const DEFAULT_LOCALES = {
       artworks: 'Работы',
       posts: 'Посты',
       platforms: 'Площадки',
-      admin: 'Редактор'
+      admin: 'Редактор',
+      home: 'Главная',
+      gallery: 'Галерея',
+      socials: 'Соцсети',
+      revisions: 'Ревизии'
+    },
+    home: {
+      sectionsTitle: 'Разделы архива',
+      projectDescription: 'Визуальный архив stairs2line: работы и их ревизии, публикации в соцсетях и связанная с ними хронология.',
+      galleryDescription: 'Плотная галерея без подписей с фильтрацией по scope.',
+      socialsDescription: 'Профили и архив публикаций, сгруппированные по соцсетям.',
+      revisionsDescription: 'Работы с несколькими известными версиями, совмещёнными для сравнения.'
+    },
+    gallery: {
+      pageTitle: 'Галерея',
+      description: 'Плотная галерея изображений stairs2line с фильтрацией по scope.'
     },
     common: {
       newest: 'Сначала новые',
@@ -117,7 +132,9 @@ export const DEFAULT_LOCALES = {
       firstPost: 'Первая известная публикация: {date}',
       noKnownPosts: 'Известных публикаций с этим изображением нет.',
       artworkVersions: 'Версии работы',
-      genericDescription: 'Artwork stairs2line: {versions} версий, {media} медиафайлов.'
+      genericDescription: 'Artwork stairs2line: {versions} версий, {media} медиафайлов.',
+      revisionsTitle: 'Ревизии работ',
+      revisionsDescription: 'Работы с несколькими известными версиями, совмещёнными по общей видимой области.'
     },
     posts: {
       pageTitle: 'Посты stairs2line',
@@ -141,7 +158,9 @@ export const DEFAULT_LOCALES = {
       firstRebloggedAt: 'Самый ранний известный репост:',
       savedReblogs: 'Сохранившиеся репосты:',
       noKnownReblogDate: 'дата неизвестна',
-      noSavedReblogs: 'нет'
+      noSavedReblogs: 'нет',
+      socialsTitle: 'Соцсети',
+      platformCreated: 'Создан профиль {platform}'
     },
     validation: {
       title: 'Проверка архива',
@@ -154,7 +173,22 @@ export const DEFAULT_LOCALES = {
       artworks: 'Artworks',
       posts: 'Posts',
       platforms: 'Platforms',
-      admin: 'Editor'
+      admin: 'Editor',
+      home: 'Home',
+      gallery: 'Gallery',
+      socials: 'Socials',
+      revisions: 'Revisions'
+    },
+    home: {
+      sectionsTitle: 'Archive sections',
+      projectDescription: 'A visual archive of stairs2line: artworks and their revisions, posts across social platforms, and the chronology connecting them.',
+      galleryDescription: 'A dense image-only gallery with scope filters.',
+      socialsDescription: 'Profiles and archived posts grouped by social platform.',
+      revisionsDescription: 'Artworks with multiple known versions, aligned for direct comparison.'
+    },
+    gallery: {
+      pageTitle: 'Gallery',
+      description: 'A dense gallery of stairs2line images, filterable by archive scope.'
     },
     common: {
       newest: 'Newest first',
@@ -186,7 +220,9 @@ export const DEFAULT_LOCALES = {
       firstPost: 'First known post: {date}',
       noKnownPosts: 'No known posts use this image.',
       artworkVersions: 'Artwork versions',
-      genericDescription: 'A stairs2line artwork with {versions} versions and {media} media items.'
+      genericDescription: 'A stairs2line artwork with {versions} versions and {media} media items.',
+      revisionsTitle: 'Artwork revisions',
+      revisionsDescription: 'Artwork groups with multiple known versions, aligned to their shared visible area.'
     },
     posts: {
       pageTitle: 'stairs2line posts',
@@ -210,7 +246,9 @@ export const DEFAULT_LOCALES = {
       firstRebloggedAt: 'Earliest known reblog:',
       savedReblogs: 'Preserved reblogs:',
       noKnownReblogDate: 'date unknown',
-      noSavedReblogs: 'none'
+      noSavedReblogs: 'none',
+      socialsTitle: 'Socials',
+      platformCreated: '{platform} profile created'
     },
     validation: {
       title: 'Archive validation',
@@ -223,7 +261,22 @@ export const DEFAULT_LOCALES = {
       artworks: '作品',
       posts: '投稿',
       platforms: 'プラットフォーム',
-      admin: '編集'
+      admin: '編集',
+      home: 'ホーム',
+      gallery: 'ギャラリー',
+      socials: 'SNS',
+      revisions: '改訂履歴'
+    },
+    home: {
+      sectionsTitle: 'アーカイブ',
+      projectDescription: 'stairs2line の作品、改訂版、SNS 投稿、それらをつなぐ時系列をまとめたビジュアルアーカイブです。',
+      galleryDescription: 'scope で絞り込める、キャプションなしの画像ギャラリーです。',
+      socialsDescription: 'SNS ごとのプロフィールと保存済み投稿を閲覧できます。',
+      revisionsDescription: '複数の既知バージョンがある作品を、位置を合わせて比較できます。'
+    },
+    gallery: {
+      pageTitle: 'ギャラリー',
+      description: 'scope で絞り込める stairs2line の画像ギャラリーです。'
     },
     common: {
       newest: '新しい順',
@@ -255,7 +308,9 @@ export const DEFAULT_LOCALES = {
       firstPost: '最初に確認された投稿: {date}',
       noKnownPosts: 'この画像を含む既知の投稿はありません。',
       artworkVersions: '作品バージョン',
-      genericDescription: 'stairs2line の作品。{versions}バージョン、{media}メディア。'
+      genericDescription: 'stairs2line の作品。{versions}バージョン、{media}メディア。',
+      revisionsTitle: '作品の改訂履歴',
+      revisionsDescription: '複数の既知バージョンを持つ作品を、共通して見える領域に合わせて表示します。'
     },
     posts: {
       pageTitle: 'stairs2line 投稿',
@@ -279,7 +334,9 @@ export const DEFAULT_LOCALES = {
       firstRebloggedAt: '最も早く確認されたリブログ:',
       savedReblogs: '保存されているリブログ:',
       noKnownReblogDate: '日付不明',
-      noSavedReblogs: 'なし'
+      noSavedReblogs: 'なし',
+      socialsTitle: 'SNS',
+      platformCreated: '{platform} のプロフィールを作成'
     },
     validation: {
       title: 'アーカイブ検証',

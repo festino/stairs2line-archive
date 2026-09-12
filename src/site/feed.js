@@ -51,7 +51,11 @@
         const nextLink = parsed.querySelector('[data-pagination] a[rel="next"]');
         if (!nextList) throw new Error('The next page does not contain a paged list.');
 
-        for (const child of [...nextList.children]) list.append(child);
+        for (const child of [...nextList.children]) {
+          const dedupeKey = child.dataset.feedDedupeKey;
+          if (dedupeKey && [...list.querySelectorAll('[data-feed-dedupe-key]')].some((item) => item.dataset.feedDedupeKey === dedupeKey)) continue;
+          list.append(child);
+        }
         nextUrl = nextLink?.href ?? null;
         if (!nextUrl) observer?.disconnect();
         document.dispatchEvent(new CustomEvent('archive:feed-appended'));

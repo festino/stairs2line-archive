@@ -33,6 +33,14 @@ function fakePng(width, height, extraBytes = 0) {
   return buffer;
 }
 
+function fakeGif(width, height) {
+  const buffer = Buffer.alloc(13);
+  buffer.write('GIF89a', 0, 'ascii');
+  buffer.writeUInt16LE(width, 6);
+  buffer.writeUInt16LE(height, 8);
+  return buffer;
+}
+
 function localeLeafKeys(value, prefix = '') {
   const keys = [];
   for (const [key, item] of Object.entries(value ?? {})) {
@@ -610,6 +618,18 @@ test('revisions ignore decorative versions, append single-image artworks, and ga
     media: [{ id: 'artwork-0001/v-undated/m01', files: [undatedFile] }]
   });
 
+  const longIntervalArtwork = structuredClone(source.artworks[0]);
+  longIntervalArtwork.id = 'artwork-long-interval';
+  longIntervalArtwork.versions = [
+    structuredClone(source.artworks[0].versions.find((version) => version.id === 'v02')),
+    structuredClone(source.artworks[0].versions.find((version) => version.id === 'v01'))
+  ];
+  longIntervalArtwork.versions[0].createdAt = '2010-01-01T00:00:00Z';
+  longIntervalArtwork.versions[1].createdAt = '2025-01-01T00:00:00Z';
+  longIntervalArtwork.versions[0].media[0].id = 'artwork-long-interval/v02/m01';
+  longIntervalArtwork.versions[1].media[0].id = 'artwork-long-interval/v01/m01';
+  source.artworks.push(longIntervalArtwork);
+
   const singleVersionArtwork = structuredClone(source.artworks[0]);
   singleVersionArtwork.id = 'artwork-single-version';
   singleVersionArtwork.versions = [structuredClone(singleVersionArtwork.versions[0])];
@@ -630,8 +650,11 @@ test('revisions ignore decorative versions, append single-image artworks, and ga
   assert.match(revisionsHtml, /Artwork revisions/);
   assert.match(revisionsHtml, /January 1, 2020 — January 1, 2022/);
   assert.match(revisionsHtml, /class="revision-preview-link"/);
-  assert.match(revisionsHtml, /<clipPath id="revision-clip-/);
+  assert.doesNotMatch(revisionsHtml, /<clipPath id="revision-clip-/);
   assert.match(revisionsHtml, /transform="matrix\(/);
+  assert.match(revisionsHtml, /class="revision-section-heading"[^>]*>Single known versions/);
+  assert.match(revisionsHtml, /revision-card revision-card--single/);
+  assert.match(revisionsHtml, /revision-preview-link revision-preview-link--single/);
   assert.match(revisionsHtml, /data-artwork-id="artwork-single-version"/);
   assert.doesNotMatch(revisionsHtml, /data-artwork-id="artwork-decorative-only"/);
   assert.doesNotMatch(revisionsHtml, /revision-decorative\.png/);
@@ -640,6 +663,13 @@ test('revisions ignore decorative versions, append single-image artworks, and ga
   const mainArtworkIndex = revisionsHtml.indexOf('data-artwork-id="artwork-0001"');
   const singleArtworkIndex = revisionsHtml.indexOf('data-artwork-id="artwork-single-version"');
   assert.ok(mainArtworkIndex >= 0 && singleArtworkIndex > mainArtworkIndex, 'single non-decorative images are appended after real revision groups');
+  const longArtworkIndex = revisionsHtml.indexOf('data-artwork-id="artwork-long-interval"');
+  assert.ok(longArtworkIndex >= 0 && longArtworkIndex < mainArtworkIndex, 'default revision order is longest interval first');
+  assert.match(revisionsHtml, /Shortest interval first/);
+
+  const shortestHtml = await fs.readFile(path.join(output, 'en', 'artworks', 'oldest', 'index.html'), 'utf8');
+  assert.match(shortestHtml, /Longest interval first/);
+  assert.ok(shortestHtml.indexOf('data-artwork-id="artwork-0001"') < shortestHtml.indexOf('data-artwork-id="artwork-long-interval"'), 'alternate revision order is shortest interval first');
 
   const previewStart = revisionsHtml.indexOf('class="revision-preview-link"');
   const earlyVersionImage = revisionsHtml.indexOf('/twitter/revision-early.png', previewStart);
@@ -657,8 +687,11 @@ test('revisions ignore decorative versions, append single-image artworks, and ga
 
   const css = await fs.readFile(path.join(output, 'assets', 'archive.css'), 'utf8');
   assert.match(css, /\.gallery-grid\s*\{[\s\S]*?display:\s*flex/);
+  assert.match(css, /\.gallery-item\s*\{[\s\S]*?width:\s*var\(--gallery-width/);
   assert.match(css, /@media \(max-width: 700px\)[\s\S]*?\.gallery-grid\s*\{[\s\S]*?grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/);
-  assert.match(css, /\.artwork-posts\s*\{[\s\S]*?list-style:\s*none/);
+  assert.match(css, /\.revision-grid\s*\{[\s\S]*?display:\s*flex/);
+  assert.match(css, /\.revision-card--single\s*\{[\s\S]*?max-width:\s*190px/);
+  assert.match(css, /\.artwork-posts\s*\{[\s\S]*?list-style:\s*none[\s\S]*?font-size:\s*0\.82rem/);
 });
 
 test('platform profile snapshots are versioned and the latest snapshot drives the hero', async () => {
@@ -1058,14 +1091,27 @@ test('invalid viewer anchor orientation fields are reported and ignored', async 
   assert.ok(issue.details.some((detail) => detail.includes('rotation')));
 });
 
-test('MediaViewer uses bounded navigation, internal post links, explicit video playback, and artwork-only alignment', async () => {
+test('MediaViewer uses bounded navigation, internal post links, viewer autoplay, and artwork-only alignment', async () => {
   const mediaRoot = await createMediaFixture();
   const source = fixtureSource();
   const unsourcedFile = 'pixiv/unsourced.png';
+  const animatedFile = 'pixiv/animated.gif';
   await fs.writeFile(path.join(mediaRoot, unsourcedFile), fakePng(320, 320, 5));
+  await fs.writeFile(path.join(mediaRoot, animatedFile), fakeGif(160, 90));
   source.artworks[0].versions[0].media.push({
     id: 'artwork-0001/v01/m02',
     files: [unsourcedFile]
+  });
+  source.artworks.push({
+    id: 'animated-artwork',
+    title: { en: 'Animated artwork' },
+    versions: [{
+      id: 'v01',
+      scope: 'top',
+      createdAt: '2023-01-01T00:00:00Z',
+      media: [{ id: 'animated-artwork/v01/m01', files: [animatedFile] }]
+    }],
+    __source: '/source/artworks/animated.jsonc'
   });
   const compilation = await compileArchive(source, { mediaRoot });
   const output = await fs.mkdtemp(path.join(os.tmpdir(), 'stairs2line-viewer-ui-'));
@@ -1082,8 +1128,9 @@ test('MediaViewer uses bounded navigation, internal post links, explicit video p
   assert.match(js, /media-viewer-switcher-preview/);
   assert.match(js, /media-viewer-close/);
   assert.match(js, /media-viewer-play-button/);
-  assert.match(js, /video\.autoplay = false/);
-  assert.doesNotMatch(js, /video\.autoplay = true/);
+  assert.match(js, /video\.autoplay = true/);
+  assert.match(js, /video\.play\?\.\(\)\.catch/);
+  assert.match(js, /function freezeGalleryGifs/);
   assert.match(js, /pointerdown/);
   assert.match(js, /pointerType !== 'touch'/);
   assert.match(js, /edgeGuard = 28/);
@@ -1103,16 +1150,18 @@ test('MediaViewer uses bounded navigation, internal post links, explicit video p
   assert.match(js, /width \/ 2, y: height/);
   assert.match(css, /\.modal\s*\{[\s\S]*?grid-template-rows:\s*minmax\(0, 1fr\) auto/);
   assert.match(css, /\.modal-subtext\s*\{[\s\S]*?max-height:\s*min\(24dvh, 12rem\)[\s\S]*?overflow:\s*auto/);
-  assert.match(js, /const leftSpace = Math\.max\(0, rect\.left\)/);
-  assert.match(js, /const rightSpace = Math\.max\(0, window\.innerWidth - rect\.right\)/);
-  assert.match(js, /const bandHeight = Math\.min\(/);
+  assert.doesNotMatch(js, /const leftSpace = Math\.max\(0, rect\.left\)/);
+  assert.doesNotMatch(js, /const bandHeight = Math\.min\(/);
+  assert.match(js, /Navigation lives in fixed side gutters reserved by CSS/);
   assert.match(js, /switcher\?\.style\.removeProperty\('width'\)/);
-  assert.match(css, /\.media-viewer-switcher\s*\{[\s\S]*?position:\s*fixed[\s\S]*?width:\s*0[\s\S]*?height:\s*0/);
+  assert.match(css, /#mediaModal\s*\{[\s\S]*?--viewer-side-gutter:\s*clamp\(8rem, 15vw, 13rem\)/);
+  assert.match(css, /\.media-viewer-switcher\s*\{[\s\S]*?position:\s*fixed[\s\S]*?height:\s*clamp\(260px, 70dvh, 640px\)/);
   assert.match(css, /\.media-viewer-switcher-left:hover[\s\S]*?linear-gradient/);
   assert.match(css, /\.media-viewer-switcher-right:hover[\s\S]*?linear-gradient/);
-  assert.match(css, /\.media-viewer-switcher-preview\s*\{[\s\S]*?height:\s*clamp\(110px, 26vh, 270px\)/);
-  assert.match(css, /\.modal\.is-video \.media-viewer-switcher-preview\s*\{[\s\S]*?display:\s*none/);
-  assert.match(css, /#mediaModalContent img\s*\{[\s\S]*?max-width:\s*min\(90%, 1120px\)/);
+  assert.match(css, /\.media-viewer-switcher-preview\s*\{[\s\S]*?height:\s*clamp\(132px, 32dvh, 270px\)/);
+  assert.doesNotMatch(css, /\.modal\.is-video \.media-viewer-switcher-preview/);
+  assert.match(css, /#mediaModalContent img\s*\{[\s\S]*?max-width:\s*min\(100%, var\(--viewer-image-max-width, 960px\)\)/);
+  assert.match(js, /function constrainViewerImage/);
   assert.match(css, /\.media-viewer-close\s*\{/);
   assert.match(css, /\.media-viewer-play-button\s*\{/);
   assert.match(css, /\.media-viewer-post-link\.is-current/);
@@ -1124,6 +1173,8 @@ test('MediaViewer uses bounded navigation, internal post links, explicit video p
   assert.match(artworkHtml, /No known posts use this image\./);
   assert.match(artworkHtml, /data-viewer-align="artwork"/);
   assert.doesNotMatch(galleryHtml, /data-viewer-align="artwork"/);
+  assert.match(galleryHtml, /data-gallery-static-gif="true"/);
+  assert.match(galleryHtml, /gallery-video-indicator/);
   assert.match(js, /new PageMediaProvider\('\[data-paged-list\], \.post-version-list'\)/);
   assert.match(js, /for \(const root of document\.querySelectorAll\(this\.rootSelector\)\)/);
 });

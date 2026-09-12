@@ -42,7 +42,10 @@
     "artworkVersions": "作品バージョン",
     "genericDescription": "stairs2line の作品。{versions}バージョン、{media}メディア。",
     "revisionsTitle": "作品の改訂履歴",
-    "revisionsDescription": "装飾用を除いた既知のバージョンを表示します。複数版は共通の表示領域で比較し、単独版は末尾にまとめます。"
+    "revisionsDescription": "装飾用を除いた既知のバージョンを表示します。複数版は画像内部を切り抜かずに位置を合わせて比較し、単独版は末尾に分けて表示します。",
+    "singleImagesTitle": "単独の既知バージョン",
+    "longestInterval": "期間が長い順",
+    "shortestInterval": "期間が短い順"
   },
   "posts": {
     "pageTitle": "stairs2line 投稿",

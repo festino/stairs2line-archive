@@ -134,7 +134,10 @@ export const DEFAULT_LOCALES = {
       artworkVersions: 'Версии работы',
       genericDescription: 'Artwork stairs2line: {versions} версий, {media} медиафайлов.',
       revisionsTitle: 'Ревизии работ',
-      revisionsDescription: 'Недекоративные версии работ: несколько версий совмещаются по общей видимой области, одиночные изображения собраны в конце.'
+      revisionsDescription: 'Недекоративные версии работ: несколько версий совмещаются для сравнения без внутреннего кропа; одиночные известные версии собраны отдельно в конце.',
+      singleImagesTitle: 'Одиночные известные версии',
+      longestInterval: 'Сначала длинные интервалы',
+      shortestInterval: 'Сначала короткие интервалы'
     },
     posts: {
       pageTitle: 'Посты stairs2line',
@@ -222,7 +225,10 @@ export const DEFAULT_LOCALES = {
       artworkVersions: 'Artwork versions',
       genericDescription: 'A stairs2line artwork with {versions} versions and {media} media items.',
       revisionsTitle: 'Artwork revisions',
-      revisionsDescription: 'Non-decorative artwork versions: multi-version groups are aligned to their shared visible area, with single images collected at the end.'
+      revisionsDescription: 'Non-decorative artwork versions: multi-version groups are aligned for comparison without cropping; single known versions are collected separately at the end.',
+      singleImagesTitle: 'Single known versions',
+      longestInterval: 'Longest interval first',
+      shortestInterval: 'Shortest interval first'
     },
     posts: {
       pageTitle: 'stairs2line posts',
@@ -310,7 +316,10 @@ export const DEFAULT_LOCALES = {
       artworkVersions: '作品バージョン',
       genericDescription: 'stairs2line の作品。{versions}バージョン、{media}メディア。',
       revisionsTitle: '作品の改訂履歴',
-      revisionsDescription: '装飾用を除いた既知のバージョンを表示します。複数版は共通の表示領域で比較し、単独版は末尾にまとめます。'
+      revisionsDescription: '装飾用を除いた既知のバージョンを表示します。複数版は画像内部を切り抜かずに位置を合わせて比較し、単独版は末尾に分けて表示します。',
+      singleImagesTitle: '単独の既知バージョン',
+      longestInterval: '期間が長い順',
+      shortestInterval: '期間が短い順'
     },
     posts: {
       pageTitle: 'stairs2line 投稿',

@@ -169,7 +169,8 @@ function mediaElement(manifest, media, language, alt, contextType, contextId, op
           ? [`data-viewer-rotation="${escapeAttribute(media.viewerAlignment.rotation)}"`]
           : [])
       ] : [])
-    ] : [])
+    ] : []),
+    ...(options.freezeAnimation && file.mimeType === 'image/gif' ? ['data-gallery-static-gif="true"'] : [])
   ].join(' ');
 
   if (file.mimeType?.startsWith('video/')) {
@@ -370,9 +371,10 @@ function alignedRevisionPreview(manifest, artwork, versions, language) {
   const geometries = items.map((item) => revisionGeometry(manifest, item.media));
   const detailHref = routeUrl(manifest, language, `artworks/${artwork.slug}/`);
   const title = displayTitle(artwork, language, manifest.defaultLanguage) ?? artwork.id;
+  const singleClass = versions.length === 1 ? ' revision-preview-link--single' : '';
 
   if (geometries.some((geometry) => !geometry)) {
-    return `<a class="revision-preview-link revision-preview-link--fallback" href="${escapeAttribute(detailHref)}">${items.map((item) => `<span class="revision-preview-frame">${item.media ? compactMediaElement(manifest, item.media, title) : ''}</span>`).join('')}</a>`;
+    return `<a class="revision-preview-link revision-preview-link--fallback${singleClass}" href="${escapeAttribute(detailHref)}">${items.map((item) => `<span class="revision-preview-frame">${item.media ? compactMediaElement(manifest, item.media, title) : ''}</span>`).join('')}</a>`;
   }
 
   const reference = geometries[0];
@@ -398,15 +400,12 @@ function alignedRevisionPreview(manifest, artwork, versions, language) {
     };
   });
 
-  let intersection = placements[0].corners;
-  for (const placement of placements.slice(1)) intersection = intersectConvexPolygons(intersection, placement.corners);
-  const area = Math.abs(polygonArea(intersection));
-  if (intersection.length < 3 || !(area > 1e-5)) {
-    return `<a class="revision-preview-link revision-preview-link--fallback" href="${escapeAttribute(detailHref)}">${items.map((item) => `<span class="revision-preview-frame">${item.media ? compactMediaElement(manifest, item.media, title) : ''}</span>`).join('')}</a>`;
-  }
-
-  const xs = intersection.map((point) => point.x);
-  const ys = intersection.map((point) => point.y);
+  // Use the union of the aligned source bounds rather than their intersection.
+  // This preserves the useful relative positioning/orientation while ensuring
+  // every source image remains fully visible inside its comparison frame.
+  const corners = placements.flatMap((placement) => placement.corners);
+  const xs = corners.map((point) => point.x);
+  const ys = corners.map((point) => point.y);
   const minX = Math.min(...xs);
   const maxX = Math.max(...xs);
   const minY = Math.min(...ys);
@@ -414,20 +413,17 @@ function alignedRevisionPreview(manifest, artwork, versions, language) {
   const width = maxX - minX;
   const height = maxY - minY;
   if (!(width > 0) || !(height > 0)) return '';
-  const polygonPoints = intersection.map((point) => `${point.x.toFixed(4)},${point.y.toFixed(4)}`).join(' ');
   const viewBox = `${minX.toFixed(4)} ${minY.toFixed(4)} ${width.toFixed(4)} ${height.toFixed(4)}`;
 
-  const frames = placements.map((placement, index) => {
+  const frames = placements.map((placement) => {
     const file = placement.geometry.file;
     const src = mediaUrl(manifest, file.path);
-    const clipId = `revision-clip-${stableHash(`${artwork.id}:${versions[index].key}:${index}`)}`;
     const transform = placement.transform;
     return `<span class="revision-preview-frame"><svg viewBox="${viewBox}" role="img" aria-label="${escapeAttribute(title)}" preserveAspectRatio="xMidYMid meet">
-      <defs><clipPath id="${clipId}" clipPathUnits="userSpaceOnUse"><polygon points="${polygonPoints}"></polygon></clipPath></defs>
-      <g clip-path="url(#${clipId})"><image href="${escapeAttribute(src)}" width="${placement.geometry.width}" height="${placement.geometry.height}" preserveAspectRatio="none" transform="matrix(${transform.a} ${transform.b} ${transform.c} ${transform.d} ${transform.e} ${transform.f})"></image></g>
+      <image href="${escapeAttribute(src)}" width="${placement.geometry.width}" height="${placement.geometry.height}" preserveAspectRatio="none" transform="matrix(${transform.a} ${transform.b} ${transform.c} ${transform.d} ${transform.e} ${transform.f})"></image>
     </svg></span>`;
   }).join('');
-  return `<a class="revision-preview-link" href="${escapeAttribute(detailHref)}">${frames}</a>`;
+  return `<a class="revision-preview-link${singleClass}" href="${escapeAttribute(detailHref)}">${frames}</a>`;
 }
 
 function revisionVersionOrder(artwork, versions = artwork.versions) {
@@ -448,6 +444,12 @@ function revisionDateBounds(artwork, versions = artwork.versions) {
     earliest: dated[0]?.version ?? null,
     latest: dated.at(-1)?.version ?? null
   };
+}
+
+function revisionIntervalMs(artwork, versions = artwork.versions) {
+  const dated = revisionVersionOrder(artwork, versions).filter((item) => !Number.isNaN(item.time));
+  if (dated.length < 2) return null;
+  return Math.max(0, dated.at(-1).time - dated[0].time);
 }
 
 function revisionPreviewVersions(artwork, versions = artwork.versions) {
@@ -476,7 +478,8 @@ function renderRevisionCard(manifest, artwork, language, eligibleVersions = artw
   const versions = revisionPreviewVersions(artwork, eligibleVersions);
   const href = routeUrl(manifest, language, `artworks/${artwork.slug}/`);
   const dateRange = revisionDateRangeText(manifest, artwork, language, eligibleVersions);
-  return `<article class="card revision-card" data-list-item data-artwork-id="${escapeAttribute(artwork.id)}">
+  const singleClass = eligibleVersions.length === 1 ? ' revision-card--single' : '';
+  return `<article class="card revision-card${singleClass}" data-list-item data-artwork-id="${escapeAttribute(artwork.id)}">
     ${alignedRevisionPreview(manifest, artwork, versions, language)}
     <div class="card-body revision-card-body">
       <p class="metadata"><a href="${escapeAttribute(href)}">${escapeHtml(dateRange)}</a></p>
@@ -490,13 +493,23 @@ function renderGalleryItem(manifest, artwork, version, language, index, options 
   const file = manifest.files[media.displayFile];
   const title = displayTitle(artwork, language, manifest.defaultLanguage) ?? artwork.id;
   const ratio = file?.width > 0 && file?.height > 0 ? file.width / file.height : 1;
+  const baseHeight = 168;
+  const isWide = ratio > 2;
+  // Regular images share one visual height. Panoramas are the exception:
+  // cap their width and reduce their row height proportionally rather than
+  // blowing them up into long strips or letterboxing them inside a tall box.
+  const targetWidth = isWide
+    ? Math.max(72, Math.min(340, baseHeight * ratio))
+    : Math.max(72, baseHeight * ratio);
+  const targetHeight = isWide ? targetWidth / ratio : baseHeight;
   const separator = options.startsUndatedGroup ? '<div class="gallery-date-divider" aria-hidden="true"></div>' : '';
-  const videoIndicator = file?.mimeType?.startsWith('video/')
+  const isMotion = file?.mimeType?.startsWith('video/') || file?.mimeType === 'image/gif';
+  const motionIndicator = isMotion
     ? '<span class="gallery-video-indicator" aria-hidden="true">▶</span>'
     : '';
-  return `${separator}<div class="gallery-item${ratio > 2.25 ? ' gallery-item--wide' : ''}" style="--gallery-aspect:${escapeAttribute(ratio.toFixed(5))}" data-list-item data-version-id="${escapeAttribute(version.key)}">
-    ${mediaElement(manifest, media, language, title, 'artworkVersion', version.key, { eager: index < 4, videoPreview: true })}
-    ${videoIndicator}
+  return `${separator}<div class="gallery-item${isWide ? ' gallery-item--wide' : ''}" style="--gallery-width:${escapeAttribute(targetWidth.toFixed(2))}px;--gallery-height:${targetHeight}px;--gallery-aspect:${escapeAttribute(ratio.toFixed(5))}" data-list-item data-version-id="${escapeAttribute(version.key)}">
+    ${mediaElement(manifest, media, language, title, 'artworkVersion', version.key, { eager: index < 4, videoPreview: true, freezeAnimation: true })}
+    ${motionIndicator}
   </div>`;
 }
 
@@ -1060,7 +1073,7 @@ async function writePaginatedListing(outputRoot, manifest, language, baseRelativ
       ${renderToolbar(manifest, language, { ...pageOptions.toolbar, enableFeed: pageCount > 1 })}
       <section class="${escapeAttribute(pageOptions.listClass)}" data-paged-list>
         ${beforeItems}
-        ${pageItems.length > 0 ? pageItems.map((item, index) => renderItem(item, index)).join('\n') : `<p>${escapeHtml(localeText(manifest.locales, language, 'common.noItems'))}</p>`}
+        ${pageItems.length > 0 ? pageItems.map((item, index) => renderItem(item, index, itemContext)).join('\n') : `<p>${escapeHtml(localeText(manifest.locales, language, 'common.noItems'))}</p>`}
         ${afterItems}
       </section>
       ${renderPagination(manifest, language, baseRelative, page, pageCount)}`;
@@ -1096,17 +1109,30 @@ async function buildArtworkListings(outputRoot, manifest, language) {
     .map((artwork) => ({ artwork, versions: nonDecorativeRevisionVersions(manifest, artwork) }))
     .filter((item) => item.versions.length > 0);
   for (const direction of ['desc', 'asc']) {
-    const oldest = direction === 'asc';
-    const baseRelative = oldest ? 'artworks/oldest' : 'artworks';
+    const shortestFirst = direction === 'asc';
+    const baseRelative = shortestFirst ? 'artworks/oldest' : 'artworks';
     const sortCandidates = (items) => [...items].sort((a, b) => {
+      const aInterval = revisionIntervalMs(a.artwork, a.versions);
+      const bInterval = revisionIntervalMs(b.artwork, b.versions);
+      if (aInterval !== null || bInterval !== null) {
+        if (aInterval === null) return 1;
+        if (bInterval === null) return -1;
+        if (aInterval !== bInterval) return shortestFirst ? aInterval - bInterval : bInterval - aInterval;
+      }
+
+      // Equal/unknown intervals remain stable and useful by falling back to the
+      // relevant endpoint date. Single-image cards therefore still have a
+      // deterministic order inside their separate section.
       const aBounds = revisionDateBounds(a.artwork, a.versions);
       const bBounds = revisionDateBounds(b.artwork, b.versions);
-      const aDate = direction === 'asc' ? aBounds.earliest?.sortAt : aBounds.latest?.sortAt;
-      const bDate = direction === 'asc' ? bBounds.earliest?.sortAt : bBounds.latest?.sortAt;
+      const aDate = shortestFirst ? aBounds.earliest?.sortAt : aBounds.latest?.sortAt;
+      const bDate = shortestFirst ? bBounds.earliest?.sortAt : bBounds.latest?.sortAt;
       return compareNullableDates(aDate, bDate, direction) || a.artwork.id.localeCompare(b.artwork.id);
     });
-    const multiVersion = sortCandidates(revisionCandidates.filter((item) => item.versions.length > 1));
-    const singleVersion = sortCandidates(revisionCandidates.filter((item) => item.versions.length === 1));
+    const multiVersion = sortCandidates(revisionCandidates.filter((item) => item.versions.length > 1))
+      .map((item) => ({ ...item, isSingle: false }));
+    const singleVersion = sortCandidates(revisionCandidates.filter((item) => item.versions.length === 1))
+      .map((item) => ({ ...item, isSingle: true }));
     const sorted = [...multiVersion, ...singleVersion];
     await writePaginatedListing(
       outputRoot,
@@ -1115,17 +1141,23 @@ async function buildArtworkListings(outputRoot, manifest, language) {
       baseRelative,
       sorted,
       manifest.site.pageSize?.artworks ?? 36,
-      (item) => renderRevisionCard(manifest, item.artwork, language, item.versions),
+      (item, index, context) => {
+        const previous = context?.pageItems?.[index - 1] ?? null;
+        const singleHeading = item.isSingle && (index === 0 || !previous?.isSingle)
+          ? `<h2 class="revision-section-heading" data-feed-dedupe-key="revision-single-heading">${escapeHtml(localeText(manifest.locales, language, 'artworks.singleImagesTitle'))}</h2>`
+          : '';
+        return `${singleHeading}${renderRevisionCard(manifest, item.artwork, language, item.versions)}`;
+      },
       {
         heading: localeText(manifest.locales, language, 'artworks.revisionsTitle'),
         title: `${localeText(manifest.locales, language, 'artworks.revisionsTitle')} · stairs2line`,
         description: localeText(manifest.locales, language, 'artworks.revisionsDescription'),
         listClass: 'card-grid revision-grid',
         bodyClass: 'revisions-page',
-        noindex: oldest,
+        noindex: shortestFirst,
         toolbar: {
-          sortHref: routeUrl(manifest, language, oldest ? 'artworks/' : 'artworks/oldest/'),
-          sortLabel: localeText(manifest.locales, language, oldest ? 'common.oldest' : 'common.newest')
+          sortHref: routeUrl(manifest, language, shortestFirst ? 'artworks/' : 'artworks/oldest/'),
+          sortLabel: localeText(manifest.locales, language, shortestFirst ? 'artworks.longestInterval' : 'artworks.shortestInterval')
         }
       }
     );

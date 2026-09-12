@@ -423,40 +423,24 @@
     }
 
     updateSwitcherPlacement() {
+      // Navigation lives in fixed side gutters reserved by CSS. Its vertical
+      // band follows the viewer stage, never the dimensions of the current
+      // image/video, so panoramas and portrait media get the same hit area.
       for (const switcher of [this.leftSwitcher, this.rightSwitcher]) {
         switcher?.style.removeProperty('width');
         switcher?.style.removeProperty('height');
         switcher?.style.removeProperty('top');
       }
-      if (!this.renderedMedia || window.innerWidth <= 768) return;
+      if (window.innerWidth <= 768) return;
 
-      const rect = this.renderedMedia.getBoundingClientRect?.();
       const stageRect = this.modal.querySelector('.modal-dialog')?.getBoundingClientRect?.();
-      if (!rect) return;
-
-      const leftSpace = Math.max(0, rect.left);
-      const rightSpace = Math.max(0, window.innerWidth - rect.right);
-      const stageTop = Math.max(0, stageRect?.top ?? 0);
-      const stageBottom = Math.min(window.innerHeight, stageRect?.bottom ?? window.innerHeight);
-      const maxBandHeight = Math.max(0, stageBottom - stageTop);
-      const bandHeight = Math.min(
-        Math.max(96, rect.height * 0.58),
-        Math.max(0, rect.height),
-        Math.max(0, window.innerHeight * 0.56),
-        520,
-        maxBandHeight
-      );
-      const desiredTop = rect.top + (rect.height - bandHeight) / 2;
-      const bandTop = Math.min(Math.max(stageTop, desiredTop), Math.max(stageTop, stageBottom - bandHeight));
-      if (this.leftSwitcher) {
-        this.leftSwitcher.style.width = `${leftSpace}px`;
-        this.leftSwitcher.style.height = `${bandHeight}px`;
-        this.leftSwitcher.style.top = `${bandTop}px`;
-      }
-      if (this.rightSwitcher) {
-        this.rightSwitcher.style.width = `${rightSpace}px`;
-        this.rightSwitcher.style.height = `${bandHeight}px`;
-        this.rightSwitcher.style.top = `${bandTop}px`;
+      if (!stageRect || !(stageRect.height > 0)) return;
+      const navigationHeight = Math.min(640, Math.max(260, stageRect.height * 0.78));
+      const navigationCenter = stageRect.top + stageRect.height / 2;
+      for (const switcher of [this.leftSwitcher, this.rightSwitcher]) {
+        if (!switcher) continue;
+        switcher.style.height = `${navigationHeight}px`;
+        switcher.style.top = `${navigationCenter}px`;
       }
     }
 
@@ -735,12 +719,70 @@
     }
   }
 
+  function constrainViewerImage(image) {
+    if (!image?.matches?.('img.media-viewer-current')) return;
+    const update = () => {
+      if (!(image.naturalWidth > 0) || !(image.naturalHeight > 0)) return;
+      const ratio = image.naturalWidth / image.naturalHeight;
+      // Very small panoramas looked especially broken when scaled to the full
+      // desktop viewer width. Let ordinary images grow enough to be useful,
+      // but keep ultra-wide sources closer to their native dimensions.
+      const widthScale = ratio > 3 ? 2 : 3;
+      const heightScale = ratio > 3 ? 2 : 3;
+      const maxWidth = Math.min(960, Math.max(image.naturalWidth, image.naturalWidth * widthScale));
+      const maxHeight = Math.min(window.innerHeight, Math.max(image.naturalHeight, image.naturalHeight * heightScale));
+      image.style.setProperty('--viewer-image-max-width', `${maxWidth}px`);
+      image.style.setProperty('--viewer-image-max-height', `${maxHeight}px`);
+    };
+
+    if (image.complete && image.naturalWidth > 0) update();
+    else image.addEventListener('load', update, { once: true });
+  }
+
+  function freezeGalleryGif(image) {
+    if (!image?.matches?.('img[data-gallery-static-gif]') || image.dataset.galleryGifFrozen === 'true') return;
+    image.dataset.galleryGifFrozen = 'true';
+
+    const drawPoster = () => {
+      if (!(image.naturalWidth > 0) || !(image.naturalHeight > 0)) return;
+      const originalSrc = image.currentSrc || image.src;
+      const canvas = document.createElement('canvas');
+      canvas.width = image.naturalWidth;
+      canvas.height = image.naturalHeight;
+      try {
+        const context = canvas.getContext('2d');
+        context?.drawImage(image, 0, 0, canvas.width, canvas.height);
+        const posterSrc = canvas.toDataURL('image/png');
+        if (!posterSrc) return;
+        image.dataset.galleryAnimatedSrc = originalSrc;
+        image.removeAttribute('srcset');
+        image.src = posterSrc;
+        image.classList.add('is-gallery-gif-frozen');
+      } catch (error) {
+        console.warn('Could not freeze GIF gallery preview.', error);
+      }
+    };
+
+    if (image.complete && image.naturalWidth > 0) drawPoster();
+    else image.addEventListener('load', drawPoster, { once: true });
+  }
+
+  function freezeGalleryGifs(root = document) {
+    for (const image of root.querySelectorAll?.('img[data-gallery-static-gif]') ?? []) freezeGalleryGif(image);
+  }
+
   function showFullSizeCopy(sourceElement, viewer) {
     const media = sourceElement.cloneNode(true);
     media.removeAttribute('onclick');
     media.removeAttribute('style');
     media.classList.remove('clickable');
     media.classList.add('media-viewer-current');
+
+    if (media.matches('img[data-gallery-static-gif]') && sourceElement.dataset.galleryAnimatedSrc) {
+      media.removeAttribute('srcset');
+      media.src = sourceElement.dataset.galleryAnimatedSrc;
+      media.classList.remove('is-gallery-gif-frozen');
+    }
 
     const videos = media.matches('video')
       ? [media]
@@ -753,10 +795,9 @@
     container.replaceChildren(media);
 
     for (const video of videos) {
-      video.autoplay = false;
-      video.removeAttribute('autoplay');
+      video.autoplay = true;
+      video.setAttribute('autoplay', '');
       video.controls = true;
-      video.pause?.();
 
       const playButton = document.createElement('button');
       playButton.type = 'button';
@@ -776,10 +817,18 @@
       video.addEventListener('ended', syncPlayButton);
       container.append(playButton);
       syncPlayButton();
+
+      // The viewer is opened directly by a user click, so request playback
+      // immediately while that activation is still available. If a browser
+      // rejects it, the explicit play button remains visible as the fallback.
+      video.play?.().catch(() => syncPlayButton());
     }
 
     const image = media.matches('img') ? media : media.querySelector('img');
-    if (image) tryPixelateImage(image);
+    if (image) {
+      constrainViewerImage(image);
+      tryPixelateImage(image);
+    }
     viewer.setRenderedMedia(media, sourceElement);
   }
 
@@ -833,11 +882,12 @@
       viewer.show(media, provider);
     });
 
-    const pixelateSources = () => {
+    const enhanceMediaPreviews = () => {
       for (const image of document.querySelectorAll('img[data-viewer-media]')) tryPixelateImage(image);
+      freezeGalleryGifs(document);
     };
-    pixelateSources();
-    document.addEventListener('archive:feed-appended', pixelateSources);
+    enhanceMediaPreviews();
+    document.addEventListener('archive:feed-appended', enhanceMediaPreviews);
 
     window.MediaViewer = MediaViewer;
     window.showFullSizeCopy = (sourceElement) => showFullSizeCopy(sourceElement, viewer);

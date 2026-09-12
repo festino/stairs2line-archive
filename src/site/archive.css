@@ -381,13 +381,19 @@ h2 {
 
 .artwork-posts a {
   display: flex;
-  gap: 0.5em;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 1.75rem;
 }
 
 .artwork-posts {
-  margin: 0;
+  display: grid;
+  gap: 0.45rem;
+  margin: 0.75rem 0.9rem 0.9rem;
   padding-left: 0;
   list-style: none;
+  font-size: 0.82rem;
+  line-height: 1.35;
 }
 
 .artwork-posts-empty {
@@ -436,18 +442,19 @@ h2 {
 
 .media-viewer-switcher {
   position: fixed;
-  z-index: 3;
-  top: 0;
+  z-index: 5;
+  top: 50%;
   display: flex;
   align-items: center;
-  gap: 0.55rem;
-  width: 0;
-  height: 0;
-  padding: clamp(0.6rem, 1.6vw, 1.25rem);
+  gap: 0.45rem;
+  width: calc(var(--viewer-side-gutter, 10rem) - 0.65rem);
+  height: clamp(260px, 70dvh, 640px);
+  padding: 0.45rem;
   overflow: hidden;
   box-sizing: border-box;
+  transform: translateY(-50%);
   border: 0;
-  border-radius: 0;
+  border-radius: 0.8rem;
   background: transparent;
   color: white;
   cursor: pointer;
@@ -457,13 +464,13 @@ h2 {
 }
 
 .media-viewer-switcher-left {
-  left: 0;
+  left: 0.35rem;
   justify-content: flex-end;
   background: linear-gradient(to right, rgb(255 255 255 / 0), rgb(255 255 255 / 0));
 }
 
 .media-viewer-switcher-right {
-  right: 0;
+  right: 0.35rem;
   justify-content: flex-start;
   background: linear-gradient(to left, rgb(255 255 255 / 0), rgb(255 255 255 / 0));
 }
@@ -490,10 +497,11 @@ h2 {
 
 .media-viewer-switcher-preview {
   display: grid;
-  flex: 0 1 clamp(96px, 12vw, 190px);
-  width: min(clamp(96px, 12vw, 190px), max(0px, calc(100% - 2.6rem)));
+  flex: 1 1 auto;
+  width: auto;
   min-width: 0;
-  height: clamp(110px, 26vh, 270px);
+  max-width: min(11rem, calc(100% - 2.1rem));
+  height: clamp(132px, 32dvh, 270px);
   place-items: center;
   overflow: hidden;
   border: 1px solid rgb(255 255 255 / 0.22);
@@ -505,8 +513,10 @@ h2 {
 
 .media-viewer-switcher-preview img,
 .media-viewer-switcher-preview video {
+  display: block;
   width: 100%;
   height: 100%;
+  max-width: none;
   object-fit: contain;
   opacity: 0.72;
   filter: saturate(0.75) brightness(0.82);
@@ -578,13 +588,17 @@ h2 {
   overscroll-behavior: contain;
 }
 
+#mediaModal {
+  --viewer-side-gutter: clamp(8rem, 15vw, 13rem);
+}
+
 #mediaModal .modal-dialog {
   min-width: 0;
   min-height: 0;
   width: 100%;
   height: 100%;
   margin: 0;
-  padding: clamp(0.75rem, 3vh, 2rem) clamp(0.75rem, 5vw, 4rem) 0.75rem;
+  padding: clamp(0.75rem, 3vh, 2rem) var(--viewer-side-gutter) 0.75rem;
   box-sizing: border-box;
 }
 
@@ -610,11 +624,12 @@ h2 {
 }
 
 #mediaModalContent img {
-  max-width: min(90%, 1120px);
+  max-width: min(100%, var(--viewer-image-max-width, 960px));
+  max-height: min(100%, var(--viewer-image-max-height, 100dvh));
 }
 
 #mediaModalContent video {
-  max-width: 100%;
+  max-width: min(100%, 1100px);
 }
 
 #mediaModalContent .media-viewer-current.is-artwork-aligned {
@@ -672,10 +687,6 @@ h2 {
 .media-viewer-play-button:hover,
 .media-viewer-play-button:focus-visible {
   background: rgb(0 0 0 / 0.78);
-}
-
-.modal.is-video .media-viewer-switcher-preview {
-  display: none;
 }
 
 .modal-subtext {
@@ -795,8 +806,8 @@ h2 {
     position: fixed;
     top: 50%;
     bottom: auto;
-    width: 46px;
-    height: 96px;
+    width: 52px;
+    height: 128px;
     min-height: 0;
     padding: 0.2rem;
     transform: translateY(-50%);
@@ -2117,9 +2128,9 @@ h2 {
   font-size: clamp(1.35rem, 2.5vw, 2rem);
 }
 
-/* Image-only gallery. Desktop follows the old fixed-height flow; on phones the
-   regular cells become two equal columns, while very wide images get a shorter
-   full-width row. */
+/* Image-only gallery. Desktop keeps a dense fixed-height flow, but very wide
+   images have an explicit width cap so panorama-like assets cannot dominate a
+   row. On phones regular cells become two equal columns. */
 .gallery-page main {
   --page-width: 1480px;
 }
@@ -2134,9 +2145,9 @@ h2 {
 .gallery-item {
   position: relative;
   flex: 0 0 auto;
-  height: 184px;
+  width: var(--gallery-width, 168px);
+  height: var(--gallery-height, 168px);
   max-width: 100%;
-  aspect-ratio: var(--gallery-aspect, 1);
   overflow: hidden;
   background: transparent;
 }
@@ -2151,6 +2162,7 @@ h2 {
 
 .gallery-video-indicator {
   position: absolute;
+  z-index: 2;
   left: 50%;
   top: 50%;
   display: grid;
@@ -2167,11 +2179,8 @@ h2 {
   pointer-events: none;
 }
 
-.gallery-item--wide {
-  height: 118px;
-}
-
 .gallery-item .media-link {
+  position: relative;
   display: block;
   width: 100%;
   height: 100%;
@@ -2180,6 +2189,7 @@ h2 {
 
 .gallery-item .media-link img,
 .gallery-item .media-link video {
+  display: block;
   width: 100%;
   height: 100%;
   max-width: none;
@@ -2189,8 +2199,35 @@ h2 {
   background: transparent;
 }
 
-/* Revisions are grouped by artwork. The preview frames intentionally share the
-   same SVG viewBox, so only pixels visible in every aligned crop are shown. */
+/* Revisions use the same aligned coordinate system for both preview frames,
+   but the viewBox is the union of the source bounds: no source image is
+   cropped just to force a common intersection. */
+.revision-grid {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--gap);
+}
+
+.revision-card {
+  flex: 1 1 320px;
+  width: min(100%, 420px);
+  max-width: 420px;
+}
+
+.revision-card--single {
+  flex: 0 1 190px;
+  width: min(100%, 190px);
+  max-width: 190px;
+}
+
+.revision-section-heading {
+  flex: 0 0 100%;
+  width: 100%;
+  margin: 1.5rem 0 0.15rem;
+  font-size: clamp(1.1rem, 2vw, 1.35rem);
+}
+
 .revision-preview-link {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -2198,6 +2235,10 @@ h2 {
   padding: 0;
   text-decoration: none;
   background: color-mix(in srgb, Canvas 88%, currentColor 12%);
+}
+
+.revision-preview-link--single {
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .revision-preview-frame {
@@ -2322,6 +2363,11 @@ h2 {
   .gallery-item--wide {
     grid-column: 1 / -1;
     aspect-ratio: var(--gallery-aspect, 3);
+  }
+
+  .revision-card--single {
+    flex-basis: min(44vw, 190px);
+    width: min(44vw, 190px);
   }
 
   .gallery-date-divider {

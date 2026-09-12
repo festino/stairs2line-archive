@@ -42,7 +42,10 @@
     "artworkVersions": "Artwork versions",
     "genericDescription": "A stairs2line artwork with {versions} versions and {media} media items.",
     "revisionsTitle": "Artwork revisions",
-    "revisionsDescription": "Non-decorative artwork versions: multi-version groups are aligned to their shared visible area, with single images collected at the end."
+    "revisionsDescription": "Non-decorative artwork versions: multi-version groups are aligned for comparison without cropping; single known versions are collected separately at the end.",
+    "singleImagesTitle": "Single known versions",
+    "longestInterval": "Longest interval first",
+    "shortestInterval": "Shortest interval first"
   },
   "posts": {
     "pageTitle": "stairs2line posts",

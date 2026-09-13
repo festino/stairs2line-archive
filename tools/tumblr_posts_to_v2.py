@@ -354,19 +354,27 @@ def media_file_name(post_id: str, content_item: dict[str, Any]) -> str | None:
 
 
 def apply_text_formatting(text: str, formatting: Any, context: str) -> str:
-    """Preserve the small markup vocabulary used by the original script.
+    """Serialize Tumblr NPF inline formatting to the archive pseudo-markup.
 
-    Multiple non-overlapping formatting spans are supported.  Overlapping spans
-    are rejected because the old pseudo-HTML notation has no unambiguous way to
-    represent arbitrary Tumblr NPF overlap.
+    Tumblr permits differently-typed formatting ranges to overlap.  The output
+    vocabulary is intentionally tiny and is rendered later from an allow-list;
+    when ranges cross, tags are closed and reopened at the range boundary so the
+    result remains properly nested while preserving the visual formatting.
     """
     if not formatting:
         return text
     if not isinstance(formatting, list):
         raise ValueError(f"Invalid formatting in {context}")
 
-    spans: list[tuple[int, int, str, str]] = []
-    for fmt in formatting:
+    def quoted_attribute(name: str, value: str) -> str:
+        if "'" not in value:
+            return f"{name}='{value}'"
+        if '"' not in value:
+            return f'{name}="{value}"'
+        raise ValueError(f"Formatting attribute contains both quote types in {context}")
+
+    spans: list[dict[str, Any]] = []
+    for order, fmt in enumerate(formatting):
         if not isinstance(fmt, dict):
             raise ValueError(f"Invalid formatting entry in {context}")
         kind = fmt.get("type")
@@ -374,30 +382,72 @@ def apply_text_formatting(text: str, formatting: Any, context: str) -> str:
         end = fmt.get("end")
         if not isinstance(start, int) or not isinstance(end, int) or not (0 <= start <= end <= len(text)):
             raise ValueError(f"Invalid formatting range in {context}: {fmt!r}")
+        if start == end:
+            continue
 
         if kind == "bold":
             opening, closing = "<bold>", "</bold>"
+        elif kind == "italic":
+            opening, closing = "<italic>", "</italic>"
         elif kind == "strikethrough":
             opening, closing = "<strikethrough>", "</strikethrough>"
+        elif kind == "small":
+            opening, closing = "<small>", "</small>"
         elif kind == "link":
             url = fmt.get("url")
             if not isinstance(url, str):
                 raise ValueError(f"Link without URL in {context}")
-            opening, closing = f"<link url='{url}'>", "</link>"
+            opening, closing = f"<link {quoted_attribute('url', url)}>", "</link>"
+        elif kind == "mention":
+            blog = fmt.get("blog")
+            url = blog.get("url") if isinstance(blog, dict) else None
+            opening = f"<mention {quoted_attribute('url', url)}>" if isinstance(url, str) and url else "<mention>"
+            closing = "</mention>"
+        elif kind == "color":
+            color = fmt.get("hex")
+            if not isinstance(color, str) or not color.startswith("#") or len(color) != 7:
+                raise ValueError(f"Invalid color formatting in {context}: {fmt!r}")
+            opening, closing = f"<color {quoted_attribute('hex', color)}>", "</color>"
         else:
             raise ValueError(f"Unsupported formatting ({kind}) in {context}")
-        spans.append((start, end, opening, closing))
+        spans.append({
+            "start": start,
+            "end": end,
+            "opening": opening,
+            "closing": closing,
+            "order": order,
+        })
 
-    # Nested/overlapping ranges can require a real rich-text serializer.  Keep
-    # the importer conservative rather than silently changing the text.
-    ordered = sorted(spans, key=lambda span: (span[0], span[1]))
-    for previous, current in zip(ordered, ordered[1:]):
-        if current[0] < previous[1]:
-            raise ValueError(f"Overlapping formatting is unsupported in {context}")
+    if not spans:
+        return text
 
-    for start, end, opening, closing in sorted(spans, key=lambda span: span[0], reverse=True):
-        text = text[:start] + opening + text[start:end] + closing + text[end:]
-    return text
+    boundaries = sorted({0, len(text), *(span["start"] for span in spans), *(span["end"] for span in spans)})
+    previous: list[dict[str, Any]] = []
+    output: list[str] = []
+
+    for left, right in zip(boundaries, boundaries[1:]):
+        active = [
+            span for span in spans
+            if span["start"] <= left and span["end"] >= right
+        ]
+        active.sort(key=lambda span: (span["start"], -span["end"], span["order"]))
+
+        common = 0
+        while common < len(previous) and common < len(active) and previous[common] is active[common]:
+            common += 1
+
+        for span in reversed(previous[common:]):
+            output.append(span["closing"])
+        for span in active[common:]:
+            output.append(span["opening"])
+
+        output.append(text[left:right])
+        previous = active
+
+    for span in reversed(previous):
+        output.append(span["closing"])
+
+    return "".join(output)
 
 
 def normalize_layout(raw_layout: list[dict[str, Any]], content_to_media: dict[int, int], context: str) -> list[dict[str, Any]] | None:

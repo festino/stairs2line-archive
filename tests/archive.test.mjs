@@ -1577,6 +1577,42 @@ test('post body ordering follows platform conventions and Tumblr evidence preced
   assert.ok(tumblrEvidence >= 0 && tumblrEvidence < tumblrMedia && tumblrMedia < tumblrText, 'Tumblr reblog evidence precedes every part of the post content, then media, then text');
 });
 
+test('Tumblr pseudo-markup is rendered as safe inline formatting instead of escaped text', async () => {
+  const mediaRoot = await createMediaFixture();
+  const source = fixtureSource();
+  source.posts = [{
+    key: 'tumblr:444',
+    platform: 'tumblr',
+    id: '444',
+    status: 'alive',
+    publishedAt: '2020-01-04T00:00:00Z',
+    versions: [{
+      originalLanguage: 'en',
+      description: {
+        en: "<bold>Bold</bold> <italic>italic</italic> <strikethrough>strike</strikethrough> <small>small</small> <link url='https://example.com/?a=1&b=2'>link</link> <mention url='https://example.tumblr.com/'>@example</mention> <color hex='#ff0000'>red</color> <script>alert(1)</script>"
+      },
+      media: [PIXIV_FILE]
+    }],
+    __source: '/source/posts/tumblr.jsonc'
+  }];
+
+  const compilation = await compileArchive(source, { mediaRoot });
+  const output = await fs.mkdtemp(path.join(os.tmpdir(), 'stairs2line-tumblr-formatting-'));
+  await buildStaticSite(compilation, source, output, { mediaRoot });
+  const html = await fs.readFile(path.join(output, 'en', 'posts', 'tumblr', '444', 'index.html'), 'utf8');
+
+  assert.match(html, /<strong>Bold<\/strong>/);
+  assert.match(html, /<em>italic<\/em>/);
+  assert.match(html, /<s>strike<\/s>/);
+  assert.match(html, /<small>small<\/small>/);
+  assert.match(html, /<a href="https:\/\/example\.com\/\?a=1&amp;b=2" target="_blank" rel="noreferrer">link<\/a>/);
+  assert.match(html, /class="tumblr-mention"[^>]*>@example<\/a>/);
+  assert.match(html, /class="tumblr-inline-color" style="color:#ff0000">red<\/span>/);
+  assert.match(html, /&lt;script&gt;alert\(1\)&lt;\/script&gt;/);
+  const postText = html.slice(html.indexOf('class="post-text"'));
+  assert.doesNotMatch(postText, /&lt;bold&gt;/);
+});
+
 test('canonical post status is top-level and Tumblr versions preserve reblog evidence', async () => {
   const mediaRoot = await createMediaFixture();
   const source = fixtureSource();
@@ -1769,6 +1805,57 @@ test('Tumblr importer maps archived suffixes, defaults new posts alive, and repo
   assert.match(result.stderr, /New media filenames not present in the old post file: 2/);
   assert.match(result.stderr, /tumblr\/300_animated\.gif/);
   assert.match(result.stderr, /tumblr\/300_photo\.jpg/);
+});
+
+test('Tumblr importer preserves all NPF inline styles and serializes overlapping ranges safely', async () => {
+  const input = await fs.mkdtemp(path.join(os.tmpdir(), 'stairs2line-tumblr-import-formatting-'));
+  const oldPosts = path.join(input, 'old.jsonc');
+  await fs.writeFile(oldPosts, JSON.stringify({ posts: [] }));
+
+  const text = 'abcdefghij bold italic strike small link mention color';
+  const span = (word, type, extra = {}) => {
+    const start = text.indexOf(word);
+    return { start, end: start + word.length, type, ...extra };
+  };
+  const fresh = {
+    id: '400',
+    id_string: '400',
+    timestamp: 5000,
+    blog_name: 'artist',
+    blog: { name: 'artist' },
+    content: [{
+      type: 'text',
+      text,
+      formatting: [
+        { start: 0, end: 6, type: 'bold' },
+        { start: 3, end: 10, type: 'italic' },
+        span('bold', 'bold'),
+        span('italic', 'italic'),
+        span('strike', 'strikethrough'),
+        span('small', 'small'),
+        span('link', 'link', { url: 'https://example.com/' }),
+        span('mention', 'mention', { blog: { url: 'https://example.tumblr.com/' } }),
+        span('color', 'color', { hex: '#12abEF' })
+      ]
+    }],
+    layout: []
+  };
+  await fs.writeFile(path.join(input, 'fresh.json'), JSON.stringify(fresh));
+
+  const script = new URL('../tools/tumblr_posts_to_v2.py', import.meta.url);
+  const result = spawnSync('python3', [script.pathname, oldPosts, input], { encoding: 'utf8' });
+  assert.equal(result.status, 0, result.stderr);
+  const imported = JSON.parse(result.stdout);
+  const description = imported.posts[0].versions[0].description.ja;
+
+  assert.match(description, /^<bold>abc<italic>def<\/italic><\/bold><italic>ghij<\/italic>/);
+  assert.match(description, /<bold>bold<\/bold>/);
+  assert.match(description, /<italic>italic<\/italic>/);
+  assert.match(description, /<strikethrough>strike<\/strikethrough>/);
+  assert.match(description, /<small>small<\/small>/);
+  assert.match(description, /<link url='https:\/\/example\.com\/'>link<\/link>/);
+  assert.match(description, /<mention url='https:\/\/example\.tumblr\.com\/'>mention<\/mention>/);
+  assert.match(description, /<color hex='#12abEF'>color<\/color>/);
 });
 
 

@@ -35,6 +35,110 @@ function linkify(input) {
   return result;
 }
 
+function safeHttpUrl(value) {
+  if (typeof value !== 'string' || !value.trim()) return null;
+  try {
+    const parsed = new URL(value);
+    return parsed.protocol === 'http:' || parsed.protocol === 'https:' ? value : null;
+  } catch {
+    return null;
+  }
+}
+
+function pseudoTagAttribute(token, name) {
+  const pattern = new RegExp(`\\b${name}\\s*=\\s*(["'])(.*?)\\1`, 'i');
+  return pattern.exec(token)?.[2] ?? null;
+}
+
+function renderTumblrText(input) {
+  if (typeof input !== 'string') return input;
+
+  // Tumblr NPF formatting is stored in the source files as a deliberately
+  // tiny pseudo-HTML vocabulary.  Parse only that allow-list here rather than
+  // trusting arbitrary HTML from archived post content.
+  const tokenPattern = /<\/?[a-z][a-z0-9-]*(?:\s+[^<>]*?)?>/gi;
+  const stack = [];
+  let result = '';
+  let lastIndex = 0;
+  let match;
+
+  const renderTextSegment = (segment) => {
+    const insideAnchor = stack.some((entry) => entry.anchor);
+    return insideAnchor ? escapeHtml(segment) : linkify(segment);
+  };
+
+  while ((match = tokenPattern.exec(input)) !== null) {
+    const token = match[0];
+    result += renderTextSegment(input.slice(lastIndex, match.index));
+    lastIndex = match.index + token.length;
+
+    const name = /^<\/?([a-z][a-z0-9-]*)/i.exec(token)?.[1]?.toLowerCase();
+    const closing = /^<\//.test(token);
+    if (!name) {
+      result += escapeHtml(token);
+      continue;
+    }
+
+    if (closing) {
+      const active = stack.at(-1);
+      if (active?.name === name) {
+        result += active.close;
+        stack.pop();
+      } else {
+        result += escapeHtml(token);
+      }
+      continue;
+    }
+
+    let entry = null;
+    if (name === 'bold') entry = { name, open: '<strong>', close: '</strong>' };
+    else if (name === 'italic') entry = { name, open: '<em>', close: '</em>' };
+    else if (name === 'strikethrough') entry = { name, open: '<s>', close: '</s>' };
+    else if (name === 'small') entry = { name, open: '<small>', close: '</small>' };
+    else if (name === 'link') {
+      const href = safeHttpUrl(pseudoTagAttribute(token, 'url'));
+      if (href) {
+        entry = {
+          name,
+          open: `<a href="${escapeAttribute(href)}" target="_blank" rel="noreferrer">`,
+          close: '</a>',
+          anchor: true
+        };
+      }
+    } else if (name === 'mention') {
+      const href = safeHttpUrl(pseudoTagAttribute(token, 'url'));
+      entry = href
+        ? {
+            name,
+            open: `<a class="tumblr-mention" href="${escapeAttribute(href)}" target="_blank" rel="noreferrer">`,
+            close: '</a>',
+            anchor: true
+          }
+        : { name, open: '<span class="tumblr-mention">', close: '</span>' };
+    } else if (name === 'color') {
+      const color = pseudoTagAttribute(token, 'hex');
+      if (/^#[0-9a-f]{6}$/i.test(color ?? '')) {
+        entry = {
+          name,
+          open: `<span class="tumblr-inline-color" style="color:${escapeAttribute(color)}">`,
+          close: '</span>'
+        };
+      }
+    }
+
+    if (entry) {
+      result += entry.open;
+      stack.push(entry);
+    } else {
+      result += escapeHtml(token);
+    }
+  }
+
+  result += renderTextSegment(input.slice(lastIndex));
+  while (stack.length > 0) result += stack.pop().close;
+  return result;
+}
+
 function stripLinks(input) {
   if (typeof input !== 'string') return input;
 
@@ -717,7 +821,7 @@ function renderPostCard(manifest, post, language, index, options = {}) {
     : '';
   const titleMarkup = title ? `<h2>${escapeHtml(title)}</h2>` : '';
   const descriptionMarkup = description
-    ? `<div class="post-text" lang="${escapeAttribute(version.originalLanguage)}">${linkify(description).replaceAll('\n', '<br>')}</div>`
+    ? `<div class="post-text" lang="${escapeAttribute(version.originalLanguage)}">${(post.platform === 'tumblr' ? renderTumblrText(description) : linkify(description)).replaceAll('\n', '<br>')}</div>`
     : '';
   const lostMarkup = isRecoveredMediaOnly(post)
     ? `<p class="lost-post-note">${escapeHtml(localeText(manifest.locales, language, 'posts.lostMediaOnly'))}</p>`

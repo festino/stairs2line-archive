@@ -1154,11 +1154,14 @@ function layout(manifest, language, relative, options) {
   const imagePath = options.image ?? configuredImage ?? fallbackImage;
   const image = imagePath ? absoluteUrl(manifest, mediaUrl(manifest, imagePath)) : null;
   const languageNav = languageLinks(manifest, relative);
+  const lightThemeLabel = localeText(manifest.locales, language, 'common.lightTheme');
+  const darkThemeLabel = localeText(manifest.locales, language, 'common.darkTheme');
   return `<!doctype html>
 <html lang="${escapeAttribute(language)}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>try{if(localStorage.getItem('archive-theme')==='dark')document.documentElement.dataset.theme='dark'}catch{}</script>
   <title>${escapeHtml(title)}</title>
   <meta name="description" content="${escapeAttribute(description)}">
   ${options.noindex ? '<meta name="robots" content="noindex,follow">' : ''}
@@ -1181,11 +1184,15 @@ function layout(manifest, language, relative, options) {
       <a href="${escapeAttribute(routeUrl(manifest, language, 'posts/by-platform/'))}">${escapeHtml(localeText(manifest.locales, language, 'nav.socials'))}</a>
       <a href="${escapeAttribute(routeUrl(manifest, language, 'artworks/'))}">${escapeHtml(localeText(manifest.locales, language, 'nav.revisions'))}</a>
     </nav>
-    <nav class="language-nav">${languageNav.map((item) => `<a class="${item.language === language ? 'active' : ''}" href="${escapeAttribute(item.href)}">${escapeHtml(item.language.toUpperCase())}</a>`).join('')}</nav>
+    <div class="header-actions">
+      <button class="theme-toggle" type="button" role="switch" aria-checked="false" data-theme-toggle data-light-label="${escapeAttribute(lightThemeLabel)}" data-dark-label="${escapeAttribute(darkThemeLabel)}" hidden>${escapeHtml(lightThemeLabel)}</button>
+      <nav class="language-nav">${languageNav.map((item) => `<a class="${item.language === language ? 'active' : ''}" href="${escapeAttribute(item.href)}">${escapeHtml(item.language.toUpperCase())}</a>`).join('')}</nav>
+    </div>
   </header>
   <main>
     ${options.body}
   </main>
+  <script src="${escapeAttribute(joinUrl(manifest.site.basePath, 'assets/theme.js'))}" defer></script>
   <script src="${escapeAttribute(joinUrl(manifest.site.basePath, 'assets/feed.js'))}" defer></script>
   <script src="${escapeAttribute(joinUrl(manifest.site.basePath, 'assets/media-viewer-adapter.js'))}" defer></script>
 </body>

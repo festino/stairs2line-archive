@@ -1770,3 +1770,28 @@ test('Tumblr importer maps archived suffixes, defaults new posts alive, and repo
   assert.match(result.stderr, /tumblr\/300_animated\.gif/);
   assert.match(result.stderr, /tumblr\/300_photo\.jpg/);
 });
+
+
+test('static pages provide a JS-only persistent light/dark theme switch without changing URLs', async () => {
+  const mediaRoot = await createMediaFixture();
+  const source = fixtureSource();
+  const compilation = await compileArchive(source, { mediaRoot });
+  const output = await fs.mkdtemp(path.join(os.tmpdir(), 'stairs2line-theme-site-'));
+  await buildStaticSite(compilation, source, output, { mediaRoot });
+
+  const html = await fs.readFile(path.join(output, 'en', 'index.html'), 'utf8');
+  assert.match(html, /localStorage\.getItem\('archive-theme'\)/);
+  assert.match(html, /data-theme-toggle[^>]*data-light-label="Light"[^>]*data-dark-label="Dark"[^>]*hidden/);
+  assert.match(html, /assets\/theme\.js/);
+  assert.doesNotMatch(html, /[?&]theme=/);
+
+  const css = await fs.readFile(path.join(output, 'assets', 'archive.css'), 'utf8');
+  assert.match(css, /:root\s*\{[\s\S]*?color-scheme:\s*light/);
+  assert.match(css, /html\[data-theme="dark"\]\s*\{[\s\S]*?color-scheme:\s*dark/);
+
+  const themeJs = await fs.readFile(path.join(output, 'assets', 'theme.js'), 'utf8');
+  assert.match(themeJs, /const STORAGE_KEY = 'archive-theme'/);
+  assert.match(themeJs, /toggle\.hidden = false/);
+  assert.match(themeJs, /root\.dataset\.theme = 'dark'/);
+  assert.match(themeJs, /delete root\.dataset\.theme/);
+});

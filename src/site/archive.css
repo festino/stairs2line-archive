@@ -1,11 +1,23 @@
 :root {
-  color-scheme: light dark;
+  color-scheme: light;
   --page-width: 1320px;
   --gap: 1rem;
-  --border: color-mix(in srgb, currentColor 28%, transparent);
-  --muted: color-mix(in srgb, currentColor 62%, transparent);
-  --surface: color-mix(in srgb, Canvas 97%, currentColor 3%);
-  --accent: #6b5cff;
+  --page-bg: #f4f0e7;
+  --surface: #fffdf7;
+  --text: #171717;
+  --border: #aaa59a;
+  --muted: #6c6962;
+  --accent: #5e54c7;
+}
+
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --page-bg: #151515;
+  --surface: #1d1d1d;
+  --text: #ededed;
+  --border: #4f4f4f;
+  --muted: #aaa;
+  --accent: #948aff;
 }
 
 * {
@@ -20,8 +32,8 @@ body {
   margin: 0;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   line-height: 1.55;
-  background: Canvas;
-  color: CanvasText;
+  background: var(--page-bg);
+  color: var(--text);
 }
 
 a {
@@ -55,7 +67,7 @@ textarea {
   padding: 0.8rem max(1rem, calc((100vw - var(--page-width)) / 2));
   border-bottom: 1px solid var(--border);
   backdrop-filter: none;
-  background: Canvas;
+  background: var(--page-bg);
 }
 
 .site-title {
@@ -75,6 +87,28 @@ textarea {
   align-items: center;
   gap: 0.7rem;
   flex-wrap: wrap;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.theme-toggle {
+  padding: 0.42rem 0.68rem;
+  border: 1px solid transparent;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.theme-toggle:hover,
+.theme-toggle:focus-visible {
+  border-color: var(--border);
+  background: var(--surface);
 }
 
 .site-nav a,
@@ -174,7 +208,7 @@ h2 {
   width: 100%;
   aspect-ratio: 1;
   object-fit: contain;
-  background: color-mix(in srgb, Canvas 90%, currentColor 10%);
+  background: color-mix(in srgb, var(--page-bg) 90%, currentColor 10%);
 }
 
 .card-body,
@@ -208,7 +242,7 @@ h2 {
   right: 0.55rem;
   padding: 0.35rem;
   border-radius: 999px;
-  background: color-mix(in srgb, Canvas 82%, transparent);
+  background: color-mix(in srgb, var(--page-bg) 82%, transparent);
   opacity: 0;
   transition: opacity 120ms ease;
 }
@@ -430,6 +464,11 @@ h2 {
   .site-header {
     position: static;
     grid-template-columns: 1fr;
+  }
+
+  .header-actions {
+    justify-content: flex-start;
+    flex-wrap: wrap;
   }
 
   .listing-toolbar {
@@ -923,9 +962,9 @@ h2 {
   display: grid;
   place-items: center;
   overflow: hidden;
-  border: 4px solid Canvas;
+  border: 4px solid var(--page-bg);
   border-radius: 50%;
-  background: Canvas;
+  background: var(--page-bg);
   font-size: 2rem;
   font-weight: 800;
 }
@@ -965,8 +1004,8 @@ h2 {
 }
 
 .platform-view-tabs a.active {
-  background: CanvasText;
-  color: Canvas;
+  background: var(--text);
+  color: var(--page-bg);
 }
 
 /* Platform-flavoured full post cards. Keep these scoped to platform pages so
@@ -1013,7 +1052,7 @@ h2 {
 .platform-page--pixiv .post-card--pixiv .post-media-item {
   display: grid;
   place-items: center;
-  background: color-mix(in srgb, Canvas 95%, currentColor 5%);
+  background: color-mix(in srgb, var(--page-bg) 95%, currentColor 5%);
 }
 
 .platform-page--pixiv .post-card--pixiv .post-media-item .media-link {
@@ -1035,7 +1074,7 @@ h2 {
   max-width: 640px;
   margin-inline: auto;
   border-radius: 0;
-  background: Canvas;
+  background: var(--page-bg);
 }
 
 .platform-page--twitter .post-card--twitter .post-media-grid {
@@ -1158,7 +1197,7 @@ h2 {
   max-width: 560px;
   margin-inline: auto;
   border-radius: 0.35rem;
-  background: Canvas;
+  background: var(--page-bg);
 }
 
 .platform-page--tumblr main {
@@ -1272,7 +1311,7 @@ h2 {
   display: block;
   aspect-ratio: 1;
   overflow: hidden;
-  background: color-mix(in srgb, Canvas 92%, currentColor 8%);
+  background: color-mix(in srgb, var(--page-bg) 92%, currentColor 8%);
 }
 
 .compact-post-media img,
@@ -1552,7 +1591,7 @@ h2 {
   padding: 0.8rem;
   border: 1px solid var(--border);
   border-radius: 0.9rem;
-  background: Canvas;
+  background: var(--page-bg);
   box-shadow: 0 1rem 2.8rem rgb(0 0 0 / 0.24);
   text-align: left;
   opacity: 0;
@@ -1652,7 +1691,7 @@ h2 {
   height: 1.25rem;
   padding: 0.14rem;
   border-radius: 50%;
-  background: Canvas;
+  background: var(--page-bg);
   box-shadow: 0 0 0 1px var(--border);
 }
 
@@ -1756,9 +1795,9 @@ h2 {
   display: grid;
   place-items: center;
   overflow: visible;
-  border: 3px solid Canvas;
+  border: 3px solid var(--page-bg);
   border-radius: 50%;
-  background: Canvas;
+  background: var(--page-bg);
   text-decoration: none;
   font-size: 1.35rem;
   font-weight: 800;
@@ -1782,7 +1821,7 @@ h2 {
   height: 1.45rem;
   padding: 0.18rem;
   border-radius: 50%;
-  background: Canvas;
+  background: var(--page-bg);
   box-shadow: 0 0 0 1px var(--border);
 }
 
@@ -2012,7 +2051,7 @@ h2 {
 }
 
 .post-version-evidence time {
-  color: CanvasText;
+  color: var(--text);
 }
 
 .post-version-evidence a {
@@ -2054,7 +2093,7 @@ h2 {
 .post-reblog-details[open] > summary {
   border-color: var(--border);
   background: color-mix(in srgb, var(--surface) 76%, var(--accent) 24%);
-  color: CanvasText;
+  color: var(--text);
 }
 
 .post-reblog-details > summary svg {
@@ -2265,7 +2304,7 @@ h2 {
   gap: 2px;
   padding: 0;
   text-decoration: none;
-  background: color-mix(in srgb, Canvas 88%, currentColor 12%);
+  background: color-mix(in srgb, var(--page-bg) 88%, currentColor 12%);
 }
 
 .revision-preview-link--single {
@@ -2278,7 +2317,7 @@ h2 {
   min-width: 0;
   aspect-ratio: 1;
   overflow: hidden;
-  background: Canvas;
+  background: var(--page-bg);
 }
 
 .revision-preview-frame svg,
@@ -2366,7 +2405,7 @@ h2 {
 }
 
 .platform-created-event-copy strong {
-  color: CanvasText;
+  color: var(--text);
 }
 
 @media (max-width: 700px) {
@@ -2735,7 +2774,8 @@ h2 {
 .listing-actions button,
 .pagination a,
 .pagination span,
-.platform-view-tabs a {
+.platform-view-tabs a,
+.theme-toggle {
   border: 1px solid transparent;
   border-radius: 0;
 }
@@ -2753,7 +2793,9 @@ h2 {
 .pagination a:hover,
 .pagination a:focus-visible,
 .platform-view-tabs a:hover,
-.platform-view-tabs a:focus-visible {
+.platform-view-tabs a:focus-visible,
+.theme-toggle:hover,
+.theme-toggle:focus-visible {
   border-color: var(--border);
   background: var(--surface);
 }
@@ -2842,7 +2884,8 @@ h2 {
 .listing-actions a:focus-visible,
 .listing-actions button:focus-visible,
 .pagination a:focus-visible,
-.platform-view-tabs a:focus-visible {
+.platform-view-tabs a:focus-visible,
+.theme-toggle:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }

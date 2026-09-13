@@ -453,7 +453,7 @@
       "versions": [
         {
           "id": "v01",
-          "scope": "top",
+          "scope": "featured",
           "media": [
             {
               "id": "artwork-0088/v01/m01",
@@ -1286,7 +1286,7 @@
         },
         {
           "id": "v05",
-          "scope": "top",
+          "scope": "featured",
           "media": [
             {
               "id": "artwork-0099/v05/m01",
@@ -1778,7 +1778,7 @@
       "versions": [
         {
           "id": "v01",
-          "scope": "top",
+          "scope": "featured",
           "media": [
             {
               "id": "artwork-0108/v01/m01",

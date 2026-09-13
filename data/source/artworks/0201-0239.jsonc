@@ -333,7 +333,7 @@
       "versions": [
         {
           "id": "v01",
-          "scope": "top",
+          "scope": "featured",
           "media": [
             {
               "id": "artwork-0206/v01/m01",
@@ -650,7 +650,7 @@
       "versions": [
         {
           "id": "v01",
-          "scope": "top",
+          "scope": "featured",
           "media": [
             {
               "id": "artwork-0213/v01/m01",

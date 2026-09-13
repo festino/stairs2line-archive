@@ -677,7 +677,7 @@
       "versions": [
         {
           "id": "v01",
-          "scope": "top",
+          "scope": "featured",
           "media": [
             {
               "id": "artwork-0050/v01/m01",

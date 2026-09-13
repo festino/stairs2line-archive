@@ -1583,7 +1583,7 @@ h2 {
   display: block;
   position: absolute;
   z-index: 30;
-  left: 50%;
+  left: 0;
   top: calc(100% + 0.55rem);
   width: min(360px, calc(100vw - 2rem));
   max-height: min(440px, 72vh);
@@ -1596,39 +1596,15 @@ h2 {
   text-align: left;
   opacity: 0;
   visibility: hidden;
-  transform: translate(-50%, -0.2rem);
-  transition: opacity 100ms ease, transform 100ms ease, visibility 100ms ease;
+  pointer-events: none;
+  transform: none;
+  transition: none;
 }
 
-.activity-month:hover .activity-popover,
-.activity-month:focus-within .activity-popover,
 .activity-month[open] .activity-popover {
   opacity: 1;
   visibility: visible;
-  transform: translate(-50%, 0);
-}
-
-.activity-month:nth-child(-n+2) .activity-popover {
-  left: 0;
-  transform: translate(0, -0.2rem);
-}
-
-.activity-month:nth-child(-n+2):hover .activity-popover,
-.activity-month:nth-child(-n+2):focus-within .activity-popover,
-.activity-month:nth-child(-n+2)[open] .activity-popover {
-  transform: none;
-}
-
-.activity-month:nth-child(n+11) .activity-popover {
-  right: 0;
-  left: auto;
-  transform: translate(0, -0.2rem);
-}
-
-.activity-month:nth-child(n+11):hover .activity-popover,
-.activity-month:nth-child(n+11):focus-within .activity-popover,
-.activity-month:nth-child(n+11)[open] .activity-popover {
-  transform: none;
+  pointer-events: auto;
 }
 
 .activity-popover-title,
@@ -1941,17 +1917,6 @@ h2 {
     row-gap: 0.8rem;
   }
 
-  .activity-month:nth-child(n) .activity-popover {
-    left: 50%;
-    right: auto;
-    transform: translate(-50%, -0.2rem);
-  }
-
-  .activity-month:nth-child(n):hover .activity-popover,
-  .activity-month:nth-child(n):focus-within .activity-popover,
-  .activity-month:nth-child(n)[open] .activity-popover {
-    transform: translate(-50%, 0);
-  }
 }
 
 @media (max-width: 560px) {
@@ -1966,6 +1931,7 @@ h2 {
   .activity-months {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
+
 
   .activity-month-dot {
     width: 2.4rem;

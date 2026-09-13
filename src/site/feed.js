@@ -1,12 +1,59 @@
 (() => {
-  for (const details of document.querySelectorAll('details.activity-month')) {
-    details.addEventListener('toggle', () => {
-      if (!details.open) return;
-      for (const other of document.querySelectorAll('details.activity-month[open]')) {
-        if (other !== details) other.open = false;
+  const activityMonths = [...document.querySelectorAll('details.activity-month')];
+
+  function positionActivityPopover(details) {
+    const popover = details.querySelector('.activity-popover');
+    if (!popover) return;
+
+    // Position the popover before the details element is opened. The left
+    // coordinate is calculated directly instead of opening in the default
+    // place and correcting it a frame later; this avoids both edge overflow
+    // and the visible "slide" on narrow screens.
+    const anchor = details.getBoundingClientRect();
+    const visualViewport = window.visualViewport;
+    const viewportLeft = visualViewport?.offsetLeft ?? 0;
+    const viewportWidth = visualViewport?.width ?? document.documentElement.clientWidth;
+    const viewportRight = viewportLeft + viewportWidth;
+    const gutter = 16;
+    const popoverWidth = Math.min(360, Math.max(0, viewportWidth - gutter * 2));
+    const centeredLeft = anchor.left + anchor.width / 2 - popoverWidth / 2;
+    const minLeft = viewportLeft + gutter;
+    const maxLeft = Math.max(minLeft, viewportRight - gutter - popoverWidth);
+    const clampedLeft = Math.min(maxLeft, Math.max(minLeft, centeredLeft));
+
+    popover.style.left = `${Math.round(clampedLeft - anchor.left)}px`;
+    popover.style.right = 'auto';
+  }
+
+  for (const details of activityMonths) {
+    const summary = details.querySelector('summary');
+    if (!summary) continue;
+
+    summary.addEventListener('click', (event) => {
+      // Native <details> toggling happens after the click. Handle it ourselves
+      // so a newly opened popover already has its final position on its very
+      // first painted frame. Keyboard activation of <summary> also fires click.
+      event.preventDefault();
+      if (details.open) {
+        details.open = false;
+        return;
       }
+
+      for (const other of activityMonths) {
+        if (other !== details && other.open) other.open = false;
+      }
+      positionActivityPopover(details);
+      details.open = true;
     });
   }
+
+  const repositionOpenActivityPopover = () => {
+    const open = activityMonths.find((details) => details.open);
+    if (open) positionActivityPopover(open);
+  };
+  window.addEventListener('resize', repositionOpenActivityPopover, { passive: true });
+  window.visualViewport?.addEventListener('resize', repositionOpenActivityPopover, { passive: true });
+  window.visualViewport?.addEventListener('scroll', repositionOpenActivityPopover, { passive: true });
 
   const STORAGE_KEY = 'stairs2line.archive.listMode';
   const list = document.querySelector('[data-paged-list]');

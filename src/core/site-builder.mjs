@@ -194,10 +194,10 @@ function platformProfileAssetUrl(manifest, filePath) {
 
 function platformAvatarUrl(manifest, platform) {
   const profile = currentPlatformVersion(platform);
-  if (Object.prototype.hasOwnProperty.call(profile, 'avatar')) {
-    return profile.avatar === null ? null : platformProfileAssetUrl(manifest, profile.avatar);
-  }
-  return platformIconUrl(manifest, platform);
+  const avatar = typeof profile.avatar === 'string'
+    ? platformProfileAssetUrl(manifest, profile.avatar)
+    : null;
+  return avatar ?? platformIconUrl(manifest, platform);
 }
 
 function platformBannerUrl(manifest, platform) {

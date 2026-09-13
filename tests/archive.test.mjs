@@ -531,10 +531,19 @@ test('post index uses month activity cells with post thumbnails and no artwork/v
   assert.doesNotMatch(html, /artworkCount|versionCount|unique artworks/i);
 
   const css = await fs.readFile(path.join(output, 'assets', 'archive.css'), 'utf8');
-  assert.match(css, /\.activity-popover\s*\{[\s\S]*?display:\s*block/);
+  assert.match(css, /\.activity-popover\s*\{[\s\S]*?display:\s*block[\s\S]*?transition:\s*none/);
+  assert.match(css, /\.activity-month\[open\] \.activity-popover \{[\s\S]*?visibility:\s*visible/);
+  assert.doesNotMatch(css, /--activity-popover-shift-x/);
+  assert.doesNotMatch(css, /activity-month:nth-child\([^)]*\) \.activity-popover/);
   const feedJs = await fs.readFile(path.join(output, 'assets', 'feed.js'), 'utf8');
-  assert.match(feedJs, /details\.activity-month\[open\]/);
-  assert.match(feedJs, /if \(other !== details\) other\.open = false/);
+  assert.match(feedJs, /querySelectorAll\('details\.activity-month'\)/);
+  assert.match(feedJs, /positionActivityPopover/);
+  assert.match(feedJs, /getBoundingClientRect\(\)/);
+  assert.match(feedJs, /visualViewport\?\.width/);
+  assert.match(feedJs, /event\.preventDefault\(\)/);
+  assert.match(feedJs, /positionActivityPopover\(details\);\s*details\.open = true;/);
+  assert.doesNotMatch(feedJs, /requestAnimationFrame/);
+  assert.doesNotMatch(feedJs, /--activity-popover-shift-x/);
 });
 
 test('platform directory uses bounded two-column cards with thumbnail previews', async () => {
@@ -864,6 +873,31 @@ test('platform profile assets distinguish explicit null from unknown omitted fie
   const twitterHtml = await fs.readFile(path.join(output, 'en', 'posts', 'platform', 'twitter', 'index.html'), 'utf8');
   assert.match(pixivHtml, /platform-hero--pixiv platform-hero--no-banner/);
   assert.doesNotMatch(twitterHtml, /platform-hero--twitter platform-hero--no-banner/);
+});
+
+
+test('platform icon is the default profile image when avatar is omitted or explicitly null', async () => {
+  const mediaRoot = await createMediaFixture();
+  await fs.mkdir(path.join(mediaRoot, 'misc'), { recursive: true });
+  await fs.writeFile(path.join(mediaRoot, 'misc', 'twitter-icon.png'), fakePng(64, 64));
+  await fs.writeFile(path.join(mediaRoot, 'misc', 'pixiv-icon.png'), fakePng(64, 64));
+
+  const source = fixtureSource();
+  const twitter = source.platforms.platforms.find((platform) => platform.id === 'twitter');
+  const pixiv = source.platforms.platforms.find((platform) => platform.id === 'pixiv');
+  twitter.icon = 'misc/twitter-icon.png';
+  pixiv.icon = 'misc/pixiv-icon.png';
+  twitter.versions = [{ account: 'stairs2line' }];
+  pixiv.versions = [{ account: '1593221', avatar: null }];
+
+  const compilation = await compileArchive(source, { mediaRoot });
+  const output = await fs.mkdtemp(path.join(os.tmpdir(), 'stairs2line-platform-icon-avatar-'));
+  await buildStaticSite(compilation, source, output, { mediaRoot });
+
+  const twitterHtml = await fs.readFile(path.join(output, 'en', 'posts', 'platform', 'twitter', 'index.html'), 'utf8');
+  const pixivHtml = await fs.readFile(path.join(output, 'en', 'posts', 'platform', 'pixiv', 'index.html'), 'utf8');
+  assert.match(twitterHtml, /class="platform-hero-icon"><img src="\/repo\/media\/stairs2line\/misc\/twitter-icon\.png" alt="">/);
+  assert.match(pixivHtml, /class="platform-hero-icon"><img src="\/repo\/media\/stairs2line\/misc\/pixiv-icon\.png" alt="">/);
 });
 
 

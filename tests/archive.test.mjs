@@ -24,6 +24,10 @@ const TWITTER_LAYOUT_FILES = [
   'twitter/200000000000000003_LAYOUT000000003.png',
   'twitter/200000000000000004_LAYOUT000000004.png'
 ];
+const TUMBLR_LAYOUT_FILES = [
+  'tumblr/65998519870_tumblr_mvqvpc3qkK1s4v84ho1_540.png',
+  'tumblr/65998519870_tumblr_mvqvpc3qkK1s4v84ho2_1280.png'
+];
 
 function fakePng(width, height, extraBytes = 0) {
   const buffer = Buffer.alloc(24 + extraBytes);
@@ -455,6 +459,9 @@ test('static pages use the logical media display file and expose paged/feed cont
   assert.match(archiveCss, /\.platform-page \.post-card \.post-media-item \.media-link img,[\s\S]*?max-height:\s*min\(62dvh, 680px\)/);
   assert.match(archiveCss, /\.platform-page--pixiv \.post-card--pixiv[\s\S]*?max-height:\s*min\(62dvh, 680px\)/);
   assert.doesNotMatch(archiveCss, /^\.post-card--(?:pixiv|twitter|tumblr)\s*\{/m);
+  assert.match(archiveCss, /\.home-sections\s*\{[\s\S]*?align-items:\s*stretch/);
+  assert.match(archiveCss, /\.home-section-link\s*\{[\s\S]*?grid-auto-rows:\s*max-content;[\s\S]*?align-content:\s*start/);
+  assert.match(archiveCss, /\.home-platforms-preview\s*\{[\s\S]*?max-height:\s*15rem/);
 });
 
 
@@ -1423,6 +1430,78 @@ test('media already linked to a known Twitter post is not duplicated as a recove
   assert.equal(compilation.manifest.posts.some((post) => post.recovery?.kind === 'media-only'), false);
 });
 
+
+test('Tumblr posts without layout keep images in a vertical stack', async () => {
+  const mediaRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'stairs2line-tumblr-default-layout-'));
+  await fs.mkdir(path.join(mediaRoot, 'tumblr'), { recursive: true });
+  await fs.writeFile(path.join(mediaRoot, TUMBLR_LAYOUT_FILES[0]), fakePng(529, 534));
+  await fs.writeFile(path.join(mediaRoot, TUMBLR_LAYOUT_FILES[1]), fakePng(711, 404));
+
+  const source = fixtureSource();
+  source.site.mediaDirectories = ['tumblr'];
+  source.posts = [{
+    key: 'tumblr:65998519870',
+    platform: 'tumblr',
+    id: '65998519870',
+    status: 'alive',
+    publishedAt: '2013-11-04T15:15:12.000Z',
+    versions: [{ media: TUMBLR_LAYOUT_FILES }],
+    __source: '/source/posts/tumblr.jsonc'
+  }];
+  source.artworks = [{
+    id: 'artwork-tumblr-layout',
+    title: { en: 'Tumblr layout' },
+    versions: [{
+      id: 'v01',
+      scope: 'top',
+      media: TUMBLR_LAYOUT_FILES.map((filePath, index) => ({
+        id: `artwork-tumblr-layout/v01/m${String(index + 1).padStart(2, '0')}`,
+        files: [filePath]
+      }))
+    }],
+    __source: '/source/artworks/tumblr-layout.jsonc'
+  }];
+
+  const compilation = await compileArchive(source, { mediaRoot });
+  const output = await fs.mkdtemp(path.join(os.tmpdir(), 'stairs2line-tumblr-default-layout-site-'));
+  await buildStaticSite(compilation, source, output, { mediaRoot });
+  const html = await fs.readFile(path.join(output, 'en', 'posts', 'platform', 'tumblr', 'full', 'index.html'), 'utf8');
+  const singleRows = html.match(/class="tumblr-media-row"[^>]*--tumblr-row-columns:1/g) ?? [];
+
+  assert.equal(singleRows.length, 2);
+  assert.doesNotMatch(html, /--tumblr-row-columns:2/);
+  assert.equal('layout' in source.posts[0].versions[0], false);
+});
+
+test('Tumblr full post cards keep their normal width even when source images are tiny', async () => {
+  const css = await fs.readFile(new URL('../src/site/archive.css', import.meta.url), 'utf8');
+  const selector = '.platform-page--tumblr .post-card--tumblr';
+  const selectorIndex = css.indexOf(selector);
+  assert.ok(selectorIndex >= 0, 'Tumblr full-card rule exists');
+  const blockEnd = css.indexOf('}', selectorIndex);
+  const rule = css.slice(selectorIndex, blockEnd + 1);
+  assert.match(rule, /width:\s*100%/);
+  assert.match(rule, /max-width:\s*560px/);
+});
+
+test('Tumblr photoset cells override generic natural-size media constraints', async () => {
+  const css = await fs.readFile(new URL('../src/site/archive.css', import.meta.url), 'utf8');
+  const genericSelector = '.platform-page .post-card .post-media-item .media-link img';
+  const tumblrSelector = '.platform-page--tumblr .post-card--tumblr .tumblr-media-row .post-media-item .media-link img';
+  const genericIndex = css.indexOf(genericSelector);
+  const tumblrIndex = css.indexOf(tumblrSelector);
+
+  assert.ok(genericIndex >= 0, 'generic platform media rule exists');
+  assert.ok(tumblrIndex > genericIndex, 'Tumblr photoset override comes after the generic rule');
+
+  const blockEnd = css.indexOf('}', tumblrIndex);
+  const tumblrRule = css.slice(tumblrIndex, blockEnd + 1);
+  assert.match(tumblrRule, /width:\s*100%/);
+  assert.match(tumblrRule, /max-width:\s*none/);
+  assert.match(tumblrRule, /height:\s*100%/);
+  assert.match(tumblrRule, /max-height:\s*none/);
+  assert.match(tumblrRule, /object-fit:\s*cover/);
+});
 
 test('post body ordering follows platform conventions and Tumblr evidence precedes text', async () => {
   const mediaRoot = await createMediaFixture();

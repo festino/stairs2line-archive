@@ -1154,6 +1154,7 @@ h2 {
 }
 
 .platform-page--tumblr .post-card--tumblr {
+  width: 100%;
   max-width: 560px;
   margin-inline: auto;
   border-radius: 0.35rem;
@@ -1175,19 +1176,43 @@ h2 {
   display: grid;
   grid-template-columns: repeat(var(--tumblr-row-columns), minmax(0, 1fr));
   gap: 2px;
+  aspect-ratio: var(--tumblr-row-aspect, auto);
+  overflow: hidden;
 }
 
-.tumblr-media-row .post-media-item,
-.tumblr-media-row .media-link {
+.platform-page--tumblr .post-card--tumblr .tumblr-media-row .post-media-item,
+.platform-page--tumblr .post-card--tumblr .tumblr-media-row .media-link {
   min-width: 0;
-}
-
-.tumblr-media-row .media-link img,
-.tumblr-media-row .media-link video {
+  min-height: 0;
   width: 100%;
   height: 100%;
+}
+
+.platform-page--tumblr .post-card--tumblr .tumblr-media-row .post-media-item {
+  overflow: hidden;
+}
+
+.platform-page--tumblr .post-card--tumblr .tumblr-media-row .media-link {
+  display: block;
+}
+
+/* The generic platform-card rules above intentionally preserve natural image
+   dimensions. Tumblr photosets are different: each block must fill the cell
+   defined by the photoset row, with the image cropped inside that cell. Keep
+   this selector at least as specific as the generic platform rule so tall
+   photos cannot shrink to their intrinsic width and leave gaps in a row. */
+.platform-page--tumblr .post-card--tumblr .tumblr-media-row .post-media-item .media-link img,
+.platform-page--tumblr .post-card--tumblr .tumblr-media-row .post-media-item .media-link video {
+  display: block;
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  max-height: none;
+  min-width: 0;
   min-height: 0;
+  aspect-ratio: auto;
   object-fit: cover;
+  object-position: center;
 }
 
 .post-version-list {
@@ -2093,12 +2118,15 @@ h2 {
 .home-sections {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: stretch;
   gap: 0.75rem;
   margin-bottom: 2.5rem;
 }
 
 .home-section-link {
   display: grid;
+  grid-auto-rows: max-content;
+  align-content: start;
   gap: 0.35rem;
   min-height: 8rem;
   padding: 1rem;
@@ -2452,4 +2480,244 @@ h2 {
   .home-featured-heading {
     align-items: flex-start;
   }
+}
+
+/* Homepage cards can contain previews and platform links beneath their descriptions. */
+.home-section-title {
+  color: inherit;
+  text-decoration: none;
+}
+
+.home-section-title:hover,
+.home-section-title:focus-visible {
+  text-decoration: underline;
+}
+
+.home-social-icons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 0.45rem;
+}
+
+.home-social-icons a {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.45rem;
+}
+
+.home-social-icons img {
+  width: 1.45rem;
+  height: 1.45rem;
+  object-fit: contain;
+}
+
+.home-featured-grid,
+.home-revision-example {
+  margin-top: 0.55rem;
+}
+
+.home-featured-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.home-featured-grid .gallery-item,
+.home-revision-example .gallery-item {
+  width: min(100%, 8.5rem);
+  height: 8.5rem;
+}
+
+.home-revision-example {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.45rem;
+}
+
+.home-revision-example .gallery-item {
+  width: 100%;
+}
+
+.home-section-card {
+  display: grid;
+  gap: 0.35rem;
+  min-height: 8rem;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 0.85rem;
+  background: var(--surface);
+}
+
+.home-section-card > span {
+  color: var(--muted);
+}
+
+.home-section-card > .home-section-link {
+  display: inline;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+.home-section-card > .home-section-link:hover,
+.home-section-card > .home-section-link:focus-visible { text-decoration: underline; }
+
+/* Homepage section cards remain single navigation targets. Their previews are
+   descriptive only, so clicking anywhere in the card follows the section link. */
+.home-sections {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.home-section-link[data-home-section="gallery"] {
+  grid-column: 1 / -1;
+}
+
+.home-featured-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(7.5rem, 1fr));
+  gap: 0.5rem;
+  margin-top: 0.35rem;
+}
+
+.home-artwork-thumb {
+  display: block;
+  min-width: 0;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  border-radius: 0.45rem;
+  background: var(--background);
+}
+
+.home-artwork-thumb img,
+.home-artwork-thumb video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.home-platforms-preview {
+  position: relative;
+  display: block;
+  min-height: 0;
+  max-height: 15rem;
+  margin-top: 0.85rem;
+  overflow: hidden;
+  border-radius: 0.65rem;
+}
+
+.home-platforms-preview::after {
+  content: "";
+  position: absolute;
+  z-index: 3;
+  inset: auto 0 0;
+  height: 5.5rem;
+  pointer-events: none;
+  background: linear-gradient(to bottom, transparent, var(--surface) 88%);
+}
+
+.home-platforms-preview-inner {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.home-social-platform {
+  display: grid;
+  grid-template-columns: minmax(7rem, 0.8fr) minmax(0, 2.2fr);
+  align-items: center;
+  gap: 0.7rem;
+  min-width: 0;
+  padding: 0.55rem;
+  border: 1px solid color-mix(in srgb, var(--border) 78%, transparent);
+  border-radius: 0.65rem;
+  background: color-mix(in srgb, var(--background) 38%, transparent);
+}
+
+.home-social-platform-head {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-width: 0;
+}
+
+.home-social-platform-avatar {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 2.35rem;
+  height: 2.35rem;
+  overflow: hidden;
+  border-radius: 50%;
+  background: var(--background);
+  font-weight: 750;
+}
+
+.home-social-platform-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.home-social-platform-name {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--text) !important;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.home-social-posts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.3rem;
+  min-width: 0;
+}
+
+.home-social-post-thumb {
+  display: block;
+  min-width: 0;
+  aspect-ratio: 1.35 / 1;
+  overflow: hidden;
+  border-radius: 0.35rem;
+  background: var(--background);
+}
+
+.home-social-post-thumb img,
+.home-social-post-thumb video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.home-revision-example {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin-top: 0.35rem;
+}
+
+@media (max-width: 700px) {
+  .home-sections {
+    grid-template-columns: 1fr;
+  }
+
+  .home-section-link[data-home-section="gallery"] {
+    grid-column: auto;
+  }
+
+  .home-featured-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .home-social-platform {
+    grid-template-columns: 1fr;
+    gap: 0.45rem;
+  }
+
 }

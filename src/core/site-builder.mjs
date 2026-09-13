@@ -591,17 +591,10 @@ function fallbackPostTitle(manifest, post, platform, language) {
 }
 
 function defaultTumblrRows(mediaCount) {
-  const rows = [];
-  let index = 0;
-  if (mediaCount % 2 === 1 && mediaCount > 1) {
-    rows.push([0]);
-    index = 1;
-  }
-  while (index < mediaCount) {
-    rows.push(index + 1 < mediaCount ? [index, index + 1] : [index]);
-    index += 2;
-  }
-  return rows;
+  // Tumblr NPF defines an omitted layout as a vertical stack. Legacy
+  // photosets also had an explicit PhotosetLayout value, so when that
+  // evidence is missing we should not invent a grid from the media count.
+  return Array.from({ length: mediaCount }, (_, index) => [index]);
 }
 
 function tumblrLayoutRows(version) {
@@ -614,6 +607,20 @@ function tumblrLayoutRows(version) {
   }
   if (rows.length > 0) return rows;
   return defaultTumblrRows(version.mediaRefs?.length ?? 0);
+}
+
+function tumblrRowAspectRatio(manifest, mediaRefs, blocks) {
+  const aspectRatios = blocks.map((mediaIndex) => {
+    const mediaRef = mediaRefs[mediaIndex];
+    const filePath = mediaRef?.displayFile ?? mediaRef?.filePath;
+    const file = filePath ? manifest.files[filePath] : null;
+    if (!file?.width || !file?.height) return null;
+    return file.width / file.height;
+  });
+
+  if (aspectRatios.some((value) => !Number.isFinite(value) || value <= 0)) return null;
+  if (aspectRatios.length === 1) return aspectRatios[0];
+  return aspectRatios.length * Math.max(...aspectRatios);
 }
 
 function twitterSingleMediaCropClass(manifest, mediaRef) {
@@ -644,7 +651,10 @@ function renderPostMedia(manifest, post, version, language, index) {
         used.add(mediaIndex);
         return `<div class="post-media-item">${mediaRefElement(manifest, mediaRef, language, title, 'post', post.key, { eager: index === 0 && mediaIndex === 0, versionIndex: version.index })}</div>`;
       }).filter(Boolean).join('');
-      return items ? `<div class="tumblr-media-row" style="--tumblr-row-columns:${blocks.length}">${items}</div>` : '';
+      if (!items) return '';
+      const aspectRatio = tumblrRowAspectRatio(manifest, mediaRefs, blocks);
+      const aspectStyle = aspectRatio ? `;--tumblr-row-aspect:${aspectRatio}` : '';
+      return `<div class="tumblr-media-row" style="--tumblr-row-columns:${blocks.length}${aspectStyle}">${items}</div>`;
     }).join('');
     const trailing = mediaRefs.map((mediaRef, mediaIndex) => used.has(mediaIndex) ? '' : `<div class="tumblr-media-row" style="--tumblr-row-columns:1"><div class="post-media-item">${mediaRefElement(manifest, mediaRef, language, title, 'post', post.key, { versionIndex: version.index })}</div></div>`).join('');
     return `<div class="post-media-grid tumblr-media-layout">${rows}${trailing}</div>`;
@@ -900,10 +910,12 @@ function renderPostActivityMap(manifest, posts, language, direction = 'desc') {
   </section>`;
 }
 
-function renderHomeSection(manifest, language, href, titleKey, descriptionKey) {
-  return `<a class="home-section-link" href="${escapeAttribute(routeUrl(manifest, language, href))}">
+function renderHomeSection(manifest, language, href, titleKey, descriptionKey, extra = '', className = '') {
+  const sectionAttr = className ? ` data-home-section="${escapeAttribute(className)}"` : '';
+  return `<a class="home-section-link" href="${escapeAttribute(routeUrl(manifest, language, href))}"${sectionAttr}>
     <strong>${escapeHtml(localeText(manifest.locales, language, titleKey))}</strong>
     <span>${escapeHtml(localeText(manifest.locales, language, descriptionKey))}</span>
+    ${extra}
   </a>`;
 }
 
@@ -921,6 +933,13 @@ function dedupeGalleryVersions(manifest, items) {
     seen.add(identity);
     return true;
   });
+}
+
+function renderHomeArtworkThumb(manifest, artwork, version, language) {
+  const media = revisionPreviewMedia(manifest, version);
+  if (!media?.displayFile) return '';
+  const title = displayTitle(artwork, language, manifest.defaultLanguage) ?? artwork.id;
+  return `<span class="home-artwork-thumb">${compactMediaElement(manifest, media, title)}</span>`;
 }
 
 function renderHomeOfficialLinks(manifest, language) {
@@ -941,9 +960,63 @@ function renderHomeFeaturedGallery(manifest, language) {
       .map((version) => ({ artwork, version }))
   ));
   if (featured.length === 0) return '';
-  return `<section class="home-featured">
-    <div class="gallery-grid home-featured-grid">${featured.map((item, index) => renderGalleryItem(manifest, item.artwork, item.version, language, index)).join('')}</div>
-  </section>`;
+  return `<span class="home-featured-grid">${featured.map((item) => renderHomeArtworkThumb(manifest, item.artwork, item.version, language)).join('')}</span>`;
+}
+
+function renderHomePlatformPostThumb(manifest, post, language) {
+  const version = latestPostVersion(post);
+  const mediaRef = version.mediaRefs?.[0] ?? null;
+  if (!mediaRef?.displayFile && !mediaRef?.filePath) return '';
+  const platform = manifest.platforms.find((item) => item.id === post.platform);
+  const title = stripLinks(
+    displayTitle(version, language, version.originalLanguage)
+      ?? displayDescription(version, language, version.originalLanguage)
+      ?? fallbackPostTitle(manifest, post, platform, language)
+  );
+  return `<span class="home-social-post-thumb">${compactMediaElement(manifest, mediaRef, title)}</span>`;
+}
+
+function renderHomePlatformsPreview(manifest, language) {
+  const platforms = manifest.platforms
+    .map((platform) => ({
+      platform,
+      posts: manifest.posts
+        .filter((post) => post.platform === platform.id)
+        .sort((a, b) => compareNullableDates(a.publishedAt, b.publishedAt, 'desc'))
+    }))
+    .filter(({ posts }) => posts.length > 0)
+    .slice(0, 4);
+
+  const items = platforms.map(({ platform, posts }) => {
+    const label = platformLabel(platform, language, manifest.defaultLanguage);
+    const avatar = platformAvatarUrl(manifest, platform);
+    const icon = platformIconUrl(manifest, platform);
+    const previewPosts = posts
+      .filter((post) => {
+        const mediaRef = latestPostVersion(post).mediaRefs?.[0];
+        return Boolean(mediaRef?.displayFile ?? mediaRef?.filePath);
+      })
+      .slice(0, 3);
+    if (previewPosts.length === 0) return '';
+    return `<span class="home-social-platform home-social-platform--${escapeAttribute(platform.id)}">
+      <span class="home-social-platform-head">
+        <span class="home-social-platform-avatar">${avatar ? `<img src="${escapeAttribute(avatar)}" alt="">` : icon ? `<img src="${escapeAttribute(icon)}" alt="">` : `<span>${escapeHtml(label.slice(0, 1))}</span>`}</span>
+        <span class="home-social-platform-name">${escapeHtml(label)}</span>
+      </span>
+      <span class="home-social-posts">${previewPosts.map((post) => renderHomePlatformPostThumb(manifest, post, language)).join('')}</span>
+    </span>`;
+  }).filter(Boolean).join('');
+
+  return items ? `<span class="home-platforms-preview"><span class="home-platforms-preview-inner">${items}</span></span>` : '';
+}
+
+function renderHomeRevisionExample(manifest, language) {
+  const artwork = manifest.artworks.find((item) => item.id === 'artwork-0084');
+  if (!artwork) return '';
+  const versions = nonDecorativeRevisionVersions(manifest, artwork);
+  if (versions.length < 2) return '';
+  const pair = [versions[0], versions.at(-1)];
+  return `<span class="home-revision-example">${pair.map((version) => renderHomeArtworkThumb(manifest, artwork, version, language)).join('')}</span>`;
 }
 
 async function buildHomePage(outputRoot, manifest, language) {
@@ -952,13 +1025,12 @@ async function buildHomePage(outputRoot, manifest, language) {
       <h1>${escapeHtml(siteTitle)}</h1>
       <p class="home-lead">${escapeHtml(localeText(manifest.locales, language, 'home.artistDescription'))}</p>
       <p>${escapeHtml(localeText(manifest.locales, language, 'home.archivePurpose'))}</p>
-      <p>${localeText(manifest.locales, language, 'home.supportText', { accounts: renderHomeOfficialLinks(manifest, language) })} <a class="home-all-accounts" href="${escapeAttribute(routeUrl(manifest, language, 'posts/by-platform/'))}">${escapeHtml(localeText(manifest.locales, language, 'home.allAccounts'))}</a></p>
+      <p>${localeText(manifest.locales, language, 'home.supportText', { accounts: renderHomeOfficialLinks(manifest, language) })}</p>
     </section>
-    ${renderHomeFeaturedGallery(manifest, language)}
     <section class="home-sections" aria-label="${escapeAttribute(localeText(manifest.locales, language, 'home.sectionsTitle'))}">
-      ${renderHomeSection(manifest, language, 'gallery/', 'nav.gallery', 'home.galleryDescription')}
-      ${renderHomeSection(manifest, language, 'posts/by-platform/', 'nav.socials', 'home.socialsDescription')}
-      ${renderHomeSection(manifest, language, 'artworks/', 'nav.revisions', 'home.revisionsDescription')}
+      ${renderHomeSection(manifest, language, 'gallery/', 'nav.gallery', 'home.galleryDescription', renderHomeFeaturedGallery(manifest, language), 'gallery')}
+      ${renderHomeSection(manifest, language, 'posts/by-platform/', 'nav.socials', 'home.socialsDescription', renderHomePlatformsPreview(manifest, language))}
+      ${renderHomeSection(manifest, language, 'artworks/', 'nav.revisions', 'home.revisionsDescription', renderHomeRevisionExample(manifest, language))}
     </section>
     <p class="home-contact">${escapeHtml(localeText(manifest.locales, language, 'home.contact'))}: <a href="mailto:offestashka@mail.ru">offestashka@mail.ru</a></p>`;
   await writePage(outputRoot, manifest, language, '', layout(manifest, language, '', {

@@ -36,7 +36,7 @@
     "all": "発見済みすべて",
     "pageTitle": "stairs2line 作品",
     "created": "{date}に制作",
-    "knownNotAfter": "{date}以前に存在",
+    "knownNotAfter": "{date}まで",
     "firstPost": "最初に確認された投稿: {date}",
     "noKnownPosts": "この画像を含む既知の投稿はありません。",
     "artworkVersions": "作品バージョン",
@@ -63,6 +63,7 @@
     "originalPost": "元の投稿を開く",
     "officialPage": "公式ページ",
     "activity": "アクティビティ",
+    "activityDescription": "保存された各プラットフォームの投稿活動を月ごとにまとめたものです。",
     "publicationCount": "投稿: {count}",
     "lessActivity": "少ない",
     "moreActivity": "多い",
@@ -81,9 +82,16 @@
   "home": {
     "sectionsTitle": "アーカイブ",
     "projectDescription": "stairs2line の作品、改訂版、SNS 投稿、それらをつなぐ時系列をまとめたビジュアルアーカイブです。",
-    "galleryDescription": "scope で絞り込める、キャプションなしの画像ギャラリーです。",
-    "socialsDescription": "SNS ごとのプロフィールと保存済み投稿を閲覧できます。",
-    "revisionsDescription": "装飾用を除いた既知のバージョンを、複数ある場合は位置を合わせて比較し、単独版は末尾にまとめます。"
+    "artistDescription": "初音ミクのイラストなどで知られる日本のイラストレーターです。",
+    "archivePurpose": "このアーカイブは、インターネット上に散らばった作品と既知の全バージョンを一か所に集めることを目的としています。私は作者本人とは関係がなく、このアーカイブの公開許可もまだ得ていません。",
+    "supportText": "作者を応援する際は、現在利用されている公式アカウントをご覧ください: {accounts}。",
+    "officialAccounts": "{accounts}",
+    "allAccounts": "すべてのアカウント",
+    "featuredTitle": "ピックアップ",
+    "contact": "連絡先",
+    "galleryDescription": "画像を気軽に眺めるためのギャラリーです。",
+    "socialsDescription": "さまざまなプラットフォームの投稿アーカイブです。",
+    "revisionsDescription": "作品が年月とともにどう変わっていったかを見比べられます。"
   },
   "gallery": {
     "pageTitle": "ギャラリー",

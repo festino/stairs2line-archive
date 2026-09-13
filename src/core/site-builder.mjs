@@ -5,10 +5,10 @@ import { formatDate, localeText, localizedValue } from './localization.mjs';
 import { compareNullableDates, copyDirectory, ensureDirectory, escapeAttribute, escapeHtml, stableHash } from './util.mjs';
 
 const SCOPE_FILTERS = {
-  popular: ['top'],
-  major: ['top', 'major'],
-  versions: ['top', 'major', 'sketchy'],
-  all: ['top', 'major', 'sketchy', 'decorative']
+  popular: ['featured', 'top'],
+  major: ['featured', 'top', 'major'],
+  versions: ['featured', 'top', 'major', 'sketchy'],
+  all: ['featured', 'top', 'major', 'sketchy', 'decorative']
 };
 
 function linkify(input) {
@@ -903,26 +903,63 @@ function renderHomeSection(manifest, language, href, titleKey, descriptionKey) {
   </a>`;
 }
 
+function galleryVersionIdentity(manifest, version) {
+  const media = revisionPreviewMedia(manifest, version);
+  const file = media?.displayFile ? manifest.files[media.displayFile] : null;
+  return file?.sha256 ?? media?.displayFile ?? version.key;
+}
+
+function dedupeGalleryVersions(manifest, items) {
+  const seen = new Set();
+  return items.filter((item) => {
+    const identity = galleryVersionIdentity(manifest, item.version);
+    if (seen.has(identity)) return false;
+    seen.add(identity);
+    return true;
+  });
+}
+
+function renderHomeOfficialLinks(manifest, language) {
+  const wanted = ['twitter', 'pixiv', 'tumblr'];
+  const links = wanted.map((id) => {
+    const platform = manifest.platforms.find((item) => item.id === id);
+    const url = platformSourceUrl(platform);
+    if (!platform || !url) return '';
+    return `<a href="${escapeAttribute(url)}" target="_blank" rel="noreferrer">${escapeHtml(platformLabel(platform, language, manifest.defaultLanguage))}</a>`;
+  }).filter(Boolean).join(', ');
+  return localeText(manifest.locales, language, 'home.officialAccounts', { accounts: links });
+}
+
+function renderHomeFeaturedGallery(manifest, language) {
+  const featured = dedupeGalleryVersions(manifest, manifest.artworks.flatMap((artwork) =>
+    artwork.versions
+      .filter((version) => version.scope === 'featured' && revisionPreviewMedia(manifest, version)?.displayFile)
+      .map((version) => ({ artwork, version }))
+  ));
+  if (featured.length === 0) return '';
+  return `<section class="home-featured">
+    <div class="gallery-grid home-featured-grid">${featured.map((item, index) => renderGalleryItem(manifest, item.artwork, item.version, language, index)).join('')}</div>
+  </section>`;
+}
+
 async function buildHomePage(outputRoot, manifest, language) {
-  const siteTitle = localizedValue(manifest.site.title, language, manifest.defaultLanguage) ?? 'stairs2line';
-  const siteDescription = localizedValue(manifest.site.description, language, manifest.defaultLanguage) ?? '';
+  const siteTitle = 'Tarutaru Sentakki';
   const body = `<section class="home-hero">
       <h1>${escapeHtml(siteTitle)}</h1>
-      ${siteDescription ? `<p>${escapeHtml(siteDescription)}</p>` : ''}
-      <p>${escapeHtml(localeText(manifest.locales, language, 'home.projectDescription'))}</p>
+      <p class="home-lead">${escapeHtml(localeText(manifest.locales, language, 'home.artistDescription'))}</p>
+      <p>${escapeHtml(localeText(manifest.locales, language, 'home.archivePurpose'))}</p>
+      <p>${localeText(manifest.locales, language, 'home.supportText', { accounts: renderHomeOfficialLinks(manifest, language) })} <a class="home-all-accounts" href="${escapeAttribute(routeUrl(manifest, language, 'posts/by-platform/'))}">${escapeHtml(localeText(manifest.locales, language, 'home.allAccounts'))}</a></p>
     </section>
+    ${renderHomeFeaturedGallery(manifest, language)}
     <section class="home-sections" aria-label="${escapeAttribute(localeText(manifest.locales, language, 'home.sectionsTitle'))}">
       ${renderHomeSection(manifest, language, 'gallery/', 'nav.gallery', 'home.galleryDescription')}
       ${renderHomeSection(manifest, language, 'posts/by-platform/', 'nav.socials', 'home.socialsDescription')}
       ${renderHomeSection(manifest, language, 'artworks/', 'nav.revisions', 'home.revisionsDescription')}
     </section>
-    <section class="home-activity">
-      <h2>${escapeHtml(localeText(manifest.locales, language, 'posts.activity'))}</h2>
-      ${renderPostActivityMap(manifest, manifest.posts, language, 'desc')}
-    </section>`;
+    <p class="home-contact">${escapeHtml(localeText(manifest.locales, language, 'home.contact'))}: <a href="mailto:offestashka@mail.ru">offestashka@mail.ru</a></p>`;
   await writePage(outputRoot, manifest, language, '', layout(manifest, language, '', {
     title: `${siteTitle} · ${localeText(manifest.locales, language, 'nav.home')}`,
-    description: siteDescription || localeText(manifest.locales, language, 'home.projectDescription'),
+    description: localeText(manifest.locales, language, 'home.artistDescription'),
     bodyClass: 'home-page',
     body
   }));
@@ -1210,14 +1247,14 @@ async function buildGalleryListings(outputRoot, manifest, language) {
       const oldest = direction === 'asc';
       const baseSegment = filterKey === 'popular' ? 'gallery' : `gallery/${filterKey}`;
       const baseRelative = oldest ? `${baseSegment}/oldest` : baseSegment;
-      const versions = manifest.artworks.flatMap((artwork) => {
+      const versions = dedupeGalleryVersions(manifest, manifest.artworks.flatMap((artwork) => {
         const hasNonDecorativeVersion = artwork.versions.some((version) => version.scope !== 'decorative');
         if (!hasNonDecorativeVersion) return [];
         return artwork.versions
           .filter((version) => scopes.includes(version.scope) && revisionPreviewMedia(manifest, version)?.displayFile)
           .map((version) => ({ artwork, version }));
       })
-        .sort((a, b) => compareNullableDates(a.version.sortAt, b.version.sortAt, direction) || a.version.key.localeCompare(b.version.key));
+        .sort((a, b) => compareNullableDates(a.version.sortAt, b.version.sortAt, direction) || a.version.key.localeCompare(b.version.key)));
       const firstUndatedIndex = versions.findIndex((item) => !item.version.sortAt);
       const galleryItems = versions.map((item, index) => ({
         ...item,
@@ -1433,12 +1470,23 @@ async function buildPlatformIndex(outputRoot, manifest, language) {
       <div class="platform-preview">${previewPosts.map((post) => renderPlatformPreviewPost(manifest, post, language)).join('')}</div>
     </article>`;
   }).join('');
-  const body = `<h1>${escapeHtml(localeText(manifest.locales, language, 'posts.socialsTitle'))}</h1>
+  const body = `<div class="page-heading-row"><h1>${escapeHtml(localeText(manifest.locales, language, 'posts.socialsTitle'))}</h1><a href="${escapeAttribute(routeUrl(manifest, language, 'posts/activity/'))}">${escapeHtml(localeText(manifest.locales, language, 'posts.activity'))}</a></div>
     <section class="platform-list" data-paged-list>${cards}</section>`;
   await writePage(outputRoot, manifest, language, 'posts/by-platform', layout(manifest, language, 'posts/by-platform/', {
     title: `${localeText(manifest.locales, language, 'posts.socialsTitle')} · stairs2line`,
     description: localizedValue(manifest.site.description, language, manifest.defaultLanguage),
     bodyClass: 'platform-index-page',
+    body
+  }));
+}
+
+async function buildActivityPage(outputRoot, manifest, language) {
+  const body = `<div class="page-heading-row"><h1>${escapeHtml(localeText(manifest.locales, language, 'posts.activity'))}</h1><a href="${escapeAttribute(routeUrl(manifest, language, 'posts/by-platform/'))}">${escapeHtml(localeText(manifest.locales, language, 'posts.socialsTitle'))}</a></div>
+    ${renderPostActivityMap(manifest, manifest.posts, language, 'desc')}`;
+  await writePage(outputRoot, manifest, language, 'posts/activity', layout(manifest, language, 'posts/activity/', {
+    title: `${localeText(manifest.locales, language, 'posts.activity')} · stairs2line`,
+    description: localeText(manifest.locales, language, 'posts.activityDescription'),
+    bodyClass: 'activity-page',
     body
   }));
 }
@@ -1677,6 +1725,7 @@ export async function buildStaticSite(compilation, source, outputRoot, options =
     await buildArtworkPages(outputRoot, manifest, language);
     await buildPostListings(outputRoot, manifest, language);
     await buildPlatformIndex(outputRoot, manifest, language);
+    await buildActivityPage(outputRoot, manifest, language);
     await buildPostPages(outputRoot, manifest, language);
     await writeRedirectPage(outputRoot, manifest, language, 'posts', '');
     await writeRedirectPage(outputRoot, manifest, language, 'posts/oldest', '');

@@ -36,7 +36,7 @@
     "all": "All found",
     "pageTitle": "stairs2line artworks",
     "created": "Created {date}",
-    "knownNotAfter": "Known no later than {date}",
+    "knownNotAfter": "By {date}",
     "firstPost": "First known post: {date}",
     "noKnownPosts": "No known posts use this image.",
     "artworkVersions": "Artwork versions",
@@ -63,6 +63,7 @@
     "originalPost": "Open original post",
     "officialPage": "Official page",
     "activity": "Activity",
+    "activityDescription": "Posting activity across archived platforms, grouped by month.",
     "publicationCount": "Posts: {count}",
     "lessActivity": "Less",
     "moreActivity": "More",
@@ -81,9 +82,16 @@
   "home": {
     "sectionsTitle": "Archive sections",
     "projectDescription": "A visual archive of stairs2line: artworks and their revisions, posts across social platforms, and the chronology connecting them.",
-    "galleryDescription": "A dense image-only gallery with scope filters.",
-    "socialsDescription": "Profiles and archived posts grouped by social platform.",
-    "revisionsDescription": "Non-decorative artwork versions, aligned for comparison when several are known; single images are kept at the end."
+    "artistDescription": "A Japanese artist, best known for illustrations featuring Hatsune Miku.",
+    "archivePurpose": "The goal of this archive is to collect all works and all known versions scattered across the internet in one place. I am not affiliated with the artist and have not yet received permission to publish this archive.",
+    "supportText": "Please support the artist through the official active accounts: {accounts}.",
+    "officialAccounts": "{accounts}",
+    "allAccounts": "All accounts",
+    "featuredTitle": "Selected works",
+    "contact": "Contact",
+    "galleryDescription": "Just browse the pictures.",
+    "socialsDescription": "An archive of posts across different platforms.",
+    "revisionsDescription": "See how the artworks changed over the years."
   },
   "gallery": {
     "pageTitle": "Gallery",

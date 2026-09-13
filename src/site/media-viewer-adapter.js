@@ -633,7 +633,7 @@
     const date = formatViewerDay(media?.versionDate, language);
     if (!date) return '';
     if (media.versionDateSource === 'knownNotAfter') {
-      return viewerStringWithDate(index, language, 'versionKnownNotAfter', date, 'Published no later than {date}');
+      return viewerStringWithDate(index, language, 'versionKnownNotAfter', date, 'By {date}');
     }
     if (media.versionDateSource === 'createdAt') {
       return viewerStringWithDate(index, language, 'versionCreated', date, 'Created {date}');

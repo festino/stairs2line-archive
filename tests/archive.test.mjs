@@ -398,11 +398,17 @@ test('static pages use the logical media display file and expose paged/feed cont
 
   const galleryHtml = await fs.readFile(path.join(output, 'en', 'gallery', 'index.html'), 'utf8');
   assert.match(galleryHtml, /<img[^>]+src="\/repo\/media\/stairs2line\/pixiv\/999_p0\.png"/);
-  assert.match(galleryHtml, /data-feed-toggle/);
+  assert.equal((galleryHtml.match(/data-version-id=/g) ?? []).length, 1, 'identical artwork versions are deduplicated in the gallery');
   assert.match(galleryHtml, /class="gallery-grid"/);
   assert.match(galleryHtml, /href="\/repo\/en\/gallery\/oldest\/"/);
   assert.match(galleryHtml, /href="\/repo\/en\/gallery\/major\/"/);
   assert.doesNotMatch(galleryHtml, /class="card artwork-card"/);
+
+  const revisionsHtml = await fs.readFile(path.join(output, 'en', 'artworks', 'index.html'), 'utf8');
+  const revisionsPage2Html = await fs.readFile(path.join(output, 'en', 'artworks', 'page', '2', 'index.html'), 'utf8');
+  const revisionsCombined = revisionsHtml + revisionsPage2Html;
+  assert.match(revisionsCombined, /data-artwork-id="artwork-0001"/);
+  assert.match(revisionsCombined, /data-artwork-id="artwork-0002"/, 'gallery deduplication does not remove either artwork from revisions');
 
   const twitterHtml = await fs.readFile(path.join(output, 'en', 'posts', 'platform', 'twitter', 'index.html'), 'utf8');
   assert.match(twitterHtml, /compact-grid--twitter/);
@@ -430,8 +436,16 @@ test('static pages use the logical media display file and expose paged/feed cont
   assert.match(homeHtml, /<body class="home-page"/);
   assert.doesNotMatch(homeHtml, /<nav class="site-nav">[\s\S]*?>Home<\/a>/);
   assert.match(homeHtml, /class="home-section-link" href="\/repo\/en\/gallery\/"/);
-  assert.match(homeHtml, /class="post-activity"/);
-  assert.match(homeHtml, /class="activity-popover"/);
+  assert.match(homeHtml, /<h1>Tarutaru Sentakki<\/h1>/);
+  assert.doesNotMatch(homeHtml, /class="post-activity"/);
+  assert.match(homeHtml, /offestashka@mail\.ru/);
+
+  const activityHtml = await fs.readFile(path.join(output, 'en', 'posts', 'activity', 'index.html'), 'utf8');
+  assert.match(activityHtml, /class="post-activity"/);
+  assert.match(activityHtml, /class="activity-popover"/);
+
+  const socialsHtml = await fs.readFile(path.join(output, 'en', 'posts', 'by-platform', 'index.html'), 'utf8');
+  assert.match(socialsHtml, /href="\/repo\/en\/posts\/activity\/"/);
   assert.doesNotMatch(homeHtml, /class="post-list"/);
 
   const postsHtml = await fs.readFile(path.join(output, 'en', 'posts', 'index.html'), 'utf8');
@@ -499,7 +513,7 @@ test('post index uses month activity cells with post thumbnails and no artwork/v
   const output = await fs.mkdtemp(path.join(os.tmpdir(), 'stairs2line-activity-site-'));
   await buildStaticSite(compilation, source, output, { mediaRoot });
 
-  const html = await fs.readFile(path.join(output, 'en', 'index.html'), 'utf8');
+  const html = await fs.readFile(path.join(output, 'en', 'posts', 'activity', 'index.html'), 'utf8');
   assert.match(html, /<section class="activity-year"><h2>2020<\/h2>/);
   assert.match(html, /<details class="activity-month"[^>]*>[\s\S]*?<span class="activity-month-dot" data-activity-level="[1-5]"><span>2<\/span>/);
   assert.match(html, /activity-post-thumbnail/);
@@ -699,15 +713,15 @@ test('revisions ignore decorative versions, append single-image artworks, and ga
   const approximateOutput = await fs.mkdtemp(path.join(os.tmpdir(), 'stairs2line-approximate-version-'));
   await buildStaticSite(approximateCompilation, approximateSource, approximateOutput, { mediaRoot });
   const approximateDetail = await fs.readFile(path.join(approximateOutput, 'en', 'artworks', 'artwork-approximate-date', 'index.html'), 'utf8');
-  assert.match(approximateDetail, /Published no later than February 22, 2016/);
+  assert.match(approximateDetail, /By February 22, 2016/g);
   assert.match(approximateDetail, /No known posts use this image\./);
-  assert.ok(approximateDetail.indexOf('Published no later than February 22, 2016') < approximateDetail.indexOf('No known posts use this image.'), 'approximate non-post dates are shown before the empty post list');
+  assert.ok(approximateDetail.indexOf('By February 22, 2016') < approximateDetail.indexOf('No known posts use this image.'), 'approximate non-post dates are shown before the empty post list');
   const approximateRevisions = await fs.readFile(path.join(approximateOutput, 'en', 'artworks', 'index.html'), 'utf8');
-  assert.match(approximateRevisions, /Published no later than February 22, 2016/, 'revision cards preserve the upper-bound semantics instead of rendering knownNotAfter as an exact date');
+  assert.match(approximateRevisions, /By February 22, 2016/g, 'revision cards preserve the upper-bound semantics instead of rendering knownNotAfter as an exact date');
   const approximateViewerIndex = JSON.parse(await fs.readFile(path.join(approximateOutput, 'data', 'viewer-index.json'), 'utf8'));
   assert.equal(approximateViewerIndex.media['artwork-approximate-date/v01/m01'].versionDate, '2016-02-22');
   assert.equal(approximateViewerIndex.media['artwork-approximate-date/v01/m01'].versionDateSource, 'knownNotAfter');
-  assert.equal(approximateViewerIndex.viewerStrings.en.versionKnownNotAfter, 'Published no later than {date}');
+  assert.equal(approximateViewerIndex.viewerStrings.en.versionKnownNotAfter, 'By {date}');
 
   const popularGallery = await fs.readFile(path.join(output, 'en', 'gallery', 'index.html'), 'utf8');
   const allGallery = await fs.readFile(path.join(output, 'en', 'gallery', 'all', 'index.html'), 'utf8');

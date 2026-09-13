@@ -2402,3 +2402,54 @@ h2 {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+/* Homepage introduction and manually curated featured artwork strip. */
+.home-lead {
+  font-size: clamp(1.1rem, 2vw, 1.35rem) !important;
+}
+
+.home-featured {
+  margin: 0 0 2.25rem;
+}
+
+.home-featured-heading,
+.page-heading-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.home-featured-heading h2,
+.page-heading-row h1 {
+  margin-top: 0;
+}
+
+.home-featured-grid {
+  margin-top: 0.75rem;
+}
+
+.home-all-accounts {
+  display: inline-block;
+  margin-left: 0.35rem;
+  padding: 0.25rem 0.55rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  text-decoration: none;
+}
+
+.home-contact {
+  margin-top: 1.5rem;
+  color: var(--muted);
+}
+
+.activity-page .post-activity {
+  margin-top: 0.5rem;
+}
+
+@media (max-width: 620px) {
+  .page-heading-row,
+  .home-featured-heading {
+    align-items: flex-start;
+  }
+}

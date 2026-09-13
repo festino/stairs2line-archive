@@ -2,9 +2,9 @@
   color-scheme: light dark;
   --page-width: 1320px;
   --gap: 1rem;
-  --border: color-mix(in srgb, currentColor 20%, transparent);
+  --border: color-mix(in srgb, currentColor 28%, transparent);
   --muted: color-mix(in srgb, currentColor 62%, transparent);
-  --surface: color-mix(in srgb, Canvas 94%, currentColor 6%);
+  --surface: color-mix(in srgb, Canvas 97%, currentColor 3%);
   --accent: #6b5cff;
 }
 
@@ -54,8 +54,8 @@ textarea {
   gap: 1rem;
   padding: 0.8rem max(1rem, calc((100vw - var(--page-width)) / 2));
   border-bottom: 1px solid var(--border);
-  backdrop-filter: blur(16px);
-  background: color-mix(in srgb, Canvas 88%, transparent);
+  backdrop-filter: none;
+  background: Canvas;
 }
 
 .site-title {
@@ -2720,4 +2720,129 @@ h2 {
     gap: 0.45rem;
   }
 
+}
+
+
+/* Square editorial theme ----------------------------------------------------
+   Keep the archive visually quiet and image-led: hard edges, simple rules and
+   flat surfaces. Profile avatars and activity dots stay circular because their
+   shape is part of the content/data, not card chrome. */
+
+.site-nav a,
+.language-nav a,
+.tab-list a,
+.listing-actions a,
+.listing-actions button,
+.pagination a,
+.pagination span,
+.platform-view-tabs a {
+  border: 1px solid transparent;
+  border-radius: 0;
+}
+
+.site-nav a:hover,
+.site-nav a:focus-visible,
+.language-nav a:hover,
+.language-nav a:focus-visible,
+.tab-list a:hover,
+.tab-list a:focus-visible,
+.listing-actions a:hover,
+.listing-actions a:focus-visible,
+.listing-actions button:hover,
+.listing-actions button:focus-visible,
+.pagination a:hover,
+.pagination a:focus-visible,
+.platform-view-tabs a:hover,
+.platform-view-tabs a:focus-visible {
+  border-color: var(--border);
+  background: var(--surface);
+}
+
+.language-nav a.active,
+.tab-list a.active,
+.pagination a.active,
+.platform-view-tabs a.active {
+  border-color: currentColor;
+  background: transparent;
+  color: inherit;
+}
+
+.card,
+.post-card,
+.platform-card,
+.artwork-media,
+.platform-hero,
+.platform-page--twitter .post-card--twitter .post-media-grid,
+.platform-page--tumblr .post-card--tumblr,
+.platform-links,
+.status,
+.media-viewer-switcher,
+.media-viewer-switcher-preview,
+.media-viewer-close,
+.media-viewer-play-button,
+.media-viewer-post-link,
+.media-viewer-post-reference .media-viewer-post-link,
+.media-viewer-post-reference .media-viewer-post-link:only-child,
+.media-viewer-post-original,
+.compact-media-count--pixiv,
+.compact-date-tooltip,
+.activity-popover,
+.activity-post,
+.activity-post-thumbnail,
+.lost-post-note,
+.compact-lost-badge,
+.platform-preview-lost,
+.post-version-evidence,
+.post-reblog-details > summary,
+.post-reblog-panel,
+.gallery-video-indicator,
+.home-all-accounts,
+.home-social-icons a,
+.home-section-link,
+.home-section-card,
+.home-artwork-thumb,
+.home-platforms-preview,
+.home-social-platform,
+.home-social-post-thumb {
+  border-radius: 0;
+}
+
+/* Floating information should read like a bordered inset rather than a modern
+   elevated card. */
+.activity-popover,
+.post-reblog-panel {
+  box-shadow: none;
+}
+
+.activity-month-dot {
+  transition: none;
+}
+
+.activity-month > summary:hover .activity-month-dot,
+.activity-month > summary:focus-visible .activity-month-dot,
+.activity-month[open] > summary .activity-month-dot {
+  transform: none;
+  box-shadow: none;
+  border-color: currentColor;
+}
+
+/* Home cards are large navigation blocks; a firm rule is enough feedback. */
+.home-section-link:hover,
+.home-section-link:focus-visible,
+.platform-card:has(.platform-card-hit-area:hover) {
+  border-color: currentColor;
+}
+
+/* Keep keyboard focus obvious without re-introducing rounded/glowing chrome. */
+.home-section-link:focus-visible,
+.platform-card-hit-area:focus-visible,
+.site-nav a:focus-visible,
+.language-nav a:focus-visible,
+.tab-list a:focus-visible,
+.listing-actions a:focus-visible,
+.listing-actions button:focus-visible,
+.pagination a:focus-visible,
+.platform-view-tabs a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }

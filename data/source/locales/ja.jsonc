@@ -45,7 +45,9 @@
     "revisionsDescription": "装飾用を除いた既知のバージョンを表示します。複数版は画像内部を切り抜かずに位置を合わせて比較し、単独版は末尾に分けて表示します。",
     "singleImagesTitle": "単独の既知バージョン",
     "longestInterval": "期間が長い順",
-    "shortestInterval": "期間が短い順"
+    "shortestInterval": "期間が短い順",
+    "unconfirmedTitle": "確認したい作品",
+    "unconfirmedDescription": "既知のどのバージョンも、保存されている投稿には見つかっていない作品です。"
   },
   "posts": {
     "pageTitle": "stairs2line 投稿",

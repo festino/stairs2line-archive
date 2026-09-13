@@ -144,7 +144,9 @@ export const DEFAULT_LOCALES = {
       revisionsDescription: 'Недекоративные версии работ: несколько версий совмещаются для сравнения без внутреннего кропа; одиночные известные версии собраны отдельно в конце.',
       singleImagesTitle: 'Одиночные известные версии',
       longestInterval: 'Сначала длинные интервалы',
-      shortestInterval: 'Сначала короткие интервалы'
+      shortestInterval: 'Сначала короткие интервалы',
+      unconfirmedTitle: 'Работы для подтверждения',
+      unconfirmedDescription: 'Работы, ни одна известная версия которых не встречается ни в одной архивной публикации.'
     },
     posts: {
       pageTitle: 'Посты stairs2line',
@@ -243,7 +245,9 @@ export const DEFAULT_LOCALES = {
       revisionsDescription: 'Non-decorative artwork versions: multi-version groups are aligned for comparison without cropping; single known versions are collected separately at the end.',
       singleImagesTitle: 'Single known versions',
       longestInterval: 'Longest interval first',
-      shortestInterval: 'Shortest interval first'
+      shortestInterval: 'Shortest interval first',
+      unconfirmedTitle: 'Works to confirm',
+      unconfirmedDescription: 'Artworks for which no known version appears in any archived post.'
     },
     posts: {
       pageTitle: 'stairs2line posts',
@@ -342,7 +346,9 @@ export const DEFAULT_LOCALES = {
       revisionsDescription: '装飾用を除いた既知のバージョンを表示します。複数版は画像内部を切り抜かずに位置を合わせて比較し、単独版は末尾に分けて表示します。',
       singleImagesTitle: '単独の既知バージョン',
       longestInterval: '期間が長い順',
-      shortestInterval: '期間が短い順'
+      shortestInterval: '期間が短い順',
+      unconfirmedTitle: '確認したい作品',
+      unconfirmedDescription: '既知のどのバージョンも、保存されている投稿には見つかっていない作品です。'
     },
     posts: {
       pageTitle: 'stairs2line 投稿',

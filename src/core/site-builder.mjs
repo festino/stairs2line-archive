@@ -1237,6 +1237,39 @@ async function buildArtworkListings(outputRoot, manifest, language) {
     );
   }
 
+  // Private-to-share attribution review: artworks for which none of the known
+  // versions is connected to an archived post. Keep this out of the main
+  // navigation; it is intended as a focused page that can be sent to the artist.
+  const unconfirmedArtworks = manifest.artworks
+    .filter((artwork) => artwork.versions.every((version) =>
+      version.mediaIds.every((mediaId) => (manifest.media[mediaId]?.postIds ?? []).length === 0)))
+    .map((artwork) => {
+      const version = artwork.versions.find((candidate) =>
+        candidate.scope !== 'decorative' && revisionPreviewMedia(manifest, candidate)?.displayFile)
+        ?? artwork.versions.find((candidate) => revisionPreviewMedia(manifest, candidate)?.displayFile);
+      return version ? { artwork, version } : null;
+    })
+    .filter(Boolean)
+    .sort((a, b) => compareNullableDates(a.artwork.sortAt, b.artwork.sortAt, 'desc') || a.artwork.id.localeCompare(b.artwork.id));
+
+  await writePaginatedListing(
+    outputRoot,
+    manifest,
+    language,
+    'artworks/unconfirmed',
+    unconfirmedArtworks,
+    manifest.site.pageSize?.artworks ?? 36,
+    (item, index) => renderArtworkCard(manifest, item.artwork, item.version, language, index),
+    {
+      heading: localeText(manifest.locales, language, 'artworks.unconfirmedTitle'),
+      title: `${localeText(manifest.locales, language, 'artworks.unconfirmedTitle')} · stairs2line`,
+      description: localeText(manifest.locales, language, 'artworks.unconfirmedDescription'),
+      listClass: 'card-grid',
+      bodyClass: 'artworks-unconfirmed-page',
+      noindex: true
+    }
+  );
+
   // The old filtered artwork URLs used the same data model as the gallery.
   // Keep them as compatibility redirects instead of silently changing meaning.
   for (const key of ['major', 'versions', 'all']) {

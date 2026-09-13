@@ -45,7 +45,9 @@
     "revisionsDescription": "Non-decorative artwork versions: multi-version groups are aligned for comparison without cropping; single known versions are collected separately at the end.",
     "singleImagesTitle": "Single known versions",
     "longestInterval": "Longest interval first",
-    "shortestInterval": "Shortest interval first"
+    "shortestInterval": "Shortest interval first",
+    "unconfirmedTitle": "Works to confirm",
+    "unconfirmedDescription": "Artworks for which no known version appears in any archived post."
   },
   "posts": {
     "pageTitle": "stairs2line posts",

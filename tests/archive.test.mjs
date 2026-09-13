@@ -506,7 +506,7 @@ test('post index uses month activity cells with post thumbnails and no artwork/v
     id: '123456789012345679',
     status: 'alive',
     publishedAt: '2020-01-20T00:00:00Z',
-    versions: [{ originalLanguage: 'en', title: { en: 'Second January post' }, media: [TWITTER_FILE] }],
+    versions: [{ originalLanguage: 'en', description: { en: 'See {reference|https://example.com/source} here' }, media: [TWITTER_FILE] }],
     __source: '/source/posts/twitter.jsonc'
   });
   const compilation = await compileArchive(source, { mediaRoot });
@@ -519,6 +519,8 @@ test('post index uses month activity cells with post thumbnails and no artwork/v
   assert.match(html, /activity-post-thumbnail/);
   assert.match(html, /Posts: 2/);
   assert.match(html, /January 20, 2020 · Twitter/);
+  assert.match(html, /See reference here/);
+  assert.doesNotMatch(html, /\{reference\|https:\/\/example\.com\/source\}/);
   assert.doesNotMatch(html, /artworkCount|versionCount|unique artworks/i);
 
   const css = await fs.readFile(path.join(output, 'assets', 'archive.css'), 'utf8');

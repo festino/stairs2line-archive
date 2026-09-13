@@ -36,11 +36,11 @@ function linkify(input) {
 }
 
 function stripLinks(input) {
-    if (typeof input != "string") return input;
+  if (typeof input !== 'string') return input;
 
-    const re = /\{([^{}|]+)\|(https:\/\/[^{}\s]+)\}/g;
-
-    return input.replace(re, (_, label) => label);
+  return input
+    .replace(/\{([^{}|]+)\|(https:\/\/[^{}\s]+)\}/g, (_, label) => label)
+    .replace(/\[([^\]\n]+)\]\((https:\/\/[^)\s]+)\)/g, (_, label) => label);
 }
 
 function normalizeBasePath(value) {
@@ -776,9 +776,11 @@ function renderCompactPost(manifest, post, language) {
   const mediaRefs = version.mediaRefs ?? [];
   const mediaCount = mediaRefs.length;
   const platform = manifest.platforms.find((item) => item.id === post.platform);
-  const title = displayTitle(version, language, version.originalLanguage)
-    ?? displayDescription(version, language, version.originalLanguage)
-    ?? fallbackPostTitle(manifest, post, platform, language);
+  const title = stripLinks(
+    displayTitle(version, language, version.originalLanguage)
+      ?? displayDescription(version, language, version.originalLanguage)
+      ?? fallbackPostTitle(manifest, post, platform, language)
+  );
   const postHref = routeUrl(manifest, language, `posts/${encodeURIComponent(post.platform)}/${encodeURIComponent(post.id)}/`);
   const date = displayPostDate(manifest, post, language, { includeTime: false });
   const badge = post.platform === 'pixiv' && mediaCount > 1
@@ -834,9 +836,11 @@ function renderActivityPost(manifest, post, language) {
   const platform = manifest.platforms.find((item) => item.id === post.platform);
   const icon = platformIconUrl(manifest, platform);
   const label = platformLabel(platform, language, manifest.defaultLanguage);
-  const title = displayTitle(version, language, version.originalLanguage)
-    ?? displayDescription(version, language, version.originalLanguage)
-    ?? fallbackPostTitle(manifest, post, platform, language);
+  const title = stripLinks(
+    displayTitle(version, language, version.originalLanguage)
+      ?? displayDescription(version, language, version.originalLanguage)
+      ?? fallbackPostTitle(manifest, post, platform, language)
+  );
   const date = displayPostDate(manifest, post, language, { includeTime: false });
   const href = routeUrl(manifest, language, `posts/${encodeURIComponent(post.platform)}/${encodeURIComponent(post.id)}/`);
   return `<a class="activity-post" href="${escapeAttribute(href)}" title="${escapeAttribute(title)}">
@@ -1426,9 +1430,11 @@ function renderPlatformPreviewPost(manifest, post, language) {
   const version = latestPostVersion(post);
   const mediaRef = version.mediaRefs?.[0] ?? null;
   const platform = manifest.platforms.find((item) => item.id === post.platform);
-  const title = displayTitle(version, language, version.originalLanguage)
-    ?? displayDescription(version, language, version.originalLanguage)
-    ?? fallbackPostTitle(manifest, post, platform, language);
+  const title = stripLinks(
+    displayTitle(version, language, version.originalLanguage)
+      ?? displayDescription(version, language, version.originalLanguage)
+      ?? fallbackPostTitle(manifest, post, platform, language)
+  );
   const date = displayPostDate(manifest, post, language, { includeTime: false });
   const href = routeUrl(manifest, language, `posts/${encodeURIComponent(post.platform)}/${encodeURIComponent(post.id)}/`);
   const lostBadge = isRecoveredMediaOnly(post) ? `<span class="platform-preview-lost">${escapeHtml(localeText(manifest.locales, language, 'common.lost'))}</span>` : '';

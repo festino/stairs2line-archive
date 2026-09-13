@@ -11,7 +11,9 @@
         {
           "originalLanguage": "ja",
           "title": {
-            "ja": "ミク"
+            "ja": "ミク",
+            "en": "Miku",
+            "ru": "Мику"
           },
           "media": [
             "pixiv/34412323_p0.png"
@@ -29,7 +31,9 @@
         {
           "originalLanguage": "ja",
           "title": {
-            "ja": "あづいﾞ"
+            "ja": "あづいﾞ",
+            "en": "Soo hot",
+            "ru": "Жара-а"
           },
           "media": [
             "pixiv/36243734_p0.png"
@@ -47,7 +51,9 @@
         {
           "originalLanguage": "ja",
           "title": {
-            "ja": "みく"
+            "ja": "みく",
+            "en": "Miku",
+            "ru": "Мику"
           },
           "media": [
             "pixiv/36628281_p0.png"
@@ -65,7 +71,9 @@
         {
           "originalLanguage": "ja",
           "title": {
-            "ja": "ざっくばらん"
+            "ja": "ざっくばらん",
+            "en": "Casual",
+            "ru": "Запросто"
           },
           "media": [
             "pixiv/41839221_p0.png"
@@ -83,10 +91,14 @@
         {
           "originalLanguage": "ja",
           "title": {
-            "ja": "ネプトン"
+            "ja": "ネプトン",
+            "en": "Neptune",
+            "ru": "Нептун"
           },
           "description": {
-            "ja": "うちのこです"
+            "ja": "うちのこです",
+            "en": "This is my character.",
+            "ru": "Это мой персонаж."
           },
           "media": [
             "pixiv/42421426_p0.png"
@@ -104,7 +116,9 @@
         {
           "originalLanguage": "ja",
           "title": {
-            "ja": "miku"
+            "ja": "miku",
+            "en": "miku",
+            "ru": "miku"
           },
           "media": [
             "pixiv/44214320_p0.png"
@@ -122,7 +136,7 @@
         {
           "originalLanguage": "ja",
           "title": {
-            "ja": "+"
+            "default": "+"
           },
           "media": [
             "pixiv/45342986_p0.png"
@@ -140,7 +154,7 @@
         {
           "originalLanguage": "ja",
           "title": {
-            "ja": "▲"
+            "default": "▲"
           },
           "media": [
             "pixiv/45663109_p0.png"
@@ -158,10 +172,14 @@
         {
           "originalLanguage": "ja",
           "title": {
-            "ja": "落書き"
+            "ja": "落書き",
+            "en": "Doodle",
+            "ru": "Набросок"
           },
           "description": {
-            "ja": "人の子うちの子色々と"
+            "ja": "人の子うちの子色々と",
+            "en": "Various characters, mine and others.",
+            "ru": "Разные персонажи — мои и чужие."
           },
           "media": [
             "tumblr/81351166350_tumblr_n3byitfswV1s4v84ho4_500.png",
@@ -190,7 +208,9 @@
         {
           "originalLanguage": "ja",
           "title": {
-            "ja": "長門"
+            "ja": "長門",
+            "en": "Nagato",
+            "ru": "Нагато"
           },
           "media": [
             "pixiv/45789819_p0.png"
@@ -208,7 +228,9 @@
         {
           "originalLanguage": "ja",
           "title": {
-            "ja": "ドボン"
+            "ja": "ドボン",
+            "en": "Splash",
+            "ru": "Плюх"
           },
           "media": [
             "pixiv/46952854_p0.png"
@@ -226,7 +248,9 @@
         {
           "originalLanguage": "ja",
           "title": {
-            "ja": "じろーっ"
+            "ja": "じろーっ",
+            "en": "Staaare",
+            "ru": "Пристально"
           },
           "media": [
             "pixiv/47304887_p0.png"
@@ -244,7 +268,9 @@
         {
           "originalLanguage": "ja",
           "title": {
-            "ja": "爆音"
+            "ja": "爆音",
+            "en": "Blast",
+            "ru": "Грохот"
           },
           "media": [
             "twitter/1073163955281907712_DuSkgFBVsAEdUG5.png"
@@ -262,7 +288,9 @@
         {
           "originalLanguage": "ja",
           "title": {
-            "ja": "落書き"
+            "ja": "落書き",
+            "en": "Doodle",
+            "ru": "Набросок"
           },
           "media": [
             "tumblr/100882755344_tumblr_ndzf80Ljry1s4v84ho2_400.png",
@@ -286,7 +314,9 @@
         {
           "originalLanguage": "ja",
           "title": {
-            "ja": "三角錐"
+            "ja": "三角錐",
+            "en": "Triangular pyramid",
+            "ru": "Треугольная пирамида"
           },
           "media": [
             "pixiv/49576288_p0.png"
@@ -304,7 +334,9 @@
         {
           "originalLanguage": "ja",
           "title": {
-            "ja": "だらり"
+            "ja": "だらり",
+            "en": "Languid",
+            "ru": "Вразвалку"
           },
           "media": [
             "pixiv/49831165_p0.png"
@@ -322,10 +354,14 @@
         {
           "originalLanguage": "ja",
           "title": {
-            "ja": "さむい"
+            "ja": "さむい",
+            "en": "Cold",
+            "ru": "Холодно"
           },
           "description": {
-            "ja": "季節になりました"
+            "ja": "季節になりました",
+            "en": "That season has come.",
+            "ru": "Настал этот сезон."
           },
           "media": [
             "pixiv/53557244_p0.png"
@@ -343,10 +379,14 @@
         {
           "originalLanguage": "ja",
           "title": {
-            "ja": "角形"
+            "ja": "角形",
+            "en": "Angular",
+            "ru": "Угловатость"
           },
           "description": {
-            "ja": "綺麗な線を目指して"
+            "ja": "綺麗な線を目指して",
+            "en": "Aiming for clean lines.",
+            "ru": "Стремлюсь к чистым линиям."
           },
           "media": [
             "pixiv/54283685_p0.png"
@@ -364,10 +404,14 @@
         {
           "originalLanguage": "ja",
           "title": {
-            "ja": "VSオーバ"
+            "ja": "VSオーバ",
+            "en": "VS Flint",
+            "ru": "VS Обер"
           },
           "description": {
-            "ja": "「きみの いきおい かんじる あつい きもち つたわってくる！」"
+            "ja": "「きみの いきおい かんじる あつい きもち つたわってくる！」",
+            "en": "“I can feel your momentum — your fiery spirit comes through!”",
+            "ru": "«Я чувствую твой напор — до меня доходит твой горячий дух!»"
           },
           "media": [
             "tumblr/137491300699_tumblr_o13zdtDHPu1s4v84ho4_500.png"
@@ -385,7 +429,9 @@
         {
           "originalLanguage": "ja",
           "title": {
-            "ja": "コンパス"
+            "ja": "コンパス",
+            "en": "Compass",
+            "ru": "Компас"
           },
           "media": [
             "tumblr/139165453739_tumblr_o2flp2BTKg1s4v84ho1_500.png"
@@ -403,10 +449,14 @@
         {
           "originalLanguage": "ja",
           "title": {
-            "ja": "てん死"
+            "ja": "てん死",
+            "en": "Tenshi",
+            "ru": "Тэнси"
           },
           "description": {
-            "ja": "てらさん({user/2764844|https://www.pixiv.net/en/users/2764844})ちの子です"
+            "ja": "てらさん({user/2764844|https://www.pixiv.net/en/users/2764844})ちの子です",
+            "en": "This is Tera-san's ({user/2764844|https://www.pixiv.net/en/users/2764844}) character.",
+            "ru": "Это персонаж Тэры ({user/2764844|https://www.pixiv.net/en/users/2764844})."
           },
           "media": [
             "pixiv/55958136_p0.png"
@@ -424,10 +474,14 @@
         {
           "originalLanguage": "ja",
           "title": {
-            "ja": "3Dじゃないよ"
+            "ja": "3Dじゃないよ",
+            "en": "It's not 3D",
+            "ru": "Это не 3D"
           },
           "description": {
-            "ja": "色んなミクのメイキング集です"
+            "ja": "色んなミクのメイキング集です",
+            "en": "A collection of making-ofs for various Miku drawings.",
+            "ru": "Сборник процессов создания разных рисунков с Мику."
           },
           "media": [
             "pixiv/56808104_p0.mp4"
@@ -445,10 +499,14 @@
         {
           "originalLanguage": "ja",
           "title": {
-            "ja": "鼓動"
+            "ja": "鼓動",
+            "en": "Pulse",
+            "ru": "Пульс"
           },
           "description": {
-            "ja": "静かな音のイメージ、過去のリメイク。"
+            "ja": "静かな音のイメージ、過去のリメイク。",
+            "en": "An image of a quiet sound; a remake of an older work.",
+            "ru": "Образ тихого звука; ремейк старой работы."
           },
           "media": [
             "tumblr/709544231144947712_218ebe5ecb4b1d4922eaa0f949305f9627ed09ba.png"
@@ -466,7 +524,9 @@
         {
           "originalLanguage": "ja",
           "title": {
-            "ja": "構成"
+            "ja": "構成",
+            "en": "Composition",
+            "ru": "Композиция"
           },
           "media": [
             "tumblr/663928878095564800_81746b7d17edaffe02348c705a697cf095085ec2.png"
@@ -484,7 +544,9 @@
         {
           "originalLanguage": "ja",
           "title": {
-            "ja": "軌道"
+            "ja": "軌道",
+            "en": "Orbit",
+            "ru": "Траектория"
           },
           "media": [
             "twitter/1626858807279390720_FpPDdhAaMAETO1A.png"
@@ -502,10 +564,14 @@
         {
           "originalLanguage": "ja",
           "title": {
-            "ja": "ミク"
+            "ja": "ミク",
+            "en": "Miku",
+            "ru": "Мику"
           },
           "description": {
-            "ja": "お気に入りのポーズ、過去のリメイク。"
+            "ja": "お気に入りのポーズ、過去のリメイク。",
+            "en": "A favorite pose; a remake of an older work.",
+            "ru": "Любимая поза; ремейк старой работы."
           },
           "media": [
             "tumblr/710217409092567040_8618999a6f92255ebdabc924612f2573294f8885.png"
@@ -523,7 +589,9 @@
         {
           "originalLanguage": "ja",
           "title": {
-            "ja": "ぐったり"
+            "ja": "ぐったり",
+            "en": "Exhausted",
+            "ru": "Без сил"
           },
           "media": [
             "tumblr/710217462683172864_6f59784573dcbc4d99165444c6c5e0d5bbd7fc8f.png"
@@ -541,7 +609,9 @@
         {
           "originalLanguage": "ja",
           "title": {
-            "ja": "ゆらり"
+            "ja": "ゆらり",
+            "en": "Sway",
+            "ru": "Покачивание"
           },
           "media": [
             "tumblr/772663486221287424_f530012f1a05ea2c0a4910406e4c5015e6476553.png"
@@ -559,7 +629,9 @@
         {
           "originalLanguage": "ja",
           "title": {
-            "ja": "じー"
+            "ja": "じー",
+            "en": "Stare",
+            "ru": "Взгляд"
           },
           "media": [
             "twitter/1919748300133011553_GqRQtbsacAAiVln.png"
@@ -577,7 +649,9 @@
         {
           "originalLanguage": "ja",
           "title": {
-            "ja": "ゆらぎ"
+            "ja": "ゆらぎ",
+            "en": "Fluctuation",
+            "ru": "Колебание"
           },
           "media": [
             "tumblr/805953449568157696_f6007e0a87aa29b59b3df10a2c06dd3e6fb542cf.png"
@@ -595,7 +669,9 @@
         {
           "originalLanguage": "ja",
           "title": {
-            "ja": "ごろん"
+            "ja": "ごろん",
+            "en": "Flop",
+            "ru": "Кувырк"
           },
           "media": [
             "tumblr/806000851033456640_eba8736e9dacf17be929d57f0371f94a19737731.png"
@@ -613,10 +689,14 @@
         {
           "originalLanguage": "ja",
           "title": {
-            "ja": "鬼"
+            "ja": "鬼",
+            "en": "Oni",
+            "ru": "Они"
           },
           "description": {
-            "ja": "ｵﾆｵﾆ"
+            "ja": "ｵﾆｵﾆ",
+            "en": "ｵﾆｵﾆ",
+            "ru": "Они-они"
           },
           "media": [
             "tumblr/807351584863485952_7870f2fb92df6a246af0d8849980c86b6dea640f.png"
@@ -634,7 +714,9 @@
         {
           "originalLanguage": "ja",
           "title": {
-            "ja": "ミク"
+            "ja": "ミク",
+            "en": "Miku",
+            "ru": "Мику"
           },
           "media": [
             "tumblr/808543229379313664_79aa541c0e519d42f10d60c47eb1de4753d3a87c.png"
@@ -652,7 +734,7 @@
         {
           "originalLanguage": "ja",
           "title": {
-            "ja": "△"
+            "default": "△"
           },
           "media": [
             "tumblr/808543242321903616_5db54f603f6be9e305c9fab93bc04b5781a5e22b.png"
@@ -670,7 +752,9 @@
         {
           "originalLanguage": "ja",
           "title": {
-            "ja": "シンメトリー"
+            "ja": "シンメトリー",
+            "en": "Symmetry",
+            "ru": "Симметрия"
           },
           "media": [
             "tumblr/809079143597768704_29674e06cd848a6954e54e43bfecfa4458997cf6.png",
@@ -690,7 +774,9 @@
         {
           "originalLanguage": "ja",
           "title": {
-            "ja": "ふわり"
+            "ja": "ふわり",
+            "en": "Float",
+            "ru": "Легко"
           },
           "media": [
             "pixiv/147357899_p0.png"
@@ -708,10 +794,14 @@
         {
           "originalLanguage": "ja",
           "title": {
-            "ja": "和"
+            "ja": "和",
+            "en": "Harmony",
+            "ru": "Гармония"
           },
           "description": {
-            "ja": "過去絵のリメイク"
+            "ja": "過去絵のリメイク",
+            "en": "A remake of an older drawing.",
+            "ru": "Ремейк старого рисунка."
           },
           "media": [
             "pixiv/147401423_p0.png"
@@ -759,7 +849,9 @@
         {
           "originalLanguage": "ja",
           "title": {
-            "ja": "落書き3"
+            "ja": "落書き3",
+            "en": "Doodle 3",
+            "ru": "Набросок 3"
           },
           "media": [
             "tumblr/67110559418_tumblr_mwc3cr62SS1s4v84ho3_400.png",
@@ -778,7 +870,9 @@
         {
           "originalLanguage": "ja",
           "title": {
-            "ja": "みっくみく2"
+            "ja": "みっくみく2",
+            "en": "Mikku Miku 2",
+            "ru": "Микку-Мику 2"
           },
           "media": [
             "tumblr/71205857328_tumblr_myf741beQw1s4v84ho1_400.png"
@@ -796,7 +890,9 @@
         {
           "originalLanguage": "ja",
           "title": {
-            "ja": "角形"
+            "ja": "角形",
+            "en": "Angular",
+            "ru": "Угловатость"
           },
           "media": [
             "pixiv/42229693_p0.jpg"
@@ -814,7 +910,9 @@
         {
           "originalLanguage": "ja",
           "title": {
-            "ja": "天子"
+            "ja": "天子",
+            "en": "Tenshi",
+            "ru": "Тэнси"
           },
           "media": [
             "pixiv/42381943_p0.png"
@@ -832,7 +930,9 @@
         {
           "originalLanguage": "ja",
           "title": {
-            "ja": "靴紐"
+            "ja": "靴紐",
+            "en": "Shoelaces",
+            "ru": "Шнурки"
           },
           "media": [
             "pixiv/42995412_p0.jpg"
@@ -850,7 +950,9 @@
         {
           "originalLanguage": "ja",
           "title": {
-            "ja": "クイッ"
+            "ja": "クイッ",
+            "en": "Flick",
+            "ru": "Рывок"
           },
           "media": [
             "tumblr/87312206189_tumblr_n6ee06RFsJ1s4v84ho3_400.png"
@@ -868,7 +970,9 @@
         {
           "originalLanguage": "ja",
           "title": {
-            "ja": "サラリ"
+            "ja": "サラリ",
+            "en": "Smoothly",
+            "ru": "Плавно"
           },
           "media": [
             "tumblr/87312206189_tumblr_n6ee06RFsJ1s4v84ho2_400.png"
@@ -886,7 +990,9 @@
         {
           "originalLanguage": "ja",
           "title": {
-            "ja": "みっくみく3"
+            "ja": "みっくみく3",
+            "en": "Mikku Miku 3",
+            "ru": "Микку-Мику 3"
           },
           "media": [
             "pixiv/44671723_p0.png"
@@ -904,7 +1010,9 @@
         {
           "originalLanguage": "ja",
           "title": {
-            "ja": "ごろん"
+            "ja": "ごろん",
+            "en": "Flop",
+            "ru": "Кувырк"
           },
           "media": [
             "pixiv/44930075_p0.jpg"
@@ -922,7 +1030,9 @@
         {
           "originalLanguage": "ja",
           "title": {
-            "ja": "だらり"
+            "ja": "だらり",
+            "en": "Languid",
+            "ru": "Вразвалку"
           },
           "media": [
             "tumblr/95168716109_tumblr_naji065Ic11s4v84ho2_400.png"
@@ -940,7 +1050,9 @@
         {
           "originalLanguage": "ja",
           "title": {
-            "ja": "そっち"
+            "ja": "そっち",
+            "en": "That way",
+            "ru": "Туда"
           },
           "media": [
             "tumblr/99220698919_tumblr_ncz33nRI5f1s4v84ho5_500.png"
@@ -958,7 +1070,9 @@
         {
           "originalLanguage": "ja",
           "title": {
-            "ja": "だらん"
+            "ja": "だらん",
+            "en": "Loose",
+            "ru": "Расслабленно"
           },
           "media": [
             "pixiv/48819292_p0.jpg"
@@ -976,7 +1090,9 @@
         {
           "originalLanguage": "ja",
           "title": {
-            "ja": "ちょこん"
+            "ja": "ちょこん",
+            "en": "Perched",
+            "ru": "Примостилась"
           },
           "media": [
             "pixiv/50319824_p0.png"
@@ -994,7 +1110,9 @@
         {
           "originalLanguage": "ja",
           "title": {
-            "ja": "スラン"
+            "ja": "スラン",
+            "en": "Suran",
+            "ru": "Суран"
           },
           "media": [
             "tumblr/113499005479_tumblr_nl55ocl5Qy1s4v84ho2_400.png"
@@ -1012,7 +1130,9 @@
         {
           "originalLanguage": "ja",
           "title": {
-            "ja": "水面境界"
+            "ja": "水面境界",
+            "en": "Waterline boundary",
+            "ru": "Граница водной глади"
           },
           "media": [
             "pixiv/50563768_p0.png"
@@ -1030,7 +1150,9 @@
         {
           "originalLanguage": "ja",
           "title": {
-            "ja": "流れ星"
+            "ja": "流れ星",
+            "en": "Shooting star",
+            "ru": "Падающая звезда"
           },
           "media": [
             "pixiv/51368414_p0.png"
@@ -1048,7 +1170,9 @@
         {
           "originalLanguage": "ja",
           "title": {
-            "ja": "発声練習"
+            "ja": "発声練習",
+            "en": "Vocal practice",
+            "ru": "Распевка"
           },
           "media": [
             "tumblr/126578508869_tumblr_nt0ld5znZ21s4v84ho3_500.png"
@@ -1066,7 +1190,9 @@
         {
           "originalLanguage": "ja",
           "title": {
-            "ja": "半重力"
+            "ja": "半重力",
+            "en": "Half-gravity",
+            "ru": "Полугравитация"
           },
           "media": [
             "pixiv/52039307_p0.png"
@@ -1084,7 +1210,9 @@
         {
           "originalLanguage": "ja",
           "title": {
-            "ja": "ちょっと待って"
+            "ja": "ちょっと待って",
+            "en": "Wait a sec",
+            "ru": "Подожди немного"
           },
           "media": [
             "pixiv/52283276_p0.png"
@@ -1102,7 +1230,9 @@
         {
           "originalLanguage": "ja",
           "title": {
-            "ja": "落書き6"
+            "ja": "落書き6",
+            "en": "Doodle 6",
+            "ru": "Набросок 6"
           },
           "media": [
             "tumblr/122089998854_tumblr_nqazruJfbd1s4v84ho1_r2_1280.png",
@@ -1125,7 +1255,9 @@
         {
           "originalLanguage": "ja",
           "title": {
-            "ja": "すいっ"
+            "ja": "すいっ",
+            "en": "Swoop",
+            "ru": "Вжух"
           },
           "media": [
             "tumblr/137222440149_tumblr_o0wdkodYUz1s4v84ho1_1280.png"
@@ -1143,7 +1275,9 @@
         {
           "originalLanguage": "ja",
           "title": {
-            "ja": "落書き7"
+            "ja": "落書き7",
+            "en": "Doodle 7",
+            "ru": "Набросок 7"
           },
           "media": [
             "tumblr/137491300699_tumblr_o13zdtDHPu1s4v84ho1_500.png",
@@ -1171,7 +1305,9 @@
         {
           "originalLanguage": "ja",
           "title": {
-            "ja": "パンク"
+            "ja": "パンク",
+            "en": "Punk",
+            "ru": "Панк"
           },
           "media": [
             "pixiv/58165714_p0.png"
@@ -1189,7 +1325,9 @@
         {
           "originalLanguage": "ja",
           "title": {
-            "ja": "ていっ"
+            "ja": "ていっ",
+            "en": "Hup!",
+            "ru": "Оп!"
           },
           "media": [
             "tumblr/153302626089_tumblr_ogsjsny8GO1s4v84ho1_1280.png"
@@ -1207,7 +1345,9 @@
         {
           "originalLanguage": "ja",
           "title": {
-            "ja": "隙間"
+            "ja": "隙間",
+            "en": "Gap",
+            "ru": "Щель"
           },
           "media": [
             "pixiv/66348336_p0.png"

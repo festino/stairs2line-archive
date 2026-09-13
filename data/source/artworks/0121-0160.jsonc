@@ -1359,7 +1359,7 @@
     {
       "id": "artwork-0139",
       "title": {
-        "ja": "+"
+        "default": "+"
       },
       "versions": [
         {
@@ -1649,7 +1649,7 @@
     {
       "id": "artwork-0145",
       "title": {
-        "ja": "▲"
+        "default": "▲"
       },
       "versions": [
         {

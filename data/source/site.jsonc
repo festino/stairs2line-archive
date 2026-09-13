@@ -8,7 +8,8 @@
   "defaultLanguage": "en",
   "languages": [
     "en",
-    "ja"
+    "ja",
+    "ru"
   ],
   "mediaDirectories": [
     "twitter",

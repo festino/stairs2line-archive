@@ -2359,7 +2359,7 @@
     {
       "id": "artwork-0236",
       "title": {
-        "ja": "△"
+        "default": "△"
       },
       "versions": [
         {

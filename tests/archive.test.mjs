@@ -666,10 +666,10 @@ test('revisions ignore decorative versions, append single-image artworks, and ga
   assert.ok(mainArtworkIndex >= 0 && singleArtworkIndex > mainArtworkIndex, 'single non-decorative images are appended after real revision groups');
   const longArtworkIndex = revisionsHtml.indexOf('data-artwork-id="artwork-long-interval"');
   assert.ok(longArtworkIndex >= 0 && longArtworkIndex < mainArtworkIndex, 'default revision order is longest interval first');
-  assert.match(revisionsHtml, /Shortest interval first/);
+  assert.match(revisionsHtml, /Longest interval first/);
 
   const shortestHtml = await fs.readFile(path.join(output, 'en', 'artworks', 'oldest', 'index.html'), 'utf8');
-  assert.match(shortestHtml, /Longest interval first/);
+  assert.match(shortestHtml, /Shortest interval first/);
   assert.ok(shortestHtml.indexOf('data-artwork-id="artwork-0001"') < shortestHtml.indexOf('data-artwork-id="artwork-long-interval"'), 'alternate revision order is shortest interval first');
 
   const mainCardStart = revisionsHtml.indexOf('data-artwork-id="artwork-0001"');

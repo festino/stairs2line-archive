@@ -121,6 +121,38 @@
       },
       "versions": [
         {
+          "id": "v04",
+          "scope": "sketchy",
+          "knownNotAfter": "2016-02-22",
+          "media": [
+            {
+              "id": "artwork-0162/v04/m01",
+              "legacyIds": [
+                "63f683436052aab6cd751586885aeada460fa6bb3727-kYR2jX_fw1200"
+              ],
+              "files": [
+                "other/63f683436052aab6cd751586885aeada460fa6bb3727-kYR2jX_fw1200.png"
+              ],
+              "viewerAnchor": {
+                "points": [
+                  {
+                    "x": 250,
+                    "y": 0
+                  },
+                  {
+                    "x": 250,
+                    "y": 500
+                  }
+                ],
+                "flipX": true
+              }
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 4
+          }
+        },
+        {
           "id": "v01",
           "scope": "top",
           "media": [
@@ -216,38 +248,6 @@
             "inferredPostIds": [
               "twitter:623040653585321984"
             ]
-          }
-        },
-        {
-          "id": "v04",
-          "scope": "sketchy",
-          "knownNotAfter": "2016-02-22",
-          "media": [
-            {
-              "id": "artwork-0162/v04/m01",
-              "legacyIds": [
-                "63f683436052aab6cd751586885aeada460fa6bb3727-kYR2jX_fw1200"
-              ],
-              "files": [
-                "other/63f683436052aab6cd751586885aeada460fa6bb3727-kYR2jX_fw1200.png"
-              ],
-              "viewerAnchor": {
-                "points": [
-                  {
-                    "x": 250,
-                    "y": 0
-                  },
-                  {
-                    "x": 250,
-                    "y": 500
-                  }
-                ],
-                "flipX": true
-              }
-            }
-          ],
-          "migration": {
-            "legacyVersionIndex": 4
           }
         }
       ],
@@ -899,6 +899,36 @@
       },
       "versions": [
         {
+          "id": "v03",
+          "scope": "major",
+          "media": [
+            {
+              "id": "artwork-0172/v03/m01",
+              "legacyIds": [
+                "nrbwo4i9SL1s4v84ho2_1280"
+              ],
+              "files": [
+                "tumblr/123811035304_tumblr_nrbwo4i9SL1s4v84ho2_1280.png"
+              ],
+              "viewerAnchor": {
+                "points": [
+                  {
+                    "x": 207.9874,
+                    "y": -86.3015
+                  },
+                  {
+                    "x": 207.9874,
+                    "y": 1938.901
+                  }
+                ]
+              }
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 3
+          }
+        },
+        {
           "id": "v01",
           "scope": "sketchy",
           "media": [
@@ -961,36 +991,6 @@
             "inferredPostIds": [
               "pixiv:51368414"
             ]
-          }
-        },
-        {
-          "id": "v03",
-          "scope": "major",
-          "media": [
-            {
-              "id": "artwork-0172/v03/m01",
-              "legacyIds": [
-                "nrbwo4i9SL1s4v84ho2_1280"
-              ],
-              "files": [
-                "tumblr/123811035304_tumblr_nrbwo4i9SL1s4v84ho2_1280.png"
-              ],
-              "viewerAnchor": {
-                "points": [
-                  {
-                    "x": 207.9874,
-                    "y": -86.3015
-                  },
-                  {
-                    "x": 207.9874,
-                    "y": 1938.901
-                  }
-                ]
-              }
-            }
-          ],
-          "migration": {
-            "legacyVersionIndex": 3
           }
         }
       ],

@@ -202,24 +202,6 @@
           }
         },
         {
-          "id": "v02",
-          "scope": "decorative",
-          "media": [
-            {
-              "id": "artwork-0126/v02/m01",
-              "legacyIds": [
-                "n5esbhepR11s4v84ho4_r2_400"
-              ],
-              "files": [
-                "tumblr/85412229284_tumblr_n5esbhepR11s4v84ho4_r2_400.png"
-              ]
-            }
-          ],
-          "migration": {
-            "legacyVersionIndex": 2
-          }
-        },
-        {
           "id": "v03",
           "scope": "decorative",
           "media": [
@@ -370,6 +352,33 @@
         "ja": "クイッ"
       },
       "versions": [
+        {
+          "id": "v06",
+          "scope": "major",
+          "media": [
+            {
+              "id": "artwork-0131/v06/m01",
+              "legacyIds": [
+                "n6ee06RFsJ1s4v84ho4_400"
+              ],
+              "files": [
+                "tumblr/87312206189_tumblr_n6ee06RFsJ1s4v84ho4_400.png"
+              ],
+              "viewerAnchor": {
+                "points": [
+                  {
+                    "x": 200,
+                    "y": 0
+                  },
+                  {
+                    "x": 200,
+                    "y": 400
+                  }
+                ]
+              }
+            }
+          ]
+        },
         {
           "id": "v01",
           "scope": "sketchy",
@@ -739,28 +748,101 @@
     },
     {
       "id": "artwork-0134",
+      "title": {
+        "ja": "みっくみく3"
+      },
       "versions": [
         {
-          "id": "v01",
-          "scope": "major",
+          "id": "v02",
+          "scope": "top",
           "media": [
             {
-              "id": "artwork-0134/v01/m01",
+              "id": "artwork-0134/v02/m01",
               "legacyIds": [
-                "n6ee06RFsJ1s4v84ho4_400"
+                "n0ol35PjEb1s4v84ho3_400"
               ],
               "files": [
-                "tumblr/87312206189_tumblr_n6ee06RFsJ1s4v84ho4_400.png"
+                "tumblr/75998276207_tumblr_n0ol35PjEb1s4v84ho3_400.png"
+              ],
+              "viewerAnchor": {
+                "points": [
+                  {
+                    "x": -132,
+                    "y": 0
+                  },
+                  {
+                    "x": -132,
+                    "y": 400
+                  }
+                ]
+              }
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 2
+          }
+        },
+        {
+          "id": "v03",
+          "scope": "sketchy",
+          "media": [
+            {
+              "id": "artwork-0134/v03/m01",
+              "legacyIds": [
+                "44671723_p0"
+              ],
+              "files": [
+                "pixiv/44671723_p0.png"
+              ],
+              "viewerAnchor": {
+                "points": [
+                  {
+                    "x": 136,
+                    "y": 1
+                  },
+                  {
+                    "x": 136,
+                    "y": 401
+                  }
+                ]
+              }
+            }
+          ],
+          "migration": {
+            "legacyVersionIndex": 3,
+            "inferredPostIds": [
+              "pixiv:44671723"
+            ]
+          }
+        },
+        {
+          "id": "v04",
+          "scope": "decorative",
+          "media": [
+            {
+              "id": "artwork-0134/v04/m01",
+              "legacyIds": [
+                "56808104_p0"
+              ],
+              "files": [
+                "pixiv/56808104_p0.mp4"
               ]
             }
           ],
           "migration": {
-            "legacyVersionIndex": 1
+            "legacyVersionIndex": 4,
+            "inferredPostIds": [
+              "pixiv:56808104"
+            ]
           }
         }
       ],
       "migration": {
-        "legacyGroupIndex": 134
+        "legacyGroupIndex": 94,
+        "inferredPostIds": [
+          "pixiv:44671723",
+          "pixiv:56808104"
+        ]
       }
     },
     {

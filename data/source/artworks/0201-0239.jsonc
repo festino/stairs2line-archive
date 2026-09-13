@@ -874,7 +874,7 @@
         },
         {
           "id": "v02",
-          "scope": "sketchy",
+          "scope": "decorative",
           "media": [
             {
               "id": "artwork-0218/v02/m01",
@@ -908,7 +908,7 @@
         },
         {
           "id": "v03",
-          "scope": "sketchy",
+          "scope": "decorative",
           "media": [
             {
               "id": "artwork-0218/v03/m01",
@@ -942,7 +942,7 @@
         },
         {
           "id": "v04",
-          "scope": "sketchy",
+          "scope": "decorative",
           "media": [
             {
               "id": "artwork-0218/v04/m01",
@@ -979,7 +979,7 @@
         },
         {
           "id": "v05",
-          "scope": "sketchy",
+          "scope": "decorative",
           "media": [
             {
               "id": "artwork-0218/v05/m01",
@@ -2555,6 +2555,169 @@
           "twitter:814496337655758850"
         ]
       }
+    },
+    {
+      "id": "artwork-0242",
+      "title": {
+        "ja": ""
+      },
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "major",
+          "media": [
+            {
+              "id": "artwork-0242/v01/m01",
+              "files": [
+                "other/4422efea9a6d4e3c97f20ec4e3d4f8851d9089a21f2f-ztgfzw_fw1200.png"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "artwork-0243",
+      "title": {
+        "ja": ""
+      },
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "major",
+          "media": [
+            {
+              "id": "artwork-0243/v01/m01",
+              "files": [
+                "other/6570c1b564617d609dd786225fd5ca773ff711a2d8eb-sELVfC_fw1200.png"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "artwork-0244",
+      "title": {
+        "ja": ""
+      },
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "major",
+          "media": [
+            {
+              "id": "artwork-0244/v01/m01",
+              "files": [
+                "other/6b65b7fe7ed0416fdcdd3e9f28832c756d597bbb1070c-z25Bdq_fw1200.png"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "artwork-0245",
+      "title": {
+        "ja": ""
+      },
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "major",
+          "media": [
+            {
+              "id": "artwork-0245/v01/m01",
+              "files": [
+                "other/6c11e6ab50bb3bb1771d0bec478c69fa77249f0f47d8-MVkmjp_fw1200.png"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "artwork-0246",
+      "title": {
+        "ja": ""
+      },
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "major",
+          "media": [
+            {
+              "id": "artwork-0246/v01/m01",
+              "files": [
+                "other/before-2016-02-22_20bbfe8b2312c0101e69487adc5b5fa858b30c9844153-Il5SOO_fw1200.jpeg"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "artwork-0247",
+      "title": {
+        "ja": ""
+      },
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "major",
+          "media": [
+            {
+              "id": "artwork-0247/v01/m01",
+              "files": [
+                "other/before-2018-02-24_18ac61fd0b9bf40272f9905d74fa1bd0eb3609cf3cb9-eAQRcV_fw1200.png"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "artwork-0248",
+      "title": {
+        "ja": ""
+      },
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "major",
+          "media": [
+            {
+              "id": "artwork-0248/v01/m01",
+              "files": [
+                "other/d19ee561b2386a3e1363556f50fe3d545115b0d87255-MFnzIi_fw1200.png"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "artwork-0249",
+      "title": {
+        "ja": ""
+      },
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "sketchy",
+          "media": [
+            {
+              "id": "artwork-0249/v01/m01",
+              "legacyIds": [
+                "n5esbhepR11s4v84ho4_r2_400"
+              ],
+              "files": [
+                "tumblr/85412229284_tumblr_n5esbhepR11s4v84ho4_r2_400.png"
+              ]
+            }
+          ]
+        }
+      ]
     }
   ]
 }

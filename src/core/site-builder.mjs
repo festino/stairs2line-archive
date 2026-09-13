@@ -1190,7 +1190,7 @@ async function buildArtworkListings(outputRoot, manifest, language) {
         noindex: shortestFirst,
         toolbar: {
           sortHref: routeUrl(manifest, language, shortestFirst ? 'artworks/' : 'artworks/oldest/'),
-          sortLabel: localeText(manifest.locales, language, shortestFirst ? 'artworks.longestInterval' : 'artworks.shortestInterval')
+          sortLabel: localeText(manifest.locales, language, shortestFirst ? 'artworks.shortestInterval' : 'artworks.longestInterval')
         }
       }
     );

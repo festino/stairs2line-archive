@@ -28,7 +28,7 @@ export const DEFAULT_PLATFORMS = {
   platforms: [
     {
       id: 'twitter',
-      label: { default: 'Twitter / X' },
+      label: { default: 'Twitter' },
       defaultAccount: 'stairs2line',
       postUrlTemplate: 'https://twitter.com/{account}/status/{id}',
       icon: 'misc/twitter-icon-free-png.webp',
@@ -163,6 +163,7 @@ export const DEFAULT_LOCALES = {
       fullView: 'Полный вид',
       compactView: 'Компактный вид',
       versionLabel: 'Версия {current} из {total}',
+      profileVersion: 'Версия профиля',
       platformTitle: 'Посты на {platform}',
       genericDescription: 'Архивная публикация stairs2line на {platform}.',
       approximateDate: '≈ {date}',
@@ -266,6 +267,7 @@ export const DEFAULT_LOCALES = {
       fullView: 'Full view',
       compactView: 'Compact view',
       versionLabel: 'Version {current} of {total}',
+      profileVersion: 'Profile version',
       platformTitle: 'Posts on {platform}',
       genericDescription: 'An archived stairs2line post on {platform}.',
       approximateDate: '≈ {date}',
@@ -369,6 +371,7 @@ export const DEFAULT_LOCALES = {
       fullView: '通常表示',
       compactView: 'コンパクト表示',
       versionLabel: 'バージョン {current} / {total}',
+      profileVersion: 'プロフィールのバージョン',
       platformTitle: '{platform}の投稿',
       genericDescription: '{platform}にある stairs2line のアーカイブ投稿。',
       approximateDate: '約 {date}',

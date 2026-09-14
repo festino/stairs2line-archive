@@ -59,6 +59,7 @@
     "fullView": "Полный вид",
     "compactView": "Компактный вид",
     "versionLabel": "Версия {current} из {total}",
+    "profileVersion": "Версия профиля",
     "platformTitle": "Посты на {platform}",
     "genericDescription": "Архивная публикация stairs2line на {platform}.",
     "approximateDate": "≈ {date}",

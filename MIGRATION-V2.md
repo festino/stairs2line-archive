@@ -52,7 +52,7 @@ A platform definition now has ordered profile snapshots in `versions`. The last 
 ```json
 {
   "id": "twitter",
-  "label": { "default": "Twitter / X" },
+  "label": { "default": "Twitter" },
   "defaultAccount": "stairs2line",
   "postUrlTemplate": "https://twitter.com/{account}/status/{id}",
   "icon": "misc/twitter-icon-free-png.webp",

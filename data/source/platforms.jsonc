@@ -6,7 +6,7 @@
 	  "createdAt": "2012-01-15T13:44:32.000Z",
 	  "dateApproximate": false,
       "label": {
-        "default": "Twitter / X"
+        "default": "Twitter"
       },
       "defaultAccount": "stairs2line",
       "postUrlTemplate": "https://twitter.com/{account}/status/{id}",
@@ -17,10 +17,14 @@
           "account": "stairs2line",
           "sourceUrl": "https://twitter.com/stairs2line",
 		  "title": {
-            "ja": "たるたる"
+            "ja": "たるたる",
+            "en": "Tarutaru",
+            "ru": "Tarutaru"
           },
 		  "description": {
-            "ja": "ラーメンズ大好きです、絵が好きです。芸術に触れたい。"
+            "ja": "ラーメンズ大好きです、絵が好きです。芸術に触れたい。",
+            "en": "I love Rahmens, and I love drawing. I want to experience art.",
+            "ru": "Обожаю Rahmens и люблю рисовать. Хочу прикоснуться к искусству."
           },
           "avatar": "profiles/twitter/2026-03-04_profile_400x400.png",
           "banner": "profiles/twitter/2026-07-25_header_1500x500_1398344828.jpeg"
@@ -30,10 +34,14 @@
           "account": "stairs2line",
           "sourceUrl": "https://twitter.com/stairs2line",
 		  "title": {
-            "ja": "たるたる"
+            "ja": "たるたる",
+            "en": "Tarutaru",
+            "ru": "Tarutaru"
           },
 		  "description": {
-            "ja": "Illustrator/アイデアと断片\n{michinoku800.tumblr.com|http://michinoku800.tumblr.com/}"
+            "ja": "Illustrator/アイデアと断片\n{michinoku800.tumblr.com|http://michinoku800.tumblr.com/}",
+            "en": "Illustrator / ideas and fragments\n{michinoku800.tumblr.com|http://michinoku800.tumblr.com/}",
+            "ru": "Иллюстратор / идеи и фрагменты\n{michinoku800.tumblr.com|http://michinoku800.tumblr.com/}"
           },
           "avatar": "profiles/twitter/2026-03-04_profile_400x400.png",
           "banner": "profiles/twitter/2026-07-25_header_1500x500_1398344828.jpeg"
@@ -43,10 +51,14 @@
           "account": "stairs2line",
           "sourceUrl": "https://twitter.com/stairs2line",
 		  "title": {
-            "ja": "たるたる"
+            "ja": "たるたる",
+            "en": "Tarutaru",
+            "ru": "Tarutaru"
           },
 		  "description": {
-            "ja": "アイデアと断片"
+            "ja": "アイデアと断片",
+            "en": "Ideas and fragments",
+            "ru": "Идеи и фрагменты"
           },
           "avatar": "profiles/twitter/2026-03-04_profile_400x400.png",
           "banner": "profiles/twitter/2026-07-25_header_1500x500_1398344828.jpeg"
@@ -69,10 +81,14 @@
           "account": "michinoku800",
           "sourceUrl": "https://michinoku800.tumblr.com/",
 		  "title": {
-            "ja": "ツネヒゴロ"
+            "ja": "ツネヒゴロ",
+            "en": "Tsunehigoro",
+            "ru": "Tsunehigoro"
           },
 		  "description": {
-            "ja": "10℃を下回ると更新が途絶えます"
+            "ja": "10℃を下回ると更新が途絶えます",
+            "en": "Updates stop when the temperature drops below 10 °C.",
+            "ru": "Когда температура опускается ниже 10 °C, обновления прекращаются."
           },
           "avatar": "profiles/tumblr/avatar_a40c91cb6918_512.jpg",
           "banner": "profiles/tumblr/tumblr_static_tumblr_static_filename_focused_v3.jpg"
@@ -95,10 +111,14 @@
           "account": "1593221",
           "sourceUrl": "https://www.pixiv.net/en/users/1593221",
 		  "title": {
-            "ja": "せんたっき"
+            "ja": "せんたっき",
+            "en": "Sentakki",
+            "ru": "Sentakki"
           },
 		  "description": {
-            "ja": "ぐぬぬ"
+            "ja": "ぐぬぬ",
+            "en": "Gnnn...",
+            "ru": "Гн-н-н..."
           },
           "avatar": "profiles/pixiv/5739104_せんたっき.png",
           "banner": null
@@ -121,7 +141,9 @@
           "account": "stairs2line",
           "sourceUrl": "https://www.instagram.com/stairs2line/",
 		  "title": {
-            "ja": "たるたる"
+            "ja": "たるたる",
+            "en": "Tarutaru",
+            "ru": "Tarutaru"
           },
 		  "description": {
             "ja": ""
@@ -165,7 +187,9 @@
         {
           "observedAt": "2026-09-10",
 		  "title": {
-            "ja": "せんたっき"
+            "ja": "せんたっき",
+            "en": "Sentakki",
+            "ru": "Sentakki"
           },
           "sourceUrl": "https://jkagme2x.fanbox.cc/",
           "avatar": "profiles/pixiv/5739104_せんたっき.png",

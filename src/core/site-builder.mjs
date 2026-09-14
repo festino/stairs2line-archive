@@ -192,26 +192,22 @@ function platformProfileAssetUrl(manifest, filePath) {
   return mediaUrl(manifest, filePath);
 }
 
-function platformAvatarUrl(manifest, platform) {
-  const profile = currentPlatformVersion(platform);
+function platformAvatarUrl(manifest, platform, profile = currentPlatformVersion(platform)) {
   const avatar = typeof profile.avatar === 'string'
     ? platformProfileAssetUrl(manifest, profile.avatar)
     : null;
   return avatar ?? platformIconUrl(manifest, platform);
 }
 
-function platformBannerUrl(manifest, platform) {
-  const profile = currentPlatformVersion(platform);
+function platformBannerUrl(manifest, platform, profile = currentPlatformVersion(platform)) {
   return typeof profile.banner === 'string' ? platformProfileAssetUrl(manifest, profile.banner) : null;
 }
 
-function platformBannerKnownAbsent(platform) {
-  const profile = currentPlatformVersion(platform);
+function platformBannerKnownAbsent(platform, profile = currentPlatformVersion(platform)) {
   return Object.prototype.hasOwnProperty.call(profile, 'banner') && profile.banner === null;
 }
 
-function platformSourceUrl(platform) {
-  const profile = currentPlatformVersion(platform);
+function platformSourceUrl(platform, profile = currentPlatformVersion(platform)) {
   return typeof profile.sourceUrl === 'string' && profile.sourceUrl.trim()
     ? profile.sourceUrl.trim()
     : null;
@@ -1177,21 +1173,19 @@ function renderPlatformBannerImages(banner) {
   return `<img class="platform-banner-backdrop" src="${src}" alt="" aria-hidden="true"><img class="platform-banner-image" src="${src}" alt="">`;
 }
 
-function renderPlatformHero(manifest, platform, language, options = {}) {
-  if (!platform) return '';
+function renderPlatformHeroVersion(manifest, platform, language, profile, index, currentIndex, options = {}) {
   const label = platformLabel(platform, language, manifest.defaultLanguage);
   const icon = platformIconUrl(manifest, platform);
-  const avatar = platformAvatarUrl(manifest, platform);
-  const banner = platformBannerUrl(manifest, platform);
-  const profile = currentPlatformVersion(platform);
+  const avatar = platformAvatarUrl(manifest, platform, profile);
+  const banner = platformBannerUrl(manifest, platform, profile);
   const account = profile.account ?? platform.defaultAccount ?? '';
   const bio = localizedValue(profile.description, language, manifest.defaultLanguage);
-  const sourceUrl = platformSourceUrl(platform);
+  const sourceUrl = platformSourceUrl(platform, profile);
   const baseSegment = `posts/platform/${encodeURIComponent(platform.id)}`;
   const compactHref = routeUrl(manifest, language, `${baseSegment}${options.oldest ? '/oldest' : ''}/`);
   const fullHref = routeUrl(manifest, language, `${baseSegment}/full${options.oldest ? '/oldest' : ''}/`);
-  const noBanner = platformBannerKnownAbsent(platform);
-  return `<section class="platform-hero platform-hero--${escapeAttribute(platform.id)}${noBanner ? ' platform-hero--no-banner' : ''}">
+  const noBanner = platformBannerKnownAbsent(platform, profile);
+  return `<div class="platform-profile-version${noBanner ? ' platform-profile-version--no-banner' : ''}" data-profile-version-panel="${index}" data-profile-banner-absent="${noBanner ? 'true' : 'false'}"${index === currentIndex ? '' : ' hidden'}>
     <div class="platform-hero-banner">${renderPlatformBannerImages(banner)}</div>
     <div class="platform-hero-profile">
       <div class="platform-hero-icon">${avatar ? `<img src="${escapeAttribute(avatar)}" alt="">` : `<span>${escapeHtml(label.slice(0, 1))}</span>`}${avatar && icon && avatar !== icon ? `<span class="platform-hero-platform-icon"><img src="${escapeAttribute(icon)}" alt=""></span>` : ''}</div>
@@ -1206,6 +1200,24 @@ function renderPlatformHero(manifest, platform, language, options = {}) {
         <a class="${options.compact ? '' : 'active'}" href="${escapeAttribute(fullHref)}">${escapeHtml(localeText(manifest.locales, language, 'posts.fullView'))}</a>
       </nav>
     </div>
+  </div>`;
+}
+
+function renderPlatformHero(manifest, platform, language, options = {}) {
+  if (!platform) return '';
+  const versions = platform.versions?.length ? platform.versions : [currentPlatformVersion(platform)];
+  const currentIndex = versions.length - 1;
+  const noBanner = platformBannerKnownAbsent(platform, versions[currentIndex]);
+  const versionSelector = versions.length > 1
+    ? `<div class="platform-profile-version-toolbar" hidden><label><span>${escapeHtml(localeText(manifest.locales, language, 'posts.profileVersion'))}</span><select data-profile-version-select>${versions.map((version, index) => {
+      const versionText = localeText(manifest.locales, language, 'posts.versionLabel', { current: index + 1, total: versions.length });
+      const observedAt = version.observedAt ? formatDate(version.observedAt, language, { includeTime: false }) : null;
+      return `<option value="${index}"${index === currentIndex ? ' selected' : ''}>${escapeHtml(observedAt ? `${versionText} \u00b7 ${observedAt}` : versionText)}</option>`;
+    }).join('')}</select></label></div>`
+    : '';
+  return `<section class="platform-hero platform-hero--${escapeAttribute(platform.id)}${noBanner ? ' platform-hero--no-banner' : ''}" data-profile-version-platform="${escapeAttribute(platform.id)}">
+    ${versionSelector}
+    ${versions.map((profile, index) => renderPlatformHeroVersion(manifest, platform, language, profile, index, currentIndex, options)).join('')}
   </section>`;
 }
 
@@ -1297,6 +1309,7 @@ function layout(manifest, language, relative, options) {
     ${options.body}
   </main>
   <script src="${escapeAttribute(joinUrl(manifest.site.basePath, 'assets/theme.js'))}" defer></script>
+  <script src="${escapeAttribute(joinUrl(manifest.site.basePath, 'assets/profile-version.js'))}" defer></script>
   <script src="${escapeAttribute(joinUrl(manifest.site.basePath, 'assets/feed.js'))}" defer></script>
   <script src="${escapeAttribute(joinUrl(manifest.site.basePath, 'assets/media-viewer-adapter.js'))}" defer></script>
 </body>

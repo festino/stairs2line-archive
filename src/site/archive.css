@@ -1008,6 +1008,35 @@ h2 {
   color: var(--page-bg);
 }
 
+.platform-profile-version[hidden] {
+  display: none;
+}
+
+.platform-profile-version-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0.65rem 1rem;
+  border-bottom: 1px solid var(--border);
+  background: color-mix(in srgb, var(--surface) 88%, var(--page-bg));
+}
+
+.platform-profile-version-toolbar label {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.platform-profile-version-toolbar select {
+  max-width: min(24rem, 58vw);
+  padding: 0.36rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 0.45rem;
+  background: var(--page-bg);
+  color: var(--text);
+}
+
 /* Platform-flavoured full post cards. Keep these scoped to platform pages so
    the cross-platform post index remains visually neutral. */
 .platform-page .post-list {
@@ -1945,15 +1974,18 @@ h2 {
 /* A null profile asset is different from an unknown one. Explicitly absent
    banners are not replaced by the platform-flavoured fallback artwork. */
 .platform-hero--no-banner .platform-hero-banner,
+.platform-profile-version--no-banner .platform-hero-banner,
 .platform-card--no-banner .platform-card-banner {
   display: none;
 }
 
-.platform-hero--no-banner .platform-hero-profile {
+.platform-hero--no-banner .platform-hero-profile,
+.platform-profile-version--no-banner .platform-hero-profile {
   padding-top: 1rem;
 }
 
 .platform-hero--no-banner .platform-hero-icon,
+.platform-profile-version--no-banner .platform-hero-icon,
 .platform-card--no-banner .platform-card-avatar {
   margin-top: 0;
 }
@@ -2118,6 +2150,11 @@ h2 {
 .home-hero > p {
   margin: 0.65rem 0;
   font-size: 1.05rem;
+  text-wrap: pretty;
+}
+
+.home-lead {
+  text-wrap: balance;
 }
 
 .home-sections {
@@ -2170,6 +2207,7 @@ h2 {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
+  justify-content: center;
   gap: 2px;
 }
 
@@ -2398,7 +2436,7 @@ h2 {
 
   .gallery-item--wide {
     grid-column: 1 / -1;
-    justify-self: start;
+    justify-self: center;
     width: min(100%, 300px);
     max-width: 300px;
     aspect-ratio: var(--gallery-aspect, 3);

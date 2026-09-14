@@ -753,6 +753,7 @@ test('revisions ignore decorative versions, append single-image artworks, and ga
   const css = await fs.readFile(path.join(output, 'assets', 'archive.css'), 'utf8');
   assert.match(css, /\.gallery-grid\s*\{[\s\S]*?display:\s*flex/);
   assert.match(css, /\.gallery-grid\s*\{[\s\S]*?align-items:\s*center/);
+  assert.match(css, /\.gallery-grid\s*\{[\s\S]*?justify-content:\s*center/);
   assert.match(css, /\.gallery-item\s*\{[\s\S]*?width:\s*var\(--gallery-width/);
   assert.match(css, /\.gallery-item--wide\s*\{[\s\S]*?300px/);
   assert.match(allGallery, /--gallery-height:200px/);
@@ -798,6 +799,10 @@ test('platform profile snapshots are versioned and the latest snapshot drives th
   await buildStaticSite(compilation, source, output, { mediaRoot });
   const html = await fs.readFile(path.join(output, 'en', 'posts', 'platform', 'twitter', 'index.html'), 'utf8');
   assert.match(html, /Current profile bio/);
+  assert.match(html, /Old profile bio/);
+  assert.match(html, /data-profile-version-select/);
+  assert.match(html, /data-profile-version-panel="0"[^>]*hidden/);
+  assert.match(html, /data-profile-version-panel="1"[^>]*>/);
   assert.match(html, /profiles\/twitter-avatar\.png/);
   assert.match(html, /<img class="platform-banner-backdrop" src="\/repo\/media\/stairs2line\/profiles\/twitter-banner\.png" alt="" aria-hidden="true">/);
   assert.match(html, /<img class="platform-banner-image" src="\/repo\/media\/stairs2line\/profiles\/twitter-banner\.png" alt="">/);
@@ -811,6 +816,9 @@ test('platform profile snapshots are versioned and the latest snapshot drives th
   const css = await fs.readFile(path.join(output, 'assets', 'archive.css'), 'utf8');
   assert.match(css, /\.platform-hero-banner \.platform-banner-image,[\s\S]*?object-fit:\s*contain/);
   assert.match(css, /\.platform-banner-backdrop\s*\{[\s\S]*?object-fit:\s*cover/);
+  const profileVersionJs = await fs.readFile(path.join(output, 'assets', 'profile-version.js'), 'utf8');
+  assert.match(profileVersionJs, /archive-profile-version:/);
+  assert.match(profileVersionJs, /data-profile-version-panel/);
 });
 
 test('missing versioned platform profile assets are validation errors', async () => {

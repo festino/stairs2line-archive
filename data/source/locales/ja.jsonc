@@ -59,6 +59,7 @@
     "fullView": "通常表示",
     "compactView": "コンパクト表示",
     "versionLabel": "バージョン {current} / {total}",
+    "profileVersion": "プロフィールのバージョン",
     "platformTitle": "{platform}の投稿",
     "genericDescription": "{platform}にある stairs2line のアーカイブ投稿。",
     "approximateDate": "約 {date}",

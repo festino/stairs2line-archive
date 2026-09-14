@@ -93,12 +93,12 @@
     "allAccounts": "すべてのアカウント",
     "featuredTitle": "ピックアップ",
     "contact": "連絡先",
-    "galleryDescription": "画像を気軽に眺めるためのギャラリーです。",
-    "socialsDescription": "さまざまなプラットフォームの投稿アーカイブです。",
-    "revisionsDescription": "作品が年月とともにどう変わっていったかを見比べられます。"
+    "galleryDescription": "画像を気軽に眺めるためのギャラリーです",
+    "socialsDescription": "さまざまなプラットフォームの投稿アーカイブです",
+    "revisionsDescription": "作品が年月とともにどう変わっていったかを見比べられます"
   },
   "gallery": {
     "pageTitle": "ギャラリー",
-    "description": "scope で絞り込める stairs2line の画像ギャラリーです。"
+    "description": "stairs2line の画像ギャラリーです。"
   }
 }

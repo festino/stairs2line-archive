@@ -172,6 +172,18 @@
               "twitter:942696559136800768"
             ]
           }
+        },
+        {
+          "id": "v06",
+          "scope": "decorative",
+          "media": [
+            {
+              "id": "artwork-0201/v06/m01",
+              "files": [
+                "pixiv/56808104_p0.mp4"
+              ]
+            }
+          ]
         }
       ],
       "migration": {

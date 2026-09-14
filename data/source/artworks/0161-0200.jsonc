@@ -104,6 +104,31 @@
               "twitter:942696559136800768"
             ]
           }
+        },
+        {
+          "id": "v04",
+          "scope": "decorative",
+          "media": [
+            {
+              "id": "artwork-0161/v04/m01",
+              "files": [
+                "tumblr/137329797129_tumblr_o0zaz0TGD61s4v84ho1_1280.gif",
+                "twitter/687855074966507521_687855074966507521.mp4"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "v06",
+          "scope": "decorative",
+          "media": [
+            {
+              "id": "artwork-0161/v06/m01",
+              "files": [
+                "pixiv/56808104_p0.mp4"
+              ]
+            }
+          ]
         }
       ],
       "migration": {
@@ -749,6 +774,31 @@
               "twitter:679975827577044992"
             ]
           }
+        },
+        {
+          "id": "v04",
+          "scope": "decorative",
+          "media": [
+            {
+              "id": "artwork-0167/v04/m01",
+              "files": [
+                "tumblr/137329797129_tumblr_o0zaz0TGD61s4v84ho1_1280.gif",
+                "twitter/687855074966507521_687855074966507521.mp4"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "v06",
+          "scope": "decorative",
+          "media": [
+            {
+              "id": "artwork-0167/v06/m01",
+              "files": [
+                "pixiv/56808104_p0.mp4"
+              ]
+            }
+          ]
         }
       ],
       "migration": {
@@ -1401,6 +1451,31 @@
           "migration": {
             "legacyVersionIndex": 3
           }
+        },
+        {
+          "id": "v04",
+          "scope": "decorative",
+          "media": [
+            {
+              "id": "artwork-0180/v04/m01",
+              "files": [
+                "tumblr/137329797129_tumblr_o0zaz0TGD61s4v84ho1_1280.gif",
+                "twitter/687855074966507521_687855074966507521.mp4"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "v06",
+          "scope": "decorative",
+          "media": [
+            {
+              "id": "artwork-0180/v06/m01",
+              "files": [
+                "pixiv/56808104_p0.mp4"
+              ]
+            }
+          ]
         }
       ],
       "migration": {
@@ -1479,6 +1554,31 @@
           "migration": {
             "legacyVersionIndex": 2
           }
+        },
+        {
+          "id": "v04",
+          "scope": "decorative",
+          "media": [
+            {
+              "id": "artwork-0181/v04/m01",
+              "files": [
+                "tumblr/137329797129_tumblr_o0zaz0TGD61s4v84ho1_1280.gif",
+                "twitter/687855074966507521_687855074966507521.mp4"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "v06",
+          "scope": "decorative",
+          "media": [
+            {
+              "id": "artwork-0181/v06/m01",
+              "files": [
+                "pixiv/56808104_p0.mp4"
+              ]
+            }
+          ]
         }
       ],
       "migration": {
@@ -2109,43 +2209,6 @@
         "inferredPostIds": [
           "twitter:685793462763950081",
           "pixiv:54980568"
-        ]
-      }
-    },
-    {
-      "id": "artwork-0193",
-      "title": {
-        "ja": "It's not 3D"
-      },
-      "versions": [
-        {
-          "id": "v01",
-          "scope": "sketchy",
-          "media": [
-            {
-              "id": "artwork-0193/v01/m01",
-              "legacyIds": [
-                "687855074966507521",
-                "o0zaz0TGD61s4v84ho1_1280"
-              ],
-              "files": [
-                "tumblr/137329797129_tumblr_o0zaz0TGD61s4v84ho1_1280.gif",
-                "twitter/687855074966507521_687855074966507521.mp4"
-              ]
-            }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1,
-            "inferredPostIds": [
-              "twitter:687855074966507521"
-            ]
-          }
-        }
-      ],
-      "migration": {
-        "legacyGroupIndex": 193,
-        "inferredPostIds": [
-          "twitter:687855074966507521"
         ]
       }
     },

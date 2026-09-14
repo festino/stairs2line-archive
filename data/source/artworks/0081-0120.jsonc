@@ -652,36 +652,6 @@
           }
         },
         {
-          "id": "v02",
-          "scope": "top",
-          "media": [
-            {
-              "id": "artwork-0094/v02/m01",
-              "legacyIds": [
-                "n0ol35PjEb1s4v84ho3_400"
-              ],
-              "files": [
-                "tumblr/75998276207_tumblr_n0ol35PjEb1s4v84ho3_400.png"
-              ],
-              "viewerAnchor": {
-                "points": [
-                  {
-                    "x": -132,
-                    "y": 0
-                  },
-                  {
-                    "x": -132,
-                    "y": 400
-                  }
-                ]
-              }
-            }
-          ],
-          "migration": {
-            "legacyVersionIndex": 2
-          }
-        },
-        {
           "id": "v03",
           "scope": "sketchy",
           "media": [

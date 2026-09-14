@@ -93,12 +93,12 @@
     "allAccounts": "All accounts",
     "featuredTitle": "Selected works",
     "contact": "Contact",
-    "galleryDescription": "Just browse the pictures.",
-    "socialsDescription": "An archive of posts across different platforms.",
-    "revisionsDescription": "See how the artworks changed over the years."
+    "galleryDescription": "Just browse the pictures",
+    "socialsDescription": "An archive of posts across different platforms",
+    "revisionsDescription": "See how the artworks changed over the years"
   },
   "gallery": {
     "pageTitle": "Gallery",
-    "description": "A dense gallery of stairs2line images, filterable by archive scope."
+    "description": "A dense gallery of stairs2line images."
   }
 }

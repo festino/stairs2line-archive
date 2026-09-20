@@ -275,7 +275,7 @@
       "versions": [
         {
           "id": "v01",
-          "scope": "sketchy",
+          "scope": "decorative",
           "media": [
             {
               "id": "artwork-0204/v01/m01",
@@ -284,7 +284,20 @@
               ],
               "files": [
                 "twitter/703208246358573056_CcJMG7dVIAAJu40.jpeg"
-              ]
+              ],
+              "viewerAnchor": {
+                "points": [
+                  {
+                    "x": 724.5,
+                    "y": 0
+                  },
+                  {
+                    "x": 724.5,
+                    "y": 2048
+                  }
+                ],
+                "rotation": 13
+              }
             }
           ],
           "migration": {
@@ -293,6 +306,30 @@
               "twitter:703208246358573056"
             ]
           }
+        },
+        {
+          "id": "v02",
+          "scope": "major",
+          "media": [
+            {
+              "id": "artwork-0204/v02/m01",
+              "files": [
+                "other/b53ff73f39a49066766e466b21bb43f8_54cff46e_1280.png"
+              ],
+              "viewerAnchor": {
+                "points": [
+                  {
+                    "x": 981.4249,
+                    "y": -43.1275
+                  },
+                  {
+                    "x": 751.0751,
+                    "y": 954.6275
+                  }
+                ]
+              }
+            }
+          ]
         }
       ],
       "migration": {
@@ -2725,6 +2762,26 @@
               ],
               "files": [
                 "tumblr/85412229284_tumblr_n5esbhepR11s4v84ho4_r2_400.png"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "artwork-0250",
+      "title": {
+        "ja": ""
+      },
+      "versions": [
+        {
+          "id": "v01",
+          "scope": "sketchy",
+          "media": [
+            {
+              "id": "artwork-0250/v01/m01",
+              "files": [
+                "other/9835e871b73e5d9b17eb0a09756be7fd_afcc81a0_500.png"
               ]
             }
           ]

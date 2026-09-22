@@ -102,6 +102,40 @@ function hasOwn(value, key) {
   return value != null && Object.prototype.hasOwnProperty.call(value, key);
 }
 
+function isTumblrRevisionFile(filePath) {
+  const normalized = normalizePath(filePath ?? '');
+  return normalized.startsWith('tumblr/') && /_r\d+_/i.test(path.basename(normalized));
+}
+
+function buildTumblrRevisionReblogDates(posts) {
+  const firstReblogByFile = new Map();
+  for (const post of posts) {
+    if (post.platform !== 'tumblr') continue;
+    for (const version of post.versions ?? []) {
+      if (!version.firstRebloggedAt) continue;
+      for (const filePath of version.mediaFiles ?? []) {
+        if (!isTumblrRevisionFile(filePath)) continue;
+        const previous = firstReblogByFile.get(filePath);
+        const earliest = earliestDate([previous, version.firstRebloggedAt]);
+        if (earliest) firstReblogByFile.set(filePath, earliest);
+      }
+    }
+  }
+  return firstReblogByFile;
+}
+
+function tumblrRevisionDateForArtworkVersion(version, mediaById, firstReblogByFile) {
+  const candidateDates = [];
+  for (const mediaId of version.mediaIds ?? []) {
+    const media = mediaById.get(mediaId);
+    for (const filePath of media?.declaredFiles ?? []) {
+      if (!isTumblrRevisionFile(filePath)) continue;
+      candidateDates.push(firstReblogByFile.get(filePath));
+    }
+  }
+  return earliestDate(candidateDates);
+}
+
 function normalizeArchiveDate(value) {
   if (value === undefined || value === null || value === '') return null;
   if (typeof value === 'number' || /^\d{9,13}$/.test(String(value))) {
@@ -614,7 +648,6 @@ function appendRecoveredTwitterPosts(posts, postIds, mediaById, platformsById, d
       mediaRefs,
       href: null,
       layout: null,
-      migration: null,
       recovery
     };
     const post = {
@@ -831,7 +864,6 @@ export async function compileArchive(source, options = {}) {
         createdAt: sourceVersion.createdAt ?? null,
         knownNotAfter: sourceVersion.knownNotAfter ?? null,
         mediaIds,
-        migration: sourceVersion.migration ?? null,
         sortAt: null,
         dateSource: null
       });
@@ -853,7 +885,6 @@ export async function compileArchive(source, options = {}) {
       title: sourceArtwork.title ?? {},
       description: sourceArtwork.description ?? {},
       versions,
-      migration: sourceArtwork.migration ?? null,
       sortAt: null,
       platforms: []
     });
@@ -1075,7 +1106,6 @@ export async function compileArchive(source, options = {}) {
         mediaRefs,
         href: buildPostUrl({ ...sourcePost, ...sourceVersion }, platform),
         layout: stripInternal(sourceVersion.layout ?? null),
-        migration: sourceVersion.migration ?? null
       };
       versions.push(version);
     }
@@ -1123,6 +1153,7 @@ export async function compileArchive(source, options = {}) {
 
   const postsById = new Map(posts.map((post) => [post.key, post]));
   for (const media of mediaById.values()) media.postIds = unique(media.postIds);
+  const tumblrRevisionReblogDates = buildTumblrRevisionReblogDates(posts);
 
   for (const artwork of artworks) {
     const artworkPlatforms = new Set();
@@ -1133,14 +1164,21 @@ export async function compileArchive(source, options = {}) {
         .filter(Boolean);
       for (const post of linkedPosts) artworkPlatforms.add(post.platform);
       const postDate = earliestDate(linkedPosts.map((post) => post.publishedAt));
-      version.sortAt = version.createdAt ?? version.knownNotAfter ?? postDate;
+      const tumblrFirstReblogDate = tumblrRevisionDateForArtworkVersion(
+        version,
+        mediaById,
+        tumblrRevisionReblogDates
+      );
+      version.sortAt = version.createdAt ?? version.knownNotAfter ?? tumblrFirstReblogDate ?? postDate;
       version.dateSource = version.createdAt
         ? 'createdAt'
         : version.knownNotAfter
           ? 'knownNotAfter'
-          : postDate
-            ? 'post'
-            : null;
+          : tumblrFirstReblogDate
+            ? 'tumblrFirstReblog'
+            : postDate
+              ? 'post'
+              : null;
       if (!version.sortAt) {
         issues.add({
           severity: 'warning',

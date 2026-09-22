@@ -95,7 +95,7 @@ export const DEFAULT_LOCALES = {
       sectionsTitle: 'Разделы архива',
       projectDescription: 'Визуальный архив stairs2line: работы и их ревизии, публикации в соцсетях и связанная с ними хронология.',
       artistDescription: 'Японский художник, во многом известный иллюстрациями с Хацунэ Мику.',
-      archivePurpose: 'Цель этого архива — собрать все работы и все известные версии работ, раскиданные по интернету, в одном месте. Я никак не связан с автором и пока не получил разрешение на публикацию этого архива.',
+      archivePurpose: 'Цель этого архива — собрать все работы и все известные версии работ, раскиданные по интернету, в одном месте. Я никак не связан с автором, но разрешение на публикацию этого архива получено.',
       supportText: 'Рекомендую поддержать автора на официальных активных аккаунтах: {accounts}.',
       officialAccounts: '{accounts}',
       allAccounts: 'Все аккаунты',
@@ -127,6 +127,7 @@ export const DEFAULT_LOCALES = {
       posts: 'Публикации',
       versions: 'Версии',
       files: 'Файлы',
+      media: 'Медиа',
       open: 'Открыть',
       noItems: 'Нет элементов.'
     },
@@ -176,7 +177,8 @@ export const DEFAULT_LOCALES = {
       noKnownReblogDate: 'дата неизвестна',
       noSavedReblogs: 'нет',
       socialsTitle: 'Соцсети',
-      platformCreated: 'Создан профиль {platform}'
+      platformCreated: 'Создан профиль {platform}',
+      unknownMediaDescription: 'Медиа, которые не относятся ни к одной архивной публикации.'
     },
     validation: {
       title: 'Проверка архива',
@@ -199,7 +201,7 @@ export const DEFAULT_LOCALES = {
       sectionsTitle: 'Archive sections',
       projectDescription: 'A visual archive of stairs2line: artworks and their revisions, posts across social platforms, and the chronology connecting them.',
       artistDescription: 'A Japanese artist, best known for illustrations featuring Hatsune Miku.',
-      archivePurpose: 'The goal of this archive is to collect all works and all known versions scattered across the internet in one place. I am not affiliated with the artist and have not yet received permission to publish this archive.',
+      archivePurpose: 'The goal of this archive is to collect all works and all known versions scattered across the internet in one place. I am not affiliated with the artist, but I have received permission to publish this archive.',
       supportText: 'Please support the artist through the official active accounts: {accounts}.',
       officialAccounts: '{accounts}',
       allAccounts: 'All accounts',
@@ -231,6 +233,7 @@ export const DEFAULT_LOCALES = {
       posts: 'Posts',
       versions: 'Versions',
       files: 'Files',
+      media: 'Media',
       open: 'Open',
       noItems: 'No items.'
     },
@@ -280,7 +283,8 @@ export const DEFAULT_LOCALES = {
       noKnownReblogDate: 'date unknown',
       noSavedReblogs: 'none',
       socialsTitle: 'Socials',
-      platformCreated: '{platform} profile created'
+      platformCreated: '{platform} profile created',
+      unknownMediaDescription: 'Media that is not associated with any archived post.'
     },
     validation: {
       title: 'Archive validation',
@@ -303,7 +307,7 @@ export const DEFAULT_LOCALES = {
       sectionsTitle: 'アーカイブ',
       projectDescription: 'stairs2line の作品、改訂版、SNS 投稿、それらをつなぐ時系列をまとめたビジュアルアーカイブです。',
       artistDescription: '初音ミクのイラストなどで知られる日本のイラストレーターです。',
-      archivePurpose: 'このアーカイブは、インターネット上に散らばった作品と既知の全バージョンを一か所に集めることを目的としています。私は作者本人とは関係がなく、このアーカイブの公開許可もまだ得ていません。',
+      archivePurpose: 'このアーカイブは、インターネット上に散らばった作品と既知の全バージョンを一か所に集めることを目的としています。私は作者本人とは関係ありませんが、このアーカイブの公開許可は得ています。',
       supportText: '作者を応援する際は、現在利用されている公式アカウントをご覧ください: {accounts}。',
       officialAccounts: '{accounts}',
       allAccounts: 'すべてのアカウント',
@@ -335,6 +339,7 @@ export const DEFAULT_LOCALES = {
       posts: '投稿',
       versions: 'バージョン',
       files: 'ファイル',
+      media: 'メディア',
       open: '開く',
       noItems: '項目がありません。'
     },
@@ -384,7 +389,8 @@ export const DEFAULT_LOCALES = {
       noKnownReblogDate: '日付不明',
       noSavedReblogs: 'なし',
       socialsTitle: 'SNS',
-      platformCreated: '{platform} のプロフィールを作成'
+      platformCreated: '{platform} のプロフィールを作成',
+      unknownMediaDescription: 'アーカイブされたどの投稿にも関連付けられていないメディアです。'
     },
     validation: {
       title: 'アーカイブ検証',

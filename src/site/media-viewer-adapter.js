@@ -632,7 +632,7 @@
   function artworkVersionDateText(index, media, language) {
     const date = formatViewerDay(media?.versionDate, language);
     if (!date) return '';
-    if (media.versionDateSource === 'knownNotAfter') {
+    if (media.versionDateSource === 'knownNotAfter' || media.versionDateSource === 'tumblrFirstReblog') {
       return viewerStringWithDate(index, language, 'versionKnownNotAfter', date, 'By {date}');
     }
     if (media.versionDateSource === 'createdAt') {

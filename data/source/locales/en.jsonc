@@ -28,6 +28,7 @@
     "posts": "Posts",
     "versions": "Versions",
     "files": "Files",
+    "media": "Media",
     "open": "Open",
     "noItems": "No items."
   },
@@ -77,7 +78,8 @@
     "noKnownReblogDate": "date unknown",
     "noSavedReblogs": "none",
     "socialsTitle": "Socials",
-    "platformCreated": "{platform} profile created"
+    "platformCreated": "{platform} profile created",
+    "unknownMediaDescription": "Media that is not associated with any archived post."
   },
   "validation": {
     "title": "Archive validation",
@@ -88,7 +90,7 @@
     "sectionsTitle": "Archive sections",
     "projectDescription": "A visual archive of stairs2line: artworks and their revisions, posts across social platforms, and the chronology connecting them.",
     "artistDescription": "A Japanese artist, best known for illustrations featuring Hatsune Miku.",
-    "archivePurpose": "The goal of this archive is to collect all works and all known versions scattered across the internet in one place. I am not affiliated with the artist and have not yet received permission to publish this archive.",
+    "archivePurpose": "The goal of this archive is to collect all works and all known versions scattered across the internet in one place. I am not affiliated with the artist, but I have received permission to publish this archive.",
     "supportText": "Please support the artist through the official active accounts: {accounts}.",
     "officialAccounts": "{accounts}",
     "allAccounts": "All accounts",

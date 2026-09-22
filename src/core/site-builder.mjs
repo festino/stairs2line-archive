@@ -550,15 +550,30 @@ function revisionVersionOrder(artwork, versions = artwork.versions) {
 }
 
 function revisionDateBounds(artwork, versions = artwork.versions) {
-  const dated = revisionVersionOrder(artwork, versions).filter((item) => !Number.isNaN(item.time));
+  let dated = revisionVersionOrder(artwork, versions).filter((item) => !Number.isNaN(item.time));
+  let decorativeFallback = false;
+  if (dated.length === 0 && versions.every((version) => version.scope !== 'decorative')) {
+    dated = revisionVersionOrder(
+      artwork,
+      artwork.versions.filter((version) => version.scope === 'decorative')
+    ).filter((item) => !Number.isNaN(item.time));
+    decorativeFallback = dated.length > 0;
+  }
   return {
     earliest: dated[0]?.version ?? null,
-    latest: dated.at(-1)?.version ?? null
+    latest: dated.at(-1)?.version ?? null,
+    decorativeFallback
   };
 }
 
 function revisionIntervalMs(artwork, versions = artwork.versions) {
-  const dated = revisionVersionOrder(artwork, versions).filter((item) => !Number.isNaN(item.time));
+  let dated = revisionVersionOrder(artwork, versions).filter((item) => !Number.isNaN(item.time));
+  if (dated.length === 0 && versions.every((version) => version.scope !== 'decorative')) {
+    dated = revisionVersionOrder(
+      artwork,
+      artwork.versions.filter((version) => version.scope === 'decorative')
+    ).filter((item) => !Number.isNaN(item.time));
+  }
   if (dated.length < 2) return null;
   return Math.max(0, dated.at(-1).time - dated[0].time);
 }
@@ -574,20 +589,37 @@ function revisionPreviewVersions(artwork, versions = artwork.versions) {
   return first.key === last.key ? [first] : [first, last];
 }
 
-function revisionEndpointDateText(manifest, version, language) {
+function isApproximateVersionDateSource(dateSource) {
+  return dateSource === 'knownNotAfter' || dateSource === 'tumblrFirstReblog';
+}
+
+function revisionEndpointDateText(manifest, version, language, forceApproximate = false) {
   if (!version?.sortAt) return null;
   const date = formatDate(version.sortAt, language, { includeTime: false });
-  if (version.dateSource === 'knownNotAfter') {
+  if (forceApproximate || isApproximateVersionDateSource(version.dateSource)) {
     return localeText(manifest.locales, language, 'artworks.knownNotAfter', { date });
   }
   return date;
 }
 
 function revisionDateRangeText(manifest, artwork, language, versions = artwork.versions) {
-  const { earliest, latest } = revisionDateBounds(artwork, versions);
+  const { earliest, latest, decorativeFallback } = revisionDateBounds(artwork, versions);
   if (!earliest?.sortAt && !latest?.sortAt) return localeText(manifest.locales, language, 'common.unknownDate');
-  const first = revisionEndpointDateText(manifest, earliest, language);
-  const last = revisionEndpointDateText(manifest, latest, language);
+
+  const firstDate = earliest?.sortAt ? formatDate(earliest.sortAt, language, { includeTime: false }) : null;
+  const lastDate = latest?.sortAt ? formatDate(latest.sortAt, language, { includeTime: false }) : null;
+  if (firstDate && lastDate && firstDate === lastDate) {
+    const bothApproximate = decorativeFallback || (
+      isApproximateVersionDateSource(earliest.dateSource)
+      && isApproximateVersionDateSource(latest.dateSource)
+    );
+    return bothApproximate
+      ? localeText(manifest.locales, language, 'artworks.knownNotAfter', { date: firstDate })
+      : firstDate;
+  }
+
+  const first = revisionEndpointDateText(manifest, earliest, language, decorativeFallback);
+  const last = revisionEndpointDateText(manifest, latest, language, decorativeFallback);
   if (!first || !last || first === last) return first ?? last ?? localeText(manifest.locales, language, 'common.unknownDate');
   return `${first} — ${last}`;
 }
@@ -1433,39 +1465,6 @@ async function buildArtworkListings(outputRoot, manifest, language) {
     );
   }
 
-  // Private-to-share attribution review: artworks for which none of the known
-  // versions is connected to an archived post. Keep this out of the main
-  // navigation; it is intended as a focused page that can be sent to the artist.
-  const unconfirmedArtworks = manifest.artworks
-    .filter((artwork) => artwork.versions.every((version) =>
-      version.mediaIds.every((mediaId) => (manifest.media[mediaId]?.postIds ?? []).length === 0)))
-    .map((artwork) => {
-      const version = artwork.versions.find((candidate) =>
-        candidate.scope !== 'decorative' && revisionPreviewMedia(manifest, candidate)?.displayFile)
-        ?? artwork.versions.find((candidate) => revisionPreviewMedia(manifest, candidate)?.displayFile);
-      return version ? { artwork, version } : null;
-    })
-    .filter(Boolean)
-    .sort((a, b) => compareNullableDates(a.artwork.sortAt, b.artwork.sortAt, 'desc') || a.artwork.id.localeCompare(b.artwork.id));
-
-  await writePaginatedListing(
-    outputRoot,
-    manifest,
-    language,
-    'artworks/unconfirmed',
-    unconfirmedArtworks,
-    manifest.site.pageSize?.artworks ?? 36,
-    (item, index) => renderArtworkCard(manifest, item.artwork, item.version, language, index),
-    {
-      heading: localeText(manifest.locales, language, 'artworks.unconfirmedTitle'),
-      title: `${localeText(manifest.locales, language, 'artworks.unconfirmedTitle')} · stairs2line`,
-      description: localeText(manifest.locales, language, 'artworks.unconfirmedDescription'),
-      listClass: 'card-grid',
-      bodyClass: 'artworks-unconfirmed-page',
-      noindex: true
-    }
-  );
-
   // The old filtered artwork URLs used the same data model as the gallery.
   // Keep them as compatibility redirects instead of silently changing meaning.
   for (const key of ['major', 'versions', 'all']) {
@@ -1526,7 +1525,7 @@ function artworkDateText(manifest, version, language) {
   if (!date) return localeText(manifest.locales, language, 'common.unknownDate');
   const key = version.dateSource === 'createdAt'
     ? 'artworks.created'
-    : version.dateSource === 'knownNotAfter'
+    : isApproximateVersionDateSource(version.dateSource)
       ? 'artworks.knownNotAfter'
       : 'artworks.firstPost';
   return localeText(manifest.locales, language, key, { date });
@@ -1546,7 +1545,9 @@ async function buildArtworkPages(outputRoot, manifest, language) {
         const media = manifest.media[mediaId];
         const linkedPosts = (media?.postIds ?? []).map((postId) => postsById.get(postId)).filter(Boolean);
         const hasPostDate = linkedPosts.some((post) => Boolean(post.publishedAt));
-        const versionDateNote = !hasPostDate && version.sortAt && version.dateSource !== 'post'
+        const versionDateNote = version.sortAt
+          && version.dateSource !== 'post'
+          && (!hasPostDate || version.dateSource === 'tumblrFirstReblog')
           ? `<p class="artwork-version-date">${escapeHtml(artworkDateText(manifest, version, language))}</p>`
           : '';
         return `<article class="artwork-media" data-list-item id="${escapeAttribute(version.id)}">
@@ -1653,6 +1654,74 @@ async function buildPostListings(outputRoot, manifest, language) {
       );
     }
   }
+
+  const unknownMedia = unpostedMedia(manifest);
+  await writePaginatedListing(
+    outputRoot,
+    manifest,
+    language,
+    'posts/platform/Unknown',
+    unknownMedia,
+    manifest.site.pageSize?.versions ?? 48,
+    (media, index) => renderStandaloneMediaItem(manifest, media, language, index),
+    {
+      heading: 'Unknown',
+      title: `Unknown · ${localeText(manifest.locales, language, 'common.media')}`,
+      description: localeText(manifest.locales, language, 'posts.unknownMediaDescription'),
+      listClass: 'gallery-grid',
+      bodyClass: 'gallery-page unknown-platform-page'
+    }
+  );
+}
+
+function mediaVersionContext(manifest, media) {
+  const artwork = manifest.artworks.find((item) => item.id === media.artworkId) ?? null;
+  const version = artwork?.versions.find((item) => item.id === media.versionId) ?? null;
+  return { artwork, version };
+}
+
+function mediaSortAt(manifest, media) {
+  return mediaVersionContext(manifest, media).version?.sortAt ?? null;
+}
+
+function unpostedMedia(manifest) {
+  return Object.values(manifest.media)
+    .filter((media) => (media.postIds ?? []).length === 0)
+    .sort((a, b) => compareNullableDates(mediaSortAt(manifest, a), mediaSortAt(manifest, b), 'desc') || a.id.localeCompare(b.id));
+}
+
+function mediaForPlatform(manifest, platformId) {
+  const postKeys = new Set(manifest.posts.filter((post) => post.platform === platformId).map((post) => post.key));
+  return Object.values(manifest.media).filter((media) => (media.postIds ?? []).some((postId) => postKeys.has(postId)));
+}
+
+function renderStandaloneMediaItem(manifest, media, language, index) {
+  if (!media?.displayFile) return '';
+  const file = manifest.files[media.displayFile];
+  if (!file) return '';
+  const { artwork, version } = mediaVersionContext(manifest, media);
+  const title = displayTitle(artwork ?? {}, language, manifest.defaultLanguage) ?? artwork?.id ?? media.id;
+  const ratio = file.width > 0 && file.height > 0 ? file.width / file.height : 1;
+  const baseHeight = 200;
+  const isWide = ratio > 2;
+  const targetWidth = isWide
+    ? Math.max(72, Math.min(300, baseHeight * ratio))
+    : Math.max(72, baseHeight * ratio);
+  const targetHeight = isWide ? targetWidth / ratio : baseHeight;
+  const isMotion = file.mimeType?.startsWith('video/') || file.mimeType === 'image/gif';
+  const motionIndicator = isMotion
+    ? '<span class="gallery-video-indicator" aria-hidden="true">▶</span>'
+    : '';
+  return `<div class="gallery-item${isWide ? ' gallery-item--wide' : ''}" style="--gallery-width:${escapeAttribute(targetWidth.toFixed(2))}px;--gallery-height:${targetHeight}px;--gallery-aspect:${escapeAttribute(ratio.toFixed(5))}" data-list-item data-media-id="${escapeAttribute(media.id)}">
+    ${mediaElement(manifest, media, language, title, 'artworkVersion', version?.key ?? `${media.artworkId}/${media.versionId}`, { eager: index < 4, videoPreview: true, freezeAnimation: true })}
+    ${motionIndicator}
+  </div>`;
+}
+
+function renderPlatformPreviewMedia(manifest, media, language) {
+  const { artwork } = mediaVersionContext(manifest, media);
+  const title = displayTitle(artwork ?? {}, language, manifest.defaultLanguage) ?? artwork?.id ?? media.id;
+  return `<span class="platform-preview-post" title="${escapeAttribute(title)}">${compactMediaElement(manifest, media, title)}</span>`;
 }
 
 function renderPlatformPreviewPost(manifest, post, language) {
@@ -1705,8 +1774,22 @@ async function buildPlatformIndex(outputRoot, manifest, language) {
       <div class="platform-preview">${previewPosts.map((post) => renderPlatformPreviewPost(manifest, post, language)).join('')}</div>
     </article>`;
   }).join('');
+  const unknownMedia = unpostedMedia(manifest);
+  const unknownHref = routeUrl(manifest, language, 'posts/platform/Unknown/');
+  const mediaBase = String(manifest.site.mediaBasePath ?? 'media/stairs2line/').replace(/^\/+/, '').replace(/\/+$/, '');
+  const unknownIcon = joinUrl(manifest.site.basePath, `${mediaBase}/misc/question-mark-icon.svg`);
+  const unknownCard = `<article class="platform-card platform-card--Unknown platform-card--no-banner" data-list-item>
+      <a class="platform-card-hit-area" href="${escapeAttribute(unknownHref)}" aria-label="Unknown"></a>
+      <div class="platform-card-banner"></div>
+      <div class="platform-card-profile">
+        <div class="platform-card-avatar"><img src="${escapeAttribute(unknownIcon)}" alt=""></div>
+        <div class="platform-card-copy"><h2>Unknown</h2></div>
+        <div class="platform-card-count"><strong>${unknownMedia.length}</strong><span>${escapeHtml(localeText(manifest.locales, language, 'common.media').toLowerCase())}</span></div>
+      </div>
+      <div class="platform-preview">${unknownMedia.slice(0, 6).map((media) => renderPlatformPreviewMedia(manifest, media, language)).join('')}</div>
+    </article>`;
   const body = `<div class="page-heading-row"><h1>${escapeHtml(localeText(manifest.locales, language, 'posts.socialsTitle'))}</h1><a href="${escapeAttribute(routeUrl(manifest, language, 'posts/activity/'))}">${escapeHtml(localeText(manifest.locales, language, 'posts.activity'))}</a></div>
-    <section class="platform-list" data-paged-list>${cards}</section>`;
+    <section class="platform-list" data-paged-list>${cards}${unknownCard}</section>`;
   await writePage(outputRoot, manifest, language, 'posts/by-platform', layout(manifest, language, 'posts/by-platform/', {
     title: `${localeText(manifest.locales, language, 'posts.socialsTitle')} · stairs2line`,
     description: localizedValue(manifest.site.description, language, manifest.defaultLanguage),

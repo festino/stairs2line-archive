@@ -129,9 +129,6 @@
           "items": {
             "$ref": "#/$defs/media"
           }
-        },
-        "migration": {
-          "type": "object"
         }
       },
       "additionalProperties": false
@@ -163,9 +160,6 @@
           "items": {
             "$ref": "#/$defs/version"
           }
-        },
-        "migration": {
-          "type": "object"
         }
       },
       "additionalProperties": false
@@ -378,9 +372,6 @@
           "items": {
             "$ref": "#/$defs/postLayout"
           }
-        },
-        "migration": {
-          "type": "object"
         },
         "firstRebloggedAt": {
           "description": "Earliest known timestamp of a reblog preserving this version. null means no reblog observation is available.",

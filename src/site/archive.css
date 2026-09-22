@@ -2893,3 +2893,17 @@ h2 {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
+
+/* Unknown is represented by a generic question-mark asset rather than a
+   platform/profile avatar. Keep the glyph comfortably inside the avatar
+   circle instead of cropping it like a photographic profile image. */
+.platform-card--Unknown .platform-card-avatar {
+  overflow: hidden;
+}
+
+.platform-card--Unknown .platform-card-avatar > img {
+  width: 68%;
+  height: 68%;
+  border-radius: 0;
+  object-fit: contain;
+}

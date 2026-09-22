@@ -1,4 +1,3 @@
-// Resolved physical file paths and explicit media relationships.
 {
   "artworks": [
     {
@@ -13,9 +12,6 @@
           "media": [
             {
               "id": "artwork-0201/v01/m01",
-              "legacyIds": [
-                "CZzWypNUcAAy2UH"
-              ],
               "files": [
                 "twitter/692664609057038336_CZzWypNUcAAy2UH.png"
               ],
@@ -32,13 +28,7 @@
                 ]
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1,
-            "inferredPostIds": [
-              "twitter:692664609057038336"
-            ]
-          }
+          ]
         },
         {
           "id": "v02",
@@ -46,10 +36,6 @@
           "media": [
             {
               "id": "artwork-0201/v02/m01",
-              "legacyIds": [
-                "55038245_p0",
-                "o2flp2BTKg1s4v84ho1_500"
-              ],
               "files": [
                 "tumblr/139165453739_tumblr_o2flp2BTKg1s4v84ho1_500.png"
               ],
@@ -66,13 +52,7 @@
                 ]
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 2,
-            "inferredPostIds": [
-              "pixiv:55038245"
-            ]
-          }
+          ]
         },
         {
           "id": "v03",
@@ -80,9 +60,6 @@
           "media": [
             {
               "id": "artwork-0201/v03/m01",
-              "legacyIds": [
-                "56793430-1"
-              ],
               "files": [
                 "pixiv/56793430-1.png"
               ],
@@ -99,13 +76,7 @@
                 ]
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 3,
-            "inferredPostIds": [
-              "pixiv:56793430"
-            ]
-          }
+          ]
         },
         {
           "id": "v04",
@@ -113,9 +84,6 @@
           "media": [
             {
               "id": "artwork-0201/v04/m01",
-              "legacyIds": [
-                "C02mV6hUoAEYuuC"
-              ],
               "files": [
                 "twitter/814496801692581888_C02mV6hUoAEYuuC.png"
               ],
@@ -132,13 +100,7 @@
                 ]
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 4,
-            "inferredPostIds": [
-              "twitter:814496337655758850"
-            ]
-          }
+          ]
         },
         {
           "id": "v05",
@@ -146,9 +108,6 @@
           "media": [
             {
               "id": "artwork-0201/v05/m01",
-              "legacyIds": [
-                "DRUeyyiVAAAoO86"
-              ],
               "files": [
                 "twitter/942696559136800768_DRUeyyiVAAAoO86.png"
               ],
@@ -165,13 +124,7 @@
                 ]
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 5,
-            "inferredPostIds": [
-              "twitter:942696559136800768"
-            ]
-          }
+          ]
         },
         {
           "id": "v06",
@@ -185,17 +138,7 @@
             }
           ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 201,
-        "inferredPostIds": [
-          "twitter:692664609057038336",
-          "pixiv:55038245",
-          "pixiv:56793430",
-          "twitter:814496337655758850",
-          "twitter:942696559136800768"
-        ]
-      }
+      ]
     },
     {
       "id": "artwork-0202",
@@ -209,28 +152,13 @@
           "media": [
             {
               "id": "artwork-0202/v01/m01",
-              "legacyIds": [
-                "CbqG4ruUUAArDUg"
-              ],
               "files": [
                 "twitter/701021001526579200_CbqG4ruUUAArDUg.png"
               ]
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1,
-            "inferredPostIds": [
-              "twitter:701021001526579200"
-            ]
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 202,
-        "inferredPostIds": [
-          "twitter:701021001526579200"
-        ]
-      }
+      ]
     },
     {
       "id": "artwork-0203",
@@ -244,28 +172,13 @@
           "media": [
             {
               "id": "artwork-0203/v01/m01",
-              "legacyIds": [
-                "CcJME8uVAAAFXMP"
-              ],
               "files": [
                 "twitter/703208246358573056_CcJME8uVAAAFXMP.jpeg"
               ]
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1,
-            "inferredPostIds": [
-              "twitter:703208246358573056"
-            ]
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 203,
-        "inferredPostIds": [
-          "twitter:703208246358573056"
-        ]
-      }
+      ]
     },
     {
       "id": "artwork-0204",
@@ -279,9 +192,6 @@
           "media": [
             {
               "id": "artwork-0204/v01/m01",
-              "legacyIds": [
-                "CcJMG7dVIAAJu40"
-              ],
               "files": [
                 "twitter/703208246358573056_CcJMG7dVIAAJu40.jpeg"
               ],
@@ -299,13 +209,7 @@
                 "rotation": 13
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1,
-            "inferredPostIds": [
-              "twitter:703208246358573056"
-            ]
-          }
+          ]
         },
         {
           "id": "v02",
@@ -331,13 +235,7 @@
             }
           ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 204,
-        "inferredPostIds": [
-          "twitter:703208246358573056"
-        ]
-      }
+      ]
     },
     {
       "id": "artwork-0205",
@@ -351,28 +249,13 @@
           "media": [
             {
               "id": "artwork-0205/v01/m01",
-              "legacyIds": [
-                "CceJ9umUYAM2puX"
-              ],
               "files": [
                 "twitter/704683561182318592_CceJ9umUYAM2puX.png"
               ]
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1,
-            "inferredPostIds": [
-              "twitter:704683561182318592"
-            ]
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 205,
-        "inferredPostIds": [
-          "twitter:704683561182318592"
-        ]
-      }
+      ]
     },
     {
       "id": "artwork-0206",
@@ -386,10 +269,6 @@
           "media": [
             {
               "id": "artwork-0206/v01/m01",
-              "legacyIds": [
-                "o6dg5xA0UN1s4v84ho1_400",
-                "56793430_p0"
-              ],
               "files": [
                 "tumblr/143559403624_tumblr_o6dg5xA0UN1s4v84ho1_400.png",
                 "pixiv/56793430_p0.png"
@@ -407,13 +286,7 @@
                 ]
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1,
-            "inferredPostIds": [
-              "pixiv:56793430"
-            ]
-          }
+          ]
         },
         {
           "id": "v02",
@@ -421,9 +294,6 @@
           "media": [
             {
               "id": "artwork-0206/v02/m01",
-              "legacyIds": [
-                "C02mULWUAAUQFVM"
-              ],
               "files": [
                 "twitter/814496801692581888_C02mULWUAAUQFVM.png"
               ],
@@ -440,22 +310,9 @@
                 ]
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 2,
-            "inferredPostIds": [
-              "twitter:814496337655758850"
-            ]
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 206,
-        "inferredPostIds": [
-          "pixiv:56793430",
-          "twitter:814496337655758850"
-        ]
-      }
+      ]
     },
     {
       "id": "artwork-0207",
@@ -469,28 +326,13 @@
           "media": [
             {
               "id": "artwork-0207/v01/m01",
-              "legacyIds": [
-                "56793430-2"
-              ],
               "files": [
                 "pixiv/56793430-2.png"
               ]
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1,
-            "inferredPostIds": [
-              "pixiv:56793430"
-            ]
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 207,
-        "inferredPostIds": [
-          "pixiv:56793430"
-        ]
-      }
+      ]
     },
     {
       "id": "artwork-0208",
@@ -504,28 +346,13 @@
           "media": [
             {
               "id": "artwork-0208/v01/m01",
-              "legacyIds": [
-                "56793430-3"
-              ],
               "files": [
                 "pixiv/56793430-3.png"
               ]
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1,
-            "inferredPostIds": [
-              "pixiv:56793430"
-            ]
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 208,
-        "inferredPostIds": [
-          "pixiv:56793430"
-        ]
-      }
+      ]
     },
     {
       "id": "artwork-0209",
@@ -539,28 +366,13 @@
           "media": [
             {
               "id": "artwork-0209/v01/m01",
-              "legacyIds": [
-                "56793430-5"
-              ],
               "files": [
                 "pixiv/56793430-5.png"
               ]
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1,
-            "inferredPostIds": [
-              "pixiv:56793430"
-            ]
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 209,
-        "inferredPostIds": [
-          "pixiv:56793430"
-        ]
-      }
+      ]
     },
     {
       "id": "artwork-0210",
@@ -574,28 +386,13 @@
           "media": [
             {
               "id": "artwork-0210/v01/m01",
-              "legacyIds": [
-                "56793430-8"
-              ],
               "files": [
                 "pixiv/56793430-8.png"
               ]
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1,
-            "inferredPostIds": [
-              "pixiv:56793430"
-            ]
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 210,
-        "inferredPostIds": [
-          "pixiv:56793430"
-        ]
-      }
+      ]
     },
     {
       "id": "artwork-0211",
@@ -609,28 +406,13 @@
           "media": [
             {
               "id": "artwork-0211/v01/m01",
-              "legacyIds": [
-                "Ci_BYQIUoAAsjZj"
-              ],
               "files": [
                 "twitter/734017914211160064_Ci_BYQIUoAAsjZj.jpeg"
               ]
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1,
-            "inferredPostIds": [
-              "twitter:734017914211160064"
-            ]
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 211,
-        "inferredPostIds": [
-          "twitter:734017914211160064"
-        ]
-      }
+      ]
     },
     {
       "id": "artwork-0212",
@@ -644,22 +426,12 @@
           "media": [
             {
               "id": "artwork-0212/v01/m01",
-              "legacyIds": [
-                "CkBs1T5UkAUizg5",
-                "oafv398Nmi1s4v84ho1_500"
-              ],
               "files": [
                 "tumblr/147522375114_tumblr_oafv398Nmi1s4v84ho1_500.png",
                 "twitter/738710004660740096_CkBs1T5UkAUizg5.png"
               ]
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1,
-            "inferredPostIds": [
-              "twitter:738710004660740096"
-            ]
-          }
+          ]
         },
         {
           "id": "v02",
@@ -667,29 +439,13 @@
           "media": [
             {
               "id": "artwork-0212/v02/m01",
-              "legacyIds": [
-                "C02mUyRUUAAToST"
-              ],
               "files": [
                 "twitter/814496801692581888_C02mUyRUUAAToST.png"
               ]
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 2,
-            "inferredPostIds": [
-              "twitter:814496337655758850"
-            ]
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 212,
-        "inferredPostIds": [
-          "twitter:738710004660740096",
-          "twitter:814496337655758850"
-        ]
-      }
+      ]
     },
     {
       "id": "artwork-0213",
@@ -703,30 +459,14 @@
           "media": [
             {
               "id": "artwork-0213/v01/m01",
-              "legacyIds": [
-                "CndM3oXVUAAo5Fc",
-                "oafv398Nmi1s4v84ho2_500"
-              ],
               "files": [
                 "tumblr/147522375114_tumblr_oafv398Nmi1s4v84ho2_500.png",
                 "twitter/754156330894499845_CndM3oXVUAAo5Fc.png"
               ]
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1,
-            "inferredPostIds": [
-              "twitter:754156330894499845"
-            ]
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 213,
-        "inferredPostIds": [
-          "twitter:754156330894499845"
-        ]
-      }
+      ]
     },
     {
       "id": "artwork-0214",
@@ -740,22 +480,12 @@
           "media": [
             {
               "id": "artwork-0214/v01/m01",
-              "legacyIds": [
-                "58165714_p0",
-                "oafv398Nmi1s4v84ho3_r1_500"
-              ],
               "files": [
                 "tumblr/147522375114_tumblr_oafv398Nmi1s4v84ho3_r1_500.png",
                 "pixiv/58165714_p0.png"
               ]
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1,
-            "inferredPostIds": [
-              "pixiv:58165714"
-            ]
-          }
+          ]
         },
         {
           "id": "v02",
@@ -763,31 +493,14 @@
           "media": [
             {
               "id": "artwork-0214/v02/m01",
-              "legacyIds": [
-                "C02mVVWUAAAlZCc",
-                "oafv398Nmi1s4v84ho3_500"
-              ],
               "files": [
                 "tumblr/147522375114_tumblr_oafv398Nmi1s4v84ho3_500.png",
                 "twitter/814496801692581888_C02mVVWUAAAlZCc.png"
               ]
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 2,
-            "inferredPostIds": [
-              "twitter:814496337655758850"
-            ]
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 214,
-        "inferredPostIds": [
-          "pixiv:58165714",
-          "twitter:814496337655758850"
-        ]
-      }
+      ]
     },
     {
       "id": "artwork-0215",
@@ -801,28 +514,13 @@
           "media": [
             {
               "id": "artwork-0215/v01/m01",
-              "legacyIds": [
-                "CoTH7CmUMAEw-bm"
-              ],
               "files": [
                 "twitter/757950680682278912_CoTH7CmUMAEw-bm.png"
               ]
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1,
-            "inferredPostIds": [
-              "twitter:757950680682278912"
-            ]
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 215,
-        "inferredPostIds": [
-          "twitter:757950680682278912"
-        ]
-      }
+      ]
     },
     {
       "id": "artwork-0216",
@@ -836,28 +534,13 @@
           "media": [
             {
               "id": "artwork-0216/v01/m01",
-              "legacyIds": [
-                "CuPJhyaVMAA31f9"
-              ],
               "files": [
                 "twitter/784692392053977088_CuPJhyaVMAA31f9.png"
               ]
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1,
-            "inferredPostIds": [
-              "twitter:784692392053977088"
-            ]
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 216,
-        "inferredPostIds": [
-          "twitter:784692392053977088"
-        ]
-      }
+      ]
     },
     {
       "id": "artwork-0217",
@@ -868,22 +551,13 @@
           "media": [
             {
               "id": "artwork-0217/v01/m01",
-              "legacyIds": [
-                "Cuxpvc4VYAA6LrK"
-              ],
               "files": [
                 "twitter/Cuxpvc4VYAA6LrK.jpeg"
               ]
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 217
-      }
+      ]
     },
     {
       "id": "artwork-0218",
@@ -894,9 +568,6 @@
           "media": [
             {
               "id": "artwork-0218/v01/m01",
-              "legacyIds": [
-                "Cu9ouuIUMAAlHkG"
-              ],
               "files": [
                 "twitter/787963630520184833_Cu9ouuIUMAAlHkG.jpeg"
               ],
@@ -913,13 +584,7 @@
                 ]
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1,
-            "inferredPostIds": [
-              "twitter:787963630520184833"
-            ]
-          }
+          ]
         },
         {
           "id": "v02",
@@ -927,9 +592,6 @@
           "media": [
             {
               "id": "artwork-0218/v02/m01",
-              "legacyIds": [
-                "C5a9id6U0AARcvt"
-              ],
               "files": [
                 "twitter/835063184520204289_C5a9id6U0AARcvt.jpeg"
               ],
@@ -947,13 +609,7 @@
                 "rotation": -166
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 2,
-            "inferredPostIds": [
-              "twitter:835063184520204289"
-            ]
-          }
+          ]
         },
         {
           "id": "v03",
@@ -961,9 +617,6 @@
           "media": [
             {
               "id": "artwork-0218/v03/m01",
-              "legacyIds": [
-                "C5a9hwvUYAA072w"
-              ],
               "files": [
                 "twitter/835063184520204289_C5a9hwvUYAA072w.jpeg"
               ],
@@ -981,13 +634,7 @@
                 "rotation": -30
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 3,
-            "inferredPostIds": [
-              "twitter:835063184520204289"
-            ]
-          }
+          ]
         },
         {
           "id": "v04",
@@ -995,10 +642,6 @@
           "media": [
             {
               "id": "artwork-0218/v04/m01",
-              "legacyIds": [
-                "CvbXbE1VMAA_vL3",
-                "BL22lBzFl4s"
-              ],
               "files": [
                 "other/BL22lBzFl4s.jpg",
                 "twitter/790055702207148032_CvbXbE1VMAA_vL3.jpeg"
@@ -1017,14 +660,7 @@
                 "rotation": -22
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 4,
-            "inferredPostIds": [
-              "twitter:790055702207148032",
-              "instagram:BL22lBzFl4s"
-            ]
-          }
+          ]
         },
         {
           "id": "v05",
@@ -1032,10 +668,6 @@
           "media": [
             {
               "id": "artwork-0218/v05/m01",
-              "legacyIds": [
-                "CvbXYCxUIAACYXc",
-                "BL23kSdlQJX"
-              ],
               "files": [
                 "other/BL23kSdlQJX.jpg",
                 "twitter/790055702207148032_CvbXYCxUIAACYXc.jpeg"
@@ -1053,26 +685,9 @@
                 ]
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 5,
-            "inferredPostIds": [
-              "twitter:790055702207148032",
-              "instagram:BL23kSdlQJX"
-            ]
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 218,
-        "inferredPostIds": [
-          "twitter:787963630520184833",
-          "twitter:835063184520204289",
-          "twitter:790055702207148032",
-          "instagram:BL22lBzFl4s",
-          "instagram:BL23kSdlQJX"
-        ]
-      }
+      ]
     },
     {
       "id": "artwork-0219",
@@ -1086,33 +701,14 @@
           "media": [
             {
               "id": "artwork-0219/v01/m01",
-              "legacyIds": [
-                "CxdrJ_UVQAAAgBQ",
-                "ogsjsny8GO1s4v84ho1_1280",
-                "59993262_p0"
-              ],
               "files": [
                 "tumblr/153302626089_tumblr_ogsjsny8GO1s4v84ho1_1280.png",
                 "twitter/799228235296829440_CxdrJ_UVQAAAgBQ.png"
               ]
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1,
-            "inferredPostIds": [
-              "twitter:799228235296829440",
-              "pixiv:59993262"
-            ]
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 219,
-        "inferredPostIds": [
-          "twitter:799228235296829440",
-          "pixiv:59993262"
-        ]
-      }
+      ]
     },
     {
       "id": "artwork-0220",
@@ -1123,24 +719,14 @@
           "media": [
             {
               "id": "artwork-0220/v01/m01",
-              "legacyIds": [
-                "C-A9XNYUIAA2dG1",
-                "ooyxdqeecD1s4v84ho1_r1_1280"
-              ],
               "files": [
                 "tumblr/159976260374_tumblr_ooyxdqeecD1s4v84ho1_r1_1280.png",
                 "twitter/855751421391589377_C-A9XNYUIAA2dG1.png"
               ]
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 220
-      }
+      ]
     },
     {
       "id": "artwork-0221",
@@ -1154,20 +740,11 @@
           "media": [
             {
               "id": "artwork-0221/v01/m01",
-              "legacyIds": [
-                "DRVYXFkU8AARzg-"
-              ],
               "files": [
                 "twitter/942758747167866880_DRVYXFkU8AARzg-.png"
               ]
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1,
-            "inferredPostIds": [
-              "twitter:942758747167866880"
-            ]
-          }
+          ]
         },
         {
           "id": "v02",
@@ -1175,31 +752,14 @@
           "media": [
             {
               "id": "artwork-0221/v02/m01",
-              "legacyIds": [
-                "66348336_p0",
-                "p447zttIEl1s4v84ho1_500"
-              ],
               "files": [
                 "tumblr/170852315454_tumblr_p447zttIEl1s4v84ho1_500.png",
                 "pixiv/66348336_p0.png"
               ]
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 2,
-            "inferredPostIds": [
-              "pixiv:66348336"
-            ]
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 221,
-        "inferredPostIds": [
-          "twitter:942758747167866880",
-          "pixiv:66348336"
-        ]
-      }
+      ]
     },
     {
       "id": "artwork-0222",
@@ -1210,9 +770,6 @@
           "media": [
             {
               "id": "artwork-0222/v01/m01",
-              "legacyIds": [
-                "p52azxI4Js1s4v84ho1_1280"
-              ],
               "files": [
                 "tumblr/171514650839_tumblr_p52azxI4Js1s4v84ho1_1280.png"
               ],
@@ -1229,10 +786,7 @@
                 ]
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1
-          }
+          ]
         },
         {
           "id": "v02",
@@ -1240,9 +794,6 @@
           "media": [
             {
               "id": "artwork-0222/v02/m01",
-              "legacyIds": [
-                "pjlp03hDEQ1s4v84ho1_1280"
-              ],
               "files": [
                 "tumblr/181033018374_tumblr_pjlp03hDEQ1s4v84ho1_1280.png"
               ],
@@ -1259,15 +810,9 @@
                 ]
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 2
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 222
-      }
+      ]
     },
     {
       "id": "artwork-0223",
@@ -1281,9 +826,6 @@
           "media": [
             {
               "id": "artwork-0223/v01/m01",
-              "legacyIds": [
-                "NK1806281-1_通常ver."
-              ],
               "files": [
                 "other/2018-06-28_NK1806281-1_通常ver..jpg"
               ],
@@ -1300,10 +842,7 @@
                 ]
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1
-          }
+          ]
         },
         {
           "id": "v02",
@@ -1311,9 +850,6 @@
           "media": [
             {
               "id": "artwork-0223/v02/m01",
-              "legacyIds": [
-                "NK1806281-2_ドットver."
-              ],
               "files": [
                 "other/2018-06-28_NK1806281-2_ドットver..jpg"
               ],
@@ -1330,10 +866,7 @@
                 ]
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 2
-          }
+          ]
         },
         {
           "id": "v03",
@@ -1341,9 +874,6 @@
           "media": [
             {
               "id": "artwork-0223/v03/m01",
-              "legacyIds": [
-                "NK1806281-3"
-              ],
               "files": [
                 "other/2018-06-28_NK1806281-3.jpg"
               ],
@@ -1360,10 +890,7 @@
                 ]
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 3
-          }
+          ]
         },
         {
           "id": "v04",
@@ -1371,9 +898,6 @@
           "media": [
             {
               "id": "artwork-0223/v04/m01",
-              "legacyIds": [
-                "NK1806281-4"
-              ],
               "files": [
                 "other/2018-06-28_NK1806281-4.jpg"
               ],
@@ -1390,10 +914,7 @@
                 ]
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 4
-          }
+          ]
         },
         {
           "id": "v05",
@@ -1401,9 +922,6 @@
           "media": [
             {
               "id": "artwork-0223/v05/m01",
-              "legacyIds": [
-                "NK1806281-5"
-              ],
               "files": [
                 "other/2018-06-28_NK1806281-5.jpg"
               ],
@@ -1420,10 +938,7 @@
                 ]
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 5
-          }
+          ]
         },
         {
           "id": "v06",
@@ -1431,9 +946,6 @@
           "media": [
             {
               "id": "artwork-0223/v06/m01",
-              "legacyIds": [
-                "NK1807031-1"
-              ],
               "files": [
                 "other/2018-06-28_NK1807031-1.jpg"
               ],
@@ -1450,10 +962,7 @@
                 ]
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 6
-          }
+          ]
         },
         {
           "id": "v07",
@@ -1461,9 +970,6 @@
           "media": [
             {
               "id": "artwork-0223/v07/m01",
-              "legacyIds": [
-                "NK1807031-6"
-              ],
               "files": [
                 "other/2018-06-28_NK1807031-6.jpg"
               ],
@@ -1480,10 +986,7 @@
                 ]
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 7
-          }
+          ]
         },
         {
           "id": "v08",
@@ -1491,9 +994,6 @@
           "media": [
             {
               "id": "artwork-0223/v08/m01",
-              "legacyIds": [
-                "DhK-YbdV4AA9Srl"
-              ],
               "files": [
                 "twitter/1014082314396024832_DhK-YbdV4AA9Srl.jpeg"
               ],
@@ -1510,13 +1010,7 @@
                 ]
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 8,
-            "inferredPostIds": [
-              "twitter:1014082314396024832"
-            ]
-          }
+          ]
         },
         {
           "id": "v09",
@@ -1524,9 +1018,6 @@
           "media": [
             {
               "id": "artwork-0223/v09/m01",
-              "legacyIds": [
-                "DhK-ak4UwAACuxk"
-              ],
               "files": [
                 "twitter/1014082314396024832_DhK-ak4UwAACuxk.jpeg"
               ],
@@ -1543,13 +1034,7 @@
                 ]
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 9,
-            "inferredPostIds": [
-              "twitter:1014082314396024832"
-            ]
-          }
+          ]
         },
         {
           "id": "v10",
@@ -1557,9 +1042,6 @@
           "media": [
             {
               "id": "artwork-0223/v10/m01",
-              "legacyIds": [
-                "DhK-ak1VAAAhl-f"
-              ],
               "files": [
                 "twitter/1014082314396024832_DhK-ak1VAAAhl-f.jpeg"
               ],
@@ -1576,21 +1058,9 @@
                 ]
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 10,
-            "inferredPostIds": [
-              "twitter:1014082314396024832"
-            ]
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 223,
-        "inferredPostIds": [
-          "twitter:1014082314396024832"
-        ]
-      }
+      ]
     },
     {
       "id": "artwork-0224",
@@ -1604,9 +1074,6 @@
           "media": [
             {
               "id": "artwork-0224/v01/m01",
-              "legacyIds": [
-                "Dt5QLQlVAAA_81r"
-              ],
               "files": [
                 "twitter/1071381965645869056_Dt5QLQlVAAA_81r.png"
               ],
@@ -1623,13 +1090,7 @@
                 ]
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1,
-            "inferredPostIds": [
-              "twitter:1071381965645869056"
-            ]
-          }
+          ]
         },
         {
           "id": "v02",
@@ -1637,9 +1098,6 @@
           "media": [
             {
               "id": "artwork-0224/v02/m01",
-              "legacyIds": [
-                "pjlp03hDEQ1s4v84ho1_1280"
-              ],
               "files": [
                 "tumblr/181033018374_tumblr_pjlp03hDEQ1s4v84ho1_1280.png"
               ],
@@ -1656,18 +1114,9 @@
                 ]
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 2
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 224,
-        "inferredPostIds": [
-          "twitter:1071381965645869056"
-        ]
-      }
+      ]
     },
     {
       "id": "artwork-0225",
@@ -1681,28 +1130,13 @@
           "media": [
             {
               "id": "artwork-0225/v01/m01",
-              "legacyIds": [
-                "Dw7LiXYUwAAJ9nd"
-              ],
               "files": [
                 "twitter/1085028359120142337_Dw7LiXYUwAAJ9nd.jpeg"
               ]
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1,
-            "inferredPostIds": [
-              "twitter:1085028359120142337"
-            ]
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 225,
-        "inferredPostIds": [
-          "twitter:1085028359120142337"
-        ]
-      }
+      ]
     },
     {
       "id": "artwork-0226",
@@ -1716,11 +1150,6 @@
           "media": [
             {
               "id": "artwork-0226/v01/m01",
-              "legacyIds": [
-                "FAr2aoNVcAYMIkb",
-                "105494744_p0",
-                "81746b7d17edaffe02348c705a697cf095085ec2"
-              ],
               "files": [
                 "tumblr/663928878095564800_81746b7d17edaffe02348c705a697cf095085ec2.png"
               ],
@@ -1737,14 +1166,7 @@
                 ]
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1,
-            "inferredPostIds": [
-              "twitter:1444237624500129795",
-              "pixiv:105494744"
-            ]
-          }
+          ]
         },
         {
           "id": "v02",
@@ -1752,9 +1174,6 @@
           "media": [
             {
               "id": "artwork-0226/v02/m01",
-              "legacyIds": [
-                "72dd5e4d2c94f6ddfad2f263e669bf2c8cacf5fe"
-              ],
               "files": [
                 "tumblr/710218934614376448_72dd5e4d2c94f6ddfad2f263e669bf2c8cacf5fe.png"
               ],
@@ -1771,10 +1190,7 @@
                 ]
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 2
-          }
+          ]
         },
         {
           "id": "v03",
@@ -1782,11 +1198,6 @@
           "media": [
             {
               "id": "artwork-0226/v03/m01",
-              "legacyIds": [
-                "HBj3jSXbcAAWMkS",
-                "141421623_p0",
-                "f123fa39bc5859d51246feec21a10ed8ff061f0b"
-              ],
               "files": [
                 "tumblr/809079143597768704_f123fa39bc5859d51246feec21a10ed8ff061f0b.png"
               ],
@@ -1805,25 +1216,9 @@
                 "rotation": 180
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 3,
-            "inferredPostIds": [
-              "twitter:2024641088326361472",
-              "pixiv:141421623"
-            ]
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 226,
-        "inferredPostIds": [
-          "twitter:1444237624500129795",
-          "pixiv:105494744",
-          "twitter:2024641088326361472",
-          "pixiv:141421623"
-        ]
-      }
+      ]
     },
     {
       "id": "artwork-0227",
@@ -1837,9 +1232,6 @@
           "media": [
             {
               "id": "artwork-0227/v01/m01",
-              "legacyIds": [
-                "FAw2CdzVcAEXlnl"
-              ],
               "files": [
                 "twitter/1444589381948379139_FAw2CdzVcAEXlnl.png"
               ],
@@ -1856,13 +1248,7 @@
                 ]
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1,
-            "inferredPostIds": [
-              "twitter:1444589381948379139"
-            ]
-          }
+          ]
         },
         {
           "id": "v02",
@@ -1870,9 +1256,6 @@
           "media": [
             {
               "id": "artwork-0227/v02/m01",
-              "legacyIds": [
-                "FAw2B5MVkAAacYd"
-              ],
               "files": [
                 "twitter/1444589381948379139_FAw2B5MVkAAacYd.png"
               ],
@@ -1889,13 +1272,7 @@
                 ]
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 2,
-            "inferredPostIds": [
-              "twitter:1444589381948379139"
-            ]
-          }
+          ]
         },
         {
           "id": "v03",
@@ -1903,9 +1280,6 @@
           "media": [
             {
               "id": "artwork-0227/v03/m01",
-              "legacyIds": [
-                "FB45GDaUYAMk9_8"
-              ],
               "files": [
                 "twitter/1449658930657849347_FB45GDaUYAMk9_8.png"
               ],
@@ -1922,13 +1296,7 @@
                 ]
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 3,
-            "inferredPostIds": [
-              "twitter:1449658930657849347"
-            ]
-          }
+          ]
         },
         {
           "id": "v04",
@@ -1936,9 +1304,6 @@
           "media": [
             {
               "id": "artwork-0227/v04/m01",
-              "legacyIds": [
-                "75e70c1a9bef63bac9600e61f30336aaebd121fc"
-              ],
               "files": [
                 "tumblr/666172885249966080_75e70c1a9bef63bac9600e61f30336aaebd121fc.png"
               ],
@@ -1955,19 +1320,9 @@
                 ]
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 4
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 227,
-        "inferredPostIds": [
-          "twitter:1444589381948379139",
-          "twitter:1449658930657849347"
-        ]
-      }
+      ]
     },
     {
       "id": "artwork-0228",
@@ -1981,9 +1336,6 @@
           "media": [
             {
               "id": "artwork-0228/v01/m01",
-              "legacyIds": [
-                "b10f98f6664e80864a5602a7b06162594b364381"
-              ],
               "files": [
                 "tumblr/710218934614376448_b10f98f6664e80864a5602a7b06162594b364381.png"
               ],
@@ -2000,10 +1352,7 @@
                 ]
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1
-          }
+          ]
         },
         {
           "id": "v02",
@@ -2011,10 +1360,6 @@
           "media": [
             {
               "id": "artwork-0228/v02/m01",
-              "legacyIds": [
-                "FpPDdhAaMAETO1A",
-                "105494821_p0"
-              ],
               "files": [
                 "twitter/1626858807279390720_FpPDdhAaMAETO1A.png"
               ],
@@ -2032,23 +1377,9 @@
                 "flipX": true
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 2,
-            "inferredPostIds": [
-              "twitter:1626858807279390720",
-              "pixiv:105494821"
-            ]
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 228,
-        "inferredPostIds": [
-          "twitter:1626858807279390720",
-          "pixiv:105494821"
-        ]
-      }
+      ]
     },
     {
       "id": "artwork-0229",
@@ -2062,32 +1393,13 @@
           "media": [
             {
               "id": "artwork-0229/v01/m01",
-              "legacyIds": [
-                "Fpm6PpjaYAAyo9z",
-                "6f59784573dcbc4d99165444c6c5e0d5bbd7fc8f",
-                "105724983_p0"
-              ],
               "files": [
                 "tumblr/710217462683172864_6f59784573dcbc4d99165444c6c5e0d5bbd7fc8f.png"
               ]
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1,
-            "inferredPostIds": [
-              "twitter:1628683582561562628",
-              "pixiv:105724983"
-            ]
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 229,
-        "inferredPostIds": [
-          "twitter:1628683582561562628",
-          "pixiv:105724983"
-        ]
-      }
+      ]
     },
     {
       "id": "artwork-0230",
@@ -2101,11 +1413,6 @@
           "media": [
             {
               "id": "artwork-0230/v01/m01",
-              "legacyIds": [
-                "Gf4Q4bCacAAm-w7",
-                "126228727_p0",
-                "f530012f1a05ea2c0a4910406e4c5015e6476553"
-              ],
               "files": [
                 "tumblr/772663486221287424_f530012f1a05ea2c0a4910406e4c5015e6476553.png"
               ],
@@ -2122,13 +1429,7 @@
                 ]
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1,
-            "inferredPostIds": [
-              "pixiv:126228727"
-            ]
-          }
+          ]
         },
         {
           "id": "v02",
@@ -2136,9 +1437,6 @@
           "media": [
             {
               "id": "artwork-0230/v02/m01",
-              "legacyIds": [
-                "cfm_snowmiku_skytown_st10th_message.html_post1869918372462506421"
-              ],
               "files": [
                 "other/2024-12-20_cfm_snowmiku_skytown_st10th_message.html_post1869918372462506421.jpg"
               ],
@@ -2155,22 +1453,9 @@
                 ]
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 2,
-            "inferredPostIds": [
-              "snowmiku.com:cfm_snowmiku_skytown_st10th_message.html_post1869918372462506421"
-            ]
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 230,
-        "inferredPostIds": [
-          "pixiv:126228727",
-          "snowmiku.com:cfm_snowmiku_skytown_st10th_message.html_post1869918372462506421"
-        ]
-      }
+      ]
     },
     {
       "id": "artwork-0231",
@@ -2181,29 +1466,13 @@
           "media": [
             {
               "id": "artwork-0231/v01/m01",
-              "legacyIds": [
-                "cb8cdd33be3747b560fb797aa41ad2b143f70391",
-                "GqLHebsacAAiVln"
-              ],
               "files": [
                 "tumblr/783086275245867008_cb8cdd33be3747b560fb797aa41ad2b143f70391.png"
               ]
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1,
-            "inferredPostIds": [
-              "twitter:1919315718937416068"
-            ]
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 231,
-        "inferredPostIds": [
-          "twitter:1919315718937416068"
-        ]
-      }
+      ]
     },
     {
       "id": "artwork-0232",
@@ -2217,10 +1486,6 @@
           "media": [
             {
               "id": "artwork-0232/v01/m01",
-              "legacyIds": [
-                "GqRQtbsacAAiVln",
-                "130163321_p0"
-              ],
               "files": [
                 "twitter/1919748300133011553_GqRQtbsacAAiVln.png"
               ],
@@ -2237,14 +1502,7 @@
                 ]
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1,
-            "inferredPostIds": [
-              "twitter:1919748300133011553",
-              "pixiv:130163321"
-            ]
-          }
+          ]
         },
         {
           "id": "v02",
@@ -2252,9 +1510,6 @@
           "media": [
             {
               "id": "artwork-0232/v02/m01",
-              "legacyIds": [
-                "c80cbadd53414c8c836985a3167fb70273c46965"
-              ],
               "files": [
                 "tumblr/783086275245867008_c80cbadd53414c8c836985a3167fb70273c46965.png"
               ],
@@ -2271,19 +1526,9 @@
                 ]
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 2
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 232,
-        "inferredPostIds": [
-          "twitter:1919748300133011553",
-          "pixiv:130163321"
-        ]
-      }
+      ]
     },
     {
       "id": "artwork-0233",
@@ -2297,32 +1542,13 @@
           "media": [
             {
               "id": "artwork-0233/v01/m01",
-              "legacyIds": [
-                "G-yTSa8bEAEK45M",
-                "140032321_p0",
-                "f6007e0a87aa29b59b3df10a2c06dd3e6fb542cf"
-              ],
               "files": [
                 "tumblr/805953449568157696_f6007e0a87aa29b59b3df10a2c06dd3e6fb542cf.png"
               ]
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1,
-            "inferredPostIds": [
-              "twitter:2012145323582595126",
-              "pixiv:140032321"
-            ]
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 233,
-        "inferredPostIds": [
-          "twitter:2012145323582595126",
-          "pixiv:140032321"
-        ]
-      }
+      ]
     },
     {
       "id": "artwork-0234",
@@ -2336,32 +1562,13 @@
           "media": [
             {
               "id": "artwork-0234/v01/m01",
-              "legacyIds": [
-                "G_9gbmjbUAALMDi",
-                "140700255_p0",
-                "79aa541c0e519d42f10d60c47eb1de4753d3a87c"
-              ],
               "files": [
                 "tumblr/808543229379313664_79aa541c0e519d42f10d60c47eb1de4753d3a87c.png"
               ]
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1,
-            "inferredPostIds": [
-              "twitter:2017534570459971939",
-              "pixiv:140700255"
-            ]
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 234,
-        "inferredPostIds": [
-          "twitter:2017534570459971939",
-          "pixiv:140700255"
-        ]
-      }
+      ]
     },
     {
       "id": "artwork-0235",
@@ -2378,32 +1585,13 @@
           "media": [
             {
               "id": "artwork-0235/v01/m01",
-              "legacyIds": [
-                "HAECtS1bwAEIxZJ",
-                "140653012_p0",
-                "7870f2fb92df6a246af0d8849980c86b6dea640f"
-              ],
               "files": [
                 "tumblr/807351584863485952_7870f2fb92df6a246af0d8849980c86b6dea640f.png"
               ]
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1,
-            "inferredPostIds": [
-              "twitter:2017897137342926901",
-              "pixiv:140653012"
-            ]
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 235,
-        "inferredPostIds": [
-          "twitter:2017897137342926901",
-          "pixiv:140653012"
-        ]
-      }
+      ]
     },
     {
       "id": "artwork-0236",
@@ -2417,32 +1605,13 @@
           "media": [
             {
               "id": "artwork-0236/v01/m01",
-              "legacyIds": [
-                "HBG7HEPakAEvg8Z",
-                "141188113_p0",
-                "5db54f603f6be9e305c9fab93bc04b5781a5e22b"
-              ],
               "files": [
                 "tumblr/808543242321903616_5db54f603f6be9e305c9fab93bc04b5781a5e22b.png"
               ]
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1,
-            "inferredPostIds": [
-              "twitter:2022603498349826424",
-              "pixiv:141188113"
-            ]
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 236,
-        "inferredPostIds": [
-          "twitter:2022603498349826424",
-          "pixiv:141188113"
-        ]
-      }
+      ]
     },
     {
       "id": "artwork-0237",
@@ -2453,22 +1622,13 @@
           "media": [
             {
               "id": "artwork-0237/v01/m01",
-              "legacyIds": [
-                "f5607a34393467fb0588e5997a06e516c0ca712d"
-              ],
               "files": [
                 "tumblr/808999046186418176_f5607a34393467fb0588e5997a06e516c0ca712d.png"
               ]
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 237
-      }
+      ]
     },
     {
       "id": "artwork-0238",
@@ -2479,22 +1639,13 @@
           "media": [
             {
               "id": "artwork-0238/v01/m01",
-              "legacyIds": [
-                "2956_1342f157f4e93b330a1ae5a63a4d0a9ff5d51e6e23f57-krhb78_fw1200"
-              ],
               "files": [
                 "other/2956_1342f157f4e93b330a1ae5a63a4d0a9ff5d51e6e23f57-krhb78_fw1200.jpeg"
               ]
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 238
-      }
+      ]
     },
     {
       "id": "artwork-0239",
@@ -2508,32 +1659,14 @@
           "media": [
             {
               "id": "artwork-0239/v01/m01",
-              "legacyIds": [
-                "HNf71eZbgAAUtI2",
-                "147357899_p0"
-              ],
               "files": [
                 "twitter/2078406837687455778_HNf71eZbgAAUtI2.png",
                 "pixiv/147357899_p0.png"
               ]
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1,
-            "inferredPostIds": [
-              "twitter:2078406837687455778",
-              "pixiv:147357899"
-            ]
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 239,
-        "inferredPostIds": [
-          "twitter:2078406837687455778",
-          "pixiv:147357899"
-        ]
-      }
+      ]
     },
     {
       "id": "artwork-0240",
@@ -2547,28 +1680,13 @@
           "media": [
             {
               "id": "artwork-0240/v01/m01",
-              "legacyIds": [
-                "CrbebU9VUAAGu1s"
-              ],
               "files": [
                 "twitter/772048970210086913_CrbebU9VUAAGu1s.jpeg"
               ]
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1,
-            "inferredPostIds": [
-              "twitter:772048970210086913"
-            ]
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 240,
-        "inferredPostIds": [
-          "twitter:772048970210086913"
-        ]
-      }
+      ]
     },
     {
       "id": "artwork-0241",
@@ -2582,28 +1700,13 @@
           "media": [
             {
               "id": "artwork-0241/v01/m01",
-              "legacyIds": [
-                "C02pmy9UAAA9uEP"
-              ],
               "files": [
                 "twitter/814496337655758850_C02pmy9UAAA9uEP.jpeg"
               ]
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1,
-            "inferredPostIds": [
-              "twitter:814496337655758850"
-            ]
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 241,
-        "inferredPostIds": [
-          "twitter:814496337655758850"
-        ]
-      }
+      ]
     },
     {
       "id": "artwork-0242",
@@ -2757,9 +1860,6 @@
           "media": [
             {
               "id": "artwork-0249/v01/m01",
-              "legacyIds": [
-                "n5esbhepR11s4v84ho4_r2_400"
-              ],
               "files": [
                 "tumblr/85412229284_tumblr_n5esbhepR11s4v84ho4_r2_400.png"
               ]

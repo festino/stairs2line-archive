@@ -234,10 +234,6 @@ export async function parseLegacyArchive(filePath) {
           files: [],
           legacyIds: legacyVersion.media.map(String)
         }],
-        migration: {
-          legacyVersionIndex: versionIndex + 1,
-          inferredPostIds: [...versionPostKeys]
-        }
       }));
     }
 
@@ -247,10 +243,6 @@ export async function parseLegacyArchive(filePath) {
       id: artworkId,
       ...inferredText,
       versions,
-      migration: {
-        legacyGroupIndex: groupIndex + 1,
-        inferredPostIds: [...artworkPostKeys]
-      }
     }));
   }
 

@@ -28,6 +28,7 @@
     "posts": "投稿",
     "versions": "バージョン",
     "files": "ファイル",
+    "media": "メディア",
     "open": "開く",
     "noItems": "項目がありません。"
   },
@@ -77,7 +78,8 @@
     "noKnownReblogDate": "日付不明",
     "noSavedReblogs": "なし",
     "socialsTitle": "SNS",
-    "platformCreated": "{platform} のプロフィールを作成"
+    "platformCreated": "{platform} のプロフィールを作成",
+    "unknownMediaDescription": "アーカイブされたどの投稿にも関連付けられていないメディアです。"
   },
   "validation": {
     "title": "アーカイブ検証",
@@ -88,7 +90,7 @@
     "sectionsTitle": "アーカイブ",
     "projectDescription": "stairs2line の作品、改訂版、SNS 投稿、それらをつなぐ時系列をまとめたビジュアルアーカイブです。",
     "artistDescription": "初音ミクのイラストなどで知られる日本のイラストレーターです。",
-    "archivePurpose": "このアーカイブは、インターネット上に散らばった作品と既知の全バージョンを一か所に集めることを目的としています。私は作者本人とは関係がなく、このアーカイブの公開許可もまだ得ていません。",
+    "archivePurpose": "このアーカイブは、インターネット上に散らばった作品と既知の全バージョンを一か所に集めることを目的としています。私は作者本人とは関係ありませんが、このアーカイブの公開許可は得ています。",
     "supportText": "作者を応援する際は、現在利用されている公式アカウントをご覧ください: {accounts}。",
     "officialAccounts": "{accounts}",
     "allAccounts": "すべてのアカウント",

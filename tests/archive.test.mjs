@@ -443,6 +443,11 @@ test('static pages use the logical media display file and expose paged/feed cont
   assert.match(homeHtml, /<h1>Tarutaru Sentakki<\/h1>/);
   assert.doesNotMatch(homeHtml, /class="post-activity"/);
   assert.match(homeHtml, /offestashka@mail\.ru/);
+  assert.match(homeHtml, /I have received permission to publish this archive/);
+  await assert.rejects(
+    fs.access(path.join(output, 'en', 'artworks', 'unconfirmed', 'index.html')),
+    (error) => error?.code === 'ENOENT'
+  );
 
   const activityHtml = await fs.readFile(path.join(output, 'en', 'posts', 'activity', 'index.html'), 'utf8');
   assert.match(activityHtml, /class="post-activity"/);
@@ -557,7 +562,11 @@ test('platform directory uses bounded two-column cards with thumbnail previews',
   assert.match(html, /<h1>Socials<\/h1>/);
   assert.match(html, /class="platform-list"/);
   assert.match(html, /class="platform-card-hit-area" href="\/repo\/en\/posts\/platform\/twitter\/"/);
+  assert.match(html, /class="platform-card-hit-area" href="\/repo\/en\/posts\/platform\/Unknown\/"/);
   assert.match(html, /class="platform-preview-post"/);
+  assert.match(html, /platform-card--twitter[\s\S]*?platform-card-count"><strong>1<\/strong><span>posts<\/span>/);
+  assert.match(html, /platform-card--Unknown[\s\S]*?platform-card-count"><strong>0<\/strong><span>media<\/span>/);
+  assert.match(html, /platform-card--Unknown[\s\S]*?<div class="platform-card-avatar"><img src="\/repo\/media\/stairs2line\/misc\/question-mark-icon\.svg" alt=""><\/div>/);
   assert.match(html, /class="platform-source-link" href="https:\/\/twitter\.com\/stairs2line"[^>]*>Official page/);
   assert.doesNotMatch(html, /<div class="platform-preview"><article class="post-card/);
   const twitterIndex = html.indexOf('platform-card--twitter');
@@ -713,19 +722,66 @@ test('revisions ignore decorative versions, append single-image artworks, and ga
   assert.doesNotMatch(mainCardHtml, /revision-early\.png/, 'dated middle versions do not replace undated source-order endpoints in the preview');
 
   const approximateFile = 'twitter/revision-approximate.png';
+  const decorativeFallbackFile = 'twitter/revision-decorative-fallback.png';
+  const undatedFallbackFile = 'twitter/revision-undated-fallback.png';
+  const sameDayExactFile = 'twitter/revision-same-day-exact.png';
+  const sameDayApproximateFile = 'twitter/revision-same-day-approximate.png';
   await fs.writeFile(path.join(mediaRoot, approximateFile), fakePng(320, 480, 20));
+  await fs.writeFile(path.join(mediaRoot, decorativeFallbackFile), fakePng(320, 480, 20));
+  await fs.writeFile(path.join(mediaRoot, undatedFallbackFile), fakePng(320, 480, 20));
+  await fs.writeFile(path.join(mediaRoot, sameDayExactFile), fakePng(320, 480, 20));
+  await fs.writeFile(path.join(mediaRoot, sameDayApproximateFile), fakePng(320, 480, 20));
   const approximateSource = fixtureSource();
-  approximateSource.artworks = [{
-    id: 'artwork-approximate-date',
-    title: { en: 'Approximate date artwork' },
-    versions: [{
-      id: 'v01',
-      scope: 'major',
-      knownNotAfter: '2016-02-22',
-      media: [{ id: 'artwork-approximate-date/v01/m01', files: [approximateFile] }]
-    }],
-    __source: '/source/artworks/approximate.jsonc'
-  }];
+  approximateSource.artworks = [
+    {
+      id: 'artwork-approximate-date',
+      title: { en: 'Approximate date artwork' },
+      versions: [{
+        id: 'v01',
+        scope: 'major',
+        knownNotAfter: '2016-02-22',
+        media: [{ id: 'artwork-approximate-date/v01/m01', files: [approximateFile] }]
+      }],
+      __source: '/source/artworks/approximate.jsonc'
+    },
+    {
+      id: 'artwork-decorative-date-fallback',
+      title: { en: 'Decorative fallback date' },
+      versions: [
+        {
+          id: 'v01',
+          scope: 'major',
+          media: [{ id: 'artwork-decorative-date-fallback/v01/m01', files: [undatedFallbackFile] }]
+        },
+        {
+          id: 'v99',
+          scope: 'decorative',
+          createdAt: '2017-03-04T00:00:00Z',
+          media: [{ id: 'artwork-decorative-date-fallback/v99/m01', files: [decorativeFallbackFile] }]
+        }
+      ],
+      __source: '/source/artworks/decorative-fallback.jsonc'
+    },
+    {
+      id: 'artwork-same-day-range',
+      title: { en: 'Same-day range' },
+      versions: [
+        {
+          id: 'v01',
+          scope: 'major',
+          createdAt: '2015-02-17T00:00:00Z',
+          media: [{ id: 'artwork-same-day-range/v01/m01', files: [sameDayExactFile] }]
+        },
+        {
+          id: 'v02',
+          scope: 'major',
+          knownNotAfter: '2015-02-17',
+          media: [{ id: 'artwork-same-day-range/v02/m01', files: [sameDayApproximateFile] }]
+        }
+      ],
+      __source: '/source/artworks/same-day-range.jsonc'
+    }
+  ];
   approximateSource.posts = [];
   const approximateCompilation = await compileArchive(approximateSource, { mediaRoot });
   const approximateOutput = await fs.mkdtemp(path.join(os.tmpdir(), 'stairs2line-approximate-version-'));
@@ -736,6 +792,16 @@ test('revisions ignore decorative versions, append single-image artworks, and ga
   assert.ok(approximateDetail.indexOf('By February 22, 2016') < approximateDetail.indexOf('No known posts use this image.'), 'approximate non-post dates are shown before the empty post list');
   const approximateRevisions = await fs.readFile(path.join(approximateOutput, 'en', 'artworks', 'index.html'), 'utf8');
   assert.match(approximateRevisions, /By February 22, 2016/g, 'revision cards preserve the upper-bound semantics instead of rendering knownNotAfter as an exact date');
+  assert.match(approximateRevisions, /February 17, 2015/, 'same-day revision bounds are shown as one date');
+  assert.doesNotMatch(approximateRevisions, /February 17, 2015 — By February 17, 2015/, 'an exact date and an approximate bound on the same day do not render as a redundant range');
+  const fallbackCardStart = approximateRevisions.indexOf('data-artwork-id="artwork-decorative-date-fallback"');
+  const fallbackCardEnd = approximateRevisions.indexOf('</article>', fallbackCardStart);
+  assert.ok(fallbackCardStart >= 0, 'an undated non-decorative version remains on the revisions page');
+  assert.match(
+    approximateRevisions.slice(fallbackCardStart, fallbackCardEnd),
+    /By March 4, 2017/,
+    'a decorative fallback date is always shown as approximate on the revisions page'
+  );
   const approximateViewerIndex = JSON.parse(await fs.readFile(path.join(approximateOutput, 'data', 'viewer-index.json'), 'utf8'));
   assert.equal(approximateViewerIndex.media['artwork-approximate-date/v01/m01'].versionDate, '2016-02-22');
   assert.equal(approximateViewerIndex.media['artwork-approximate-date/v01/m01'].versionDateSource, 'knownNotAfter');
@@ -761,6 +827,65 @@ test('revisions ignore decorative versions, append single-image artworks, and ga
   assert.match(css, /\.revision-grid\s*\{[\s\S]*?display:\s*flex/);
   assert.match(css, /\.revision-card--single\s*\{[\s\S]*?max-width:\s*190px/);
   assert.match(css, /\.artwork-posts\s*\{[\s\S]*?list-style:\s*none[\s\S]*?font-size:\s*0\.82rem/);
+});
+
+test('Tumblr _rN_ artwork versions use the first matching reblog as an approximate date', async () => {
+  const baseFile = 'tumblr/900_tumblr_exampleho1_1280.png';
+  const revisedFile = 'tumblr/900_tumblr_exampleho1_r1_1280.png';
+  const source = fixtureSource();
+  source.site.mediaDirectories = ['tumblr'];
+  source.posts = [{
+    key: 'tumblr:900',
+    platform: 'tumblr',
+    id: '900',
+    status: 'alive',
+    publishedAt: '2020-01-01T00:00:00Z',
+    versions: [
+      {
+        firstRebloggedAt: '2020-01-02T00:00:00Z',
+        reblogs: [{ blog: 'before-edit', id: '901' }],
+        media: [baseFile]
+      },
+      {
+        firstRebloggedAt: '2020-02-03T00:00:00Z',
+        reblogs: [{ blog: 'after-edit', id: '902' }],
+        media: [revisedFile]
+      },
+      {
+        firstRebloggedAt: '2020-03-04T00:00:00Z',
+        reblogs: [{ blog: 'later-copy', id: '903' }],
+        media: [revisedFile]
+      }
+    ],
+    __source: '/source/posts/tumblr.jsonc'
+  }];
+  source.artworks = [{
+    id: 'artwork-tumblr-revision-date',
+    title: { en: 'Tumblr revision date' },
+    versions: [{
+      id: 'v01',
+      scope: 'major',
+      media: [{
+        id: 'artwork-tumblr-revision-date/v01/m01',
+        files: [revisedFile, baseFile]
+      }]
+    }],
+    __source: '/source/artworks/tumblr-revision-date.jsonc'
+  }];
+
+  const compilation = await compileArchive(source, { previewPlaceholders: true });
+  const version = compilation.manifest.artworks[0].versions[0];
+  assert.equal(version.sortAt, '2020-02-03T00:00:00Z');
+  assert.equal(version.dateSource, 'tumblrFirstReblog');
+
+  const output = await fs.mkdtemp(path.join(os.tmpdir(), 'stairs2line-tumblr-revision-date-'));
+  await buildStaticSite(compilation, source, output, {});
+  const revisionsHtml = await fs.readFile(path.join(output, 'en', 'artworks', 'index.html'), 'utf8');
+  assert.match(revisionsHtml, /By February 3, 2020/);
+  const detailHtml = await fs.readFile(path.join(output, 'en', 'artworks', 'artwork-tumblr-revision-date', 'index.html'), 'utf8');
+  assert.match(detailHtml, /By February 3, 2020/);
+  const viewerIndex = JSON.parse(await fs.readFile(path.join(output, 'data', 'viewer-index.json'), 'utf8'));
+  assert.equal(viewerIndex.media['artwork-tumblr-revision-date/v01/m01'].versionDateSource, 'tumblrFirstReblog');
 });
 
 test('platform profile snapshots are versioned and the latest snapshot drives the hero', async () => {
@@ -1322,6 +1447,35 @@ test('individual Piapro Blog post pages expose every post image to MediaViewer n
   assert.match(html, /class="post-version-list"/);
 });
 
+
+
+test('platform directory counts posts for known platforms and media only for Unknown', async () => {
+  const mediaRoot = await createTwitterLayoutMediaFixture();
+  const source = twitterLayoutSource([4]);
+  source.site.mediaDirectories.push('other');
+  await fs.mkdir(path.join(mediaRoot, 'other'), { recursive: true });
+  await fs.writeFile(path.join(mediaRoot, UNKNOWN_OTHER_FILE), fakePng(1200, 800, 4));
+  source.artworks.push({
+    id: 'artwork-unknown-count',
+    title: { en: 'Unknown count media' },
+    versions: [{
+      id: 'v01',
+      scope: 'top',
+      media: [{ id: 'artwork-unknown-count/v01/m01', files: [UNKNOWN_OTHER_FILE] }]
+    }],
+    __source: '/source/artworks/unknown-count.jsonc'
+  });
+
+  const compilation = await compileArchive(source, { mediaRoot });
+  const output = await fs.mkdtemp(path.join(os.tmpdir(), 'stairs2line-platform-counts-'));
+  await buildStaticSite(compilation, source, output, { mediaRoot });
+  const html = await fs.readFile(path.join(output, 'en', 'posts', 'by-platform', 'index.html'), 'utf8');
+
+  assert.match(html, /platform-card--twitter[\s\S]*?platform-card-count"><strong>1<\/strong><span>posts<\/span>/);
+  assert.doesNotMatch(html, /platform-card--twitter[\s\S]*?platform-card-count"><strong>4<\/strong><span>media<\/span>/);
+  assert.match(html, /platform-card--Unknown[\s\S]*?platform-card-count"><strong>1<\/strong><span>media<\/span>/);
+});
+
 test('orphan Twitter media with a decodable media timestamp is shown as an approximate lost post', async () => {
   const mediaRoot = await createMediaFixture();
   await fs.mkdir(path.join(mediaRoot, 'other'), { recursive: true });
@@ -1387,6 +1541,13 @@ test('orphan Twitter media with a decodable media timestamp is shown as an appro
   assert.match(detailHtml, /≈ September 5, 2015/);
   assert.match(detailHtml, /The post itself was not preserved; only its images remain/);
   assert.doesNotMatch(detailHtml, /twitter\.com\/stairs2line\/status\/lost-/);
+
+  const platformDirectoryHtml = await fs.readFile(path.join(output, 'en', 'posts', 'by-platform', 'index.html'), 'utf8');
+  assert.match(platformDirectoryHtml, /platform-card--Unknown[\s\S]*?platform-card-count"><strong>1<\/strong><span>media<\/span>/);
+  const unknownHtml = await fs.readFile(path.join(output, 'en', 'posts', 'platform', 'Unknown', 'index.html'), 'utf8');
+  assert.match(unknownHtml, new RegExp(UNKNOWN_OTHER_FILE.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+  assert.doesNotMatch(unknownHtml, /class="post-card/);
+  assert.doesNotMatch(unknownHtml, new RegExp(ORPHAN_TWITTER_FILE.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
 });
 
 test('orphan Twitter media are grouped across artworks only when their upload timestamps fit one minute', async () => {

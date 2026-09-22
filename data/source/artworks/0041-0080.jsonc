@@ -1,4 +1,3 @@
-// Resolved physical file paths and explicit media relationships.
 {
   "artworks": [
     {
@@ -10,17 +9,11 @@
           "media": [
             {
               "id": "artwork-0041/v01/m01",
-              "legacyIds": [
-                "msaxwpnFbr1s4v84ho5_400"
-              ],
               "files": [
                 "tumblr/59690538540_tumblr_msaxwpnFbr1s4v84ho5_400.png"
               ]
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1
-          }
+          ]
         },
         {
           "id": "v02",
@@ -28,22 +21,13 @@
           "media": [
             {
               "id": "artwork-0041/v02/m01",
-              "legacyIds": [
-                "msaxwpnFbr1s4v84ho5_r1_400"
-              ],
               "files": [
                 "tumblr/59690538540_tumblr_msaxwpnFbr1s4v84ho5_r1_400.png"
               ]
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 2
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 41
-      }
+      ]
     },
     {
       "id": "artwork-0042",
@@ -57,10 +41,6 @@
           "media": [
             {
               "id": "artwork-0042/v01/m01",
-              "legacyIds": [
-                "msaxwpnFbr1s4v84ho6_400",
-                "36243734_p0"
-              ],
               "files": [
                 "tumblr/59690538540_tumblr_msaxwpnFbr1s4v84ho6_400.png",
                 "pixiv/36243734_p0.png"
@@ -78,13 +58,7 @@
                 ]
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1,
-            "inferredPostIds": [
-              "pixiv:36243734"
-            ]
-          }
+          ]
         },
         {
           "id": "v02",
@@ -92,9 +66,6 @@
           "media": [
             {
               "id": "artwork-0042/v02/m01",
-              "legacyIds": [
-                "n1ygvurXbo1s4v84ho4_250"
-              ],
               "files": [
                 "tumblr/78635095373_tumblr_n1ygvurXbo1s4v84ho4_250.png"
               ],
@@ -111,10 +82,7 @@
                 ]
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 2
-          }
+          ]
         },
         {
           "id": "v03",
@@ -122,9 +90,6 @@
           "media": [
             {
               "id": "artwork-0042/v03/m01",
-              "legacyIds": [
-                "n1ygvurXbo1s4v84ho5_250"
-              ],
               "files": [
                 "tumblr/78635095373_tumblr_n1ygvurXbo1s4v84ho5_250.png"
               ],
@@ -141,18 +106,9 @@
                 ]
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 3
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 42,
-        "inferredPostIds": [
-          "pixiv:36243734"
-        ]
-      }
+      ]
     },
     {
       "id": "artwork-0043",
@@ -163,22 +119,13 @@
           "media": [
             {
               "id": "artwork-0043/v01/m01",
-              "legacyIds": [
-                "msujkjn8Kb1s4v84ho2_400"
-              ],
               "files": [
                 "tumblr/60735916600_tumblr_msujkjn8Kb1s4v84ho2_400.png"
               ]
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 43
-      }
+      ]
     },
     {
       "id": "artwork-0044",
@@ -189,22 +136,13 @@
           "media": [
             {
               "id": "artwork-0044/v01/m01",
-              "legacyIds": [
-                "msujkjn8Kb1s4v84ho4_400"
-              ],
               "files": [
                 "tumblr/60735916600_tumblr_msujkjn8Kb1s4v84ho4_400.png"
               ]
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 44
-      }
+      ]
     },
     {
       "id": "artwork-0045",
@@ -215,22 +153,13 @@
           "media": [
             {
               "id": "artwork-0045/v01/m01",
-              "legacyIds": [
-                "msujkjn8Kb1s4v84ho5_400"
-              ],
               "files": [
                 "tumblr/60735916600_tumblr_msujkjn8Kb1s4v84ho5_400.png"
               ]
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 45
-      }
+      ]
     },
     {
       "id": "artwork-0046",
@@ -241,9 +170,6 @@
           "media": [
             {
               "id": "artwork-0046/v01/m01",
-              "legacyIds": [
-                "msujkjn8Kb1s4v84ho6_400"
-              ],
               "files": [
                 "tumblr/60735916600_tumblr_msujkjn8Kb1s4v84ho6_400.png"
               ],
@@ -260,10 +186,7 @@
                 ]
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1
-          }
+          ]
         },
         {
           "id": "v02",
@@ -271,9 +194,6 @@
           "media": [
             {
               "id": "artwork-0046/v02/m01",
-              "legacyIds": [
-                "n1ygvurXbo1s4v84ho2_250"
-              ],
               "files": [
                 "tumblr/78635095373_tumblr_n1ygvurXbo1s4v84ho2_250.png"
               ],
@@ -290,15 +210,9 @@
                 ]
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 2
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 46
-      }
+      ]
     },
     {
       "id": "artwork-0047",
@@ -309,9 +223,6 @@
           "media": [
             {
               "id": "artwork-0047/v01/m01",
-              "legacyIds": [
-                "msujkjn8Kb1s4v84ho1_500"
-              ],
               "files": [
                 "tumblr/60735916600_tumblr_msujkjn8Kb1s4v84ho1_500.png"
               ],
@@ -328,10 +239,7 @@
                 ]
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1
-          }
+          ]
         },
         {
           "id": "v02",
@@ -339,9 +247,6 @@
           "media": [
             {
               "id": "artwork-0047/v02/m01",
-              "legacyIds": [
-                "nuxdexjnEQ1s4v84ho1_r1_500"
-              ],
               "files": [
                 "tumblr/129414719209_tumblr_nuxdexjnEQ1s4v84ho1_r1_500.png"
               ],
@@ -358,15 +263,9 @@
                 ]
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 2
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 47
-      }
+      ]
     },
     {
       "id": "artwork-0048",
@@ -381,10 +280,6 @@
           "media": [
             {
               "id": "artwork-0048/v01/m01",
-              "legacyIds": [
-                "msujkjn8Kb1s4v84ho3_500",
-                "n8x7q9MNVH1s4v84ho2_500"
-              ],
               "files": [
                 "tumblr/60735916600_tumblr_msujkjn8Kb1s4v84ho3_500.png",
                 "tumblr/92164287224_tumblr_n8x7q9MNVH1s4v84ho2_500.png"
@@ -403,10 +298,7 @@
                 "rotation": 8.9
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1
-          }
+          ]
         },
         {
           "id": "v02",
@@ -414,9 +306,6 @@
           "media": [
             {
               "id": "artwork-0048/v02/m01",
-              "legacyIds": [
-                "n8x7q9MNVH1s4v84ho1_540"
-              ],
               "files": [
                 "tumblr/92164287224_tumblr_n8x7q9MNVH1s4v84ho1_540.png"
               ],
@@ -433,10 +322,7 @@
                 ]
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 2
-          }
+          ]
         },
         {
           "id": "v04",
@@ -444,9 +330,6 @@
           "media": [
             {
               "id": "artwork-0048/v04/m01",
-              "legacyIds": [
-                "44930075_p0"
-              ],
               "files": [
                 "pixiv/44930075_p0.jpg"
               ],
@@ -463,13 +346,7 @@
                 ]
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 4,
-            "inferredPostIds": [
-              "pixiv:44930075"
-            ]
-          }
+          ]
         },
         {
           "id": "v03",
@@ -477,9 +354,6 @@
           "media": [
             {
               "id": "artwork-0048/v03/m01",
-              "legacyIds": [
-                "CKV8LBnUAAA57nu"
-              ],
               "files": [
                 "twitter/623040653585321984_CKV8LBnUAAA57nu.png"
               ],
@@ -496,13 +370,7 @@
                 ]
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 3,
-            "inferredPostIds": [
-              "twitter:623040653585321984"
-            ]
-          }
+          ]
         },
         {
           "id": "v05",
@@ -510,11 +378,6 @@
           "media": [
             {
               "id": "artwork-0048/v05/m01",
-              "legacyIds": [
-                "G-2vtGRXEAAxsGa",
-                "140060128_p0",
-                "eba8736e9dacf17be929d57f0371f94a19737731"
-              ],
               "files": [
                 "tumblr/806000851033456640_eba8736e9dacf17be929d57f0371f94a19737731.png"
               ],
@@ -531,14 +394,7 @@
                 ]
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 5,
-            "inferredPostIds": [
-              "twitter:2012457846886334907",
-              "pixiv:140060128"
-            ]
-          }
+          ]
         },
         {
           "id": "v06",
@@ -546,11 +402,6 @@
           "media": [
             {
               "id": "artwork-0048/v06/m01",
-              "legacyIds": [
-                "HBj3j79bUAAsLCb",
-                "141421623_p1",
-                "29674e06cd848a6954e54e43bfecfa4458997cf6"
-              ],
               "files": [
                 "tumblr/809079143597768704_29674e06cd848a6954e54e43bfecfa4458997cf6.png"
               ],
@@ -568,27 +419,9 @@
                 "flipX": true
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 6,
-            "inferredPostIds": [
-              "twitter:2024641088326361472",
-              "pixiv:141421623"
-            ]
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 48,
-        "inferredPostIds": [
-          "twitter:623040653585321984",
-          "pixiv:44930075",
-          "twitter:2012457846886334907",
-          "pixiv:140060128",
-          "twitter:2024641088326361472",
-          "pixiv:141421623"
-        ]
-      }
+      ]
     },
     {
       "id": "artwork-0049",
@@ -599,17 +432,11 @@
           "media": [
             {
               "id": "artwork-0049/v02/m01",
-              "legacyIds": [
-                "mt7ck0rkmp1s4v84ho2_400"
-              ],
               "files": [
                 "tumblr/61383879024_tumblr_mt7ck0rkmp1s4v84ho2_400.png"
               ]
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 2
-          }
+          ]
         },
         {
           "id": "v01",
@@ -617,17 +444,11 @@
           "media": [
             {
               "id": "artwork-0049/v01/m01",
-              "legacyIds": [
-                "mt7ck0rkmp1s4v84ho1_400"
-              ],
               "files": [
                 "tumblr/61383879024_tumblr_mt7ck0rkmp1s4v84ho1_400.png"
               ]
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1
-          }
+          ]
         },
         {
           "id": "v04",
@@ -635,17 +456,11 @@
           "media": [
             {
               "id": "artwork-0049/v04/m01",
-              "legacyIds": [
-                "mt7ck0rkmp1s4v84ho4_400"
-              ],
               "files": [
                 "tumblr/61383879024_tumblr_mt7ck0rkmp1s4v84ho4_400.png"
               ]
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 4
-          }
+          ]
         },
         {
           "id": "v03",
@@ -653,24 +468,14 @@
           "media": [
             {
               "id": "artwork-0049/v03/m01",
-              "legacyIds": [
-                "mt7ck0rkmp1s4v84ho3_400",
-                "mtb6hobl8x1s4v84ho2_400"
-              ],
               "files": [
                 "tumblr/61383879024_tumblr_mt7ck0rkmp1s4v84ho3_400.png",
                 "tumblr/61571325816_tumblr_mtb6hobl8x1s4v84ho2_400.png"
               ]
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 3
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 49
-      }
+      ]
     },
     {
       "id": "artwork-0050",
@@ -681,9 +486,6 @@
           "media": [
             {
               "id": "artwork-0050/v01/m01",
-              "legacyIds": [
-                "mtb6hobl8x1s4v84ho1_400"
-              ],
               "files": [
                 "tumblr/61571325816_tumblr_mtb6hobl8x1s4v84ho1_400.png"
               ],
@@ -700,10 +502,7 @@
                 ]
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1
-          }
+          ]
         },
         {
           "id": "v02",
@@ -711,9 +510,6 @@
           "media": [
             {
               "id": "artwork-0050/v02/m01",
-              "legacyIds": [
-                "n1ygvurXbo1s4v84ho7_250"
-              ],
               "files": [
                 "tumblr/78635095373_tumblr_n1ygvurXbo1s4v84ho7_250.png"
               ],
@@ -730,15 +526,9 @@
                 ]
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 2
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 50
-      }
+      ]
     },
     {
       "id": "artwork-0051",
@@ -749,22 +539,13 @@
           "media": [
             {
               "id": "artwork-0051/v01/m01",
-              "legacyIds": [
-                "mtb6hobl8x1s4v84ho3_r1_400"
-              ],
               "files": [
                 "tumblr/61571325816_tumblr_mtb6hobl8x1s4v84ho3_r1_400.png"
               ]
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 51
-      }
+      ]
     },
     {
       "id": "artwork-0052",
@@ -775,22 +556,13 @@
           "media": [
             {
               "id": "artwork-0052/v01/m01",
-              "legacyIds": [
-                "mtb6hobl8x1s4v84ho4_400"
-              ],
               "files": [
                 "tumblr/61571325816_tumblr_mtb6hobl8x1s4v84ho4_400.png"
               ]
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 52
-      }
+      ]
     },
     {
       "id": "artwork-0053",
@@ -801,22 +573,13 @@
           "media": [
             {
               "id": "artwork-0053/v01/m01",
-              "legacyIds": [
-                "mte8v2HxWN1s4v84ho1_1280"
-              ],
               "files": [
                 "tumblr/61704687471_tumblr_mte8v2HxWN1s4v84ho1_1280.png"
               ]
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 53
-      }
+      ]
     },
     {
       "id": "artwork-0054",
@@ -827,22 +590,13 @@
           "media": [
             {
               "id": "artwork-0054/v01/m01",
-              "legacyIds": [
-                "mte8v2HxWN1s4v84ho2_1280"
-              ],
               "files": [
                 "tumblr/61704687471_tumblr_mte8v2HxWN1s4v84ho2_1280.png"
               ]
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 54
-      }
+      ]
     },
     {
       "id": "artwork-0055",
@@ -853,22 +607,13 @@
           "media": [
             {
               "id": "artwork-0055/v01/m01",
-              "legacyIds": [
-                "mte8v2HxWN1s4v84ho3_640"
-              ],
               "files": [
                 "tumblr/61704687471_tumblr_mte8v2HxWN1s4v84ho3_640.png"
               ]
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 55
-      }
+      ]
     },
     {
       "id": "artwork-0056",
@@ -879,22 +624,13 @@
           "media": [
             {
               "id": "artwork-0056/v01/m01",
-              "legacyIds": [
-                "mte8v2HxWN1s4v84ho4_1280"
-              ],
               "files": [
                 "tumblr/61704687471_tumblr_mte8v2HxWN1s4v84ho4_1280.png"
               ]
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 56
-      }
+      ]
     },
     {
       "id": "artwork-0057",
@@ -905,9 +641,6 @@
           "media": [
             {
               "id": "artwork-0057/v01/m01",
-              "legacyIds": [
-                "mte8v2HxWN1s4v84ho5_400"
-              ],
               "files": [
                 "tumblr/61704687471_tumblr_mte8v2HxWN1s4v84ho5_400.png"
               ],
@@ -924,10 +657,7 @@
                 ]
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1
-          }
+          ]
         },
         {
           "id": "v02",
@@ -935,9 +665,6 @@
           "media": [
             {
               "id": "artwork-0057/v02/m01",
-              "legacyIds": [
-                "mte8v2HxWN1s4v84ho6_400"
-              ],
               "files": [
                 "tumblr/61704687471_tumblr_mte8v2HxWN1s4v84ho6_400.png"
               ],
@@ -955,15 +682,9 @@
                 "flipX": true
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 2
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 57
-      }
+      ]
     },
     {
       "id": "artwork-0058",
@@ -974,22 +695,13 @@
           "media": [
             {
               "id": "artwork-0058/v01/m01",
-              "legacyIds": [
-                "mte8v2HxWN1s4v84ho7_1280"
-              ],
               "files": [
                 "tumblr/61704687471_tumblr_mte8v2HxWN1s4v84ho7_1280.png"
               ]
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 58
-      }
+      ]
     },
     {
       "id": "artwork-0059",
@@ -1000,9 +712,6 @@
           "media": [
             {
               "id": "artwork-0059/v02/m01",
-              "legacyIds": [
-                "muve5w0d8I1s4v84ho2_400"
-              ],
               "files": [
                 "tumblr/64390483901_tumblr_muve5w0d8I1s4v84ho2_400.gif"
               ],
@@ -1019,10 +728,7 @@
                 ]
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 2
-          }
+          ]
         },
         {
           "id": "v01",
@@ -1030,9 +736,6 @@
           "media": [
             {
               "id": "artwork-0059/v01/m01",
-              "legacyIds": [
-                "muve5w0d8I1s4v84ho1_400"
-              ],
               "files": [
                 "tumblr/64390483901_tumblr_muve5w0d8I1s4v84ho1_400.png"
               ],
@@ -1049,10 +752,7 @@
                 ]
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1
-          }
+          ]
         },
         {
           "id": "v03",
@@ -1060,9 +760,6 @@
           "media": [
             {
               "id": "artwork-0059/v03/m01",
-              "legacyIds": [
-                "n1ygvurXbo1s4v84ho6_250"
-              ],
               "files": [
                 "tumblr/78635095373_tumblr_n1ygvurXbo1s4v84ho6_250.png"
               ],
@@ -1079,15 +776,9 @@
                 ]
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 3
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 59
-      }
+      ]
     },
     {
       "id": "artwork-0060",
@@ -1098,17 +789,11 @@
           "media": [
             {
               "id": "artwork-0060/v01/m01",
-              "legacyIds": [
-                "muve5w0d8I1s4v84ho3_400"
-              ],
               "files": [
                 "tumblr/64390483901_tumblr_muve5w0d8I1s4v84ho3_400.png"
               ]
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1
-          }
+          ]
         },
         {
           "id": "v02",
@@ -1116,22 +801,13 @@
           "media": [
             {
               "id": "artwork-0060/v02/m01",
-              "legacyIds": [
-                "muve5w0d8I1s4v84ho4_400"
-              ],
               "files": [
                 "tumblr/64390483901_tumblr_muve5w0d8I1s4v84ho4_400.png"
               ]
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 2
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 60
-      }
+      ]
     },
     {
       "id": "artwork-0061",
@@ -1142,9 +818,6 @@
           "media": [
             {
               "id": "artwork-0061/v01/m01",
-              "legacyIds": [
-                "39798495-1"
-              ],
               "files": [
                 "pixiv/39798495-1.png"
               ],
@@ -1161,13 +834,7 @@
                 ]
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1,
-            "inferredPostIds": [
-              "pixiv:39798495"
-            ]
-          }
+          ]
         },
         {
           "id": "v02",
@@ -1175,9 +842,6 @@
           "media": [
             {
               "id": "artwork-0061/v02/m01",
-              "legacyIds": [
-                "mvaav1veKf1s4v84ho1_1280"
-              ],
               "files": [
                 "tumblr/65144069024_tumblr_mvaav1veKf1s4v84ho1_1280.png"
               ],
@@ -1194,18 +858,9 @@
                 ]
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 2
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 61,
-        "inferredPostIds": [
-          "pixiv:39798495"
-        ]
-      }
+      ]
     },
     {
       "id": "artwork-0062",
@@ -1216,22 +871,13 @@
           "media": [
             {
               "id": "artwork-0062/v01/m01",
-              "legacyIds": [
-                "mvn2znNxA31s4v84ho10_1280"
-              ],
               "files": [
                 "tumblr/65785166959_tumblr_mvn2znNxA31s4v84ho10_1280.png"
               ]
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 62
-      }
+      ]
     },
     {
       "id": "artwork-0063",
@@ -1242,22 +888,13 @@
           "media": [
             {
               "id": "artwork-0063/v01/m01",
-              "legacyIds": [
-                "mvn2znNxA31s4v84ho2_1280"
-              ],
               "files": [
                 "tumblr/65785166959_tumblr_mvn2znNxA31s4v84ho2_1280.png"
               ]
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 63
-      }
+      ]
     },
     {
       "id": "artwork-0064",
@@ -1268,22 +905,13 @@
           "media": [
             {
               "id": "artwork-0064/v01/m01",
-              "legacyIds": [
-                "mvn2znNxA31s4v84ho3_540"
-              ],
               "files": [
                 "tumblr/65785166959_tumblr_mvn2znNxA31s4v84ho3_540.png"
               ]
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 64
-      }
+      ]
     },
     {
       "id": "artwork-0065",
@@ -1294,22 +922,13 @@
           "media": [
             {
               "id": "artwork-0065/v01/m01",
-              "legacyIds": [
-                "mvn2znNxA31s4v84ho4_1280"
-              ],
               "files": [
                 "tumblr/65785166959_tumblr_mvn2znNxA31s4v84ho4_1280.png"
               ]
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 65
-      }
+      ]
     },
     {
       "id": "artwork-0066",
@@ -1320,22 +939,13 @@
           "media": [
             {
               "id": "artwork-0066/v01/m01",
-              "legacyIds": [
-                "mvn2znNxA31s4v84ho5_1280"
-              ],
               "files": [
                 "tumblr/65785166959_tumblr_mvn2znNxA31s4v84ho5_1280.png"
               ]
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 66
-      }
+      ]
     },
     {
       "id": "artwork-0067",
@@ -1346,22 +956,13 @@
           "media": [
             {
               "id": "artwork-0067/v01/m01",
-              "legacyIds": [
-                "mvn2znNxA31s4v84ho6_500"
-              ],
               "files": [
                 "tumblr/65785166959_tumblr_mvn2znNxA31s4v84ho6_500.png"
               ]
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 67
-      }
+      ]
     },
     {
       "id": "artwork-0068",
@@ -1372,22 +973,13 @@
           "media": [
             {
               "id": "artwork-0068/v01/m01",
-              "legacyIds": [
-                "mvn2znNxA31s4v84ho7_1280"
-              ],
               "files": [
                 "tumblr/65785166959_tumblr_mvn2znNxA31s4v84ho7_1280.png"
               ]
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 68
-      }
+      ]
     },
     {
       "id": "artwork-0069",
@@ -1398,22 +990,13 @@
           "media": [
             {
               "id": "artwork-0069/v01/m01",
-              "legacyIds": [
-                "mvn2znNxA31s4v84ho8_640"
-              ],
               "files": [
                 "tumblr/65785166959_tumblr_mvn2znNxA31s4v84ho8_640.png"
               ]
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 69
-      }
+      ]
     },
     {
       "id": "artwork-0070",
@@ -1424,22 +1007,13 @@
           "media": [
             {
               "id": "artwork-0070/v01/m01",
-              "legacyIds": [
-                "mvn2znNxA31s4v84ho9_500"
-              ],
               "files": [
                 "tumblr/65785166959_tumblr_mvn2znNxA31s4v84ho9_500.png"
               ]
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 70
-      }
+      ]
     },
     {
       "id": "artwork-0071",
@@ -1456,9 +1030,6 @@
           "media": [
             {
               "id": "artwork-0071/v01/m01",
-              "legacyIds": [
-                "mvqvpc3qkK1s4v84ho1_540"
-              ],
               "files": [
                 "tumblr/65998519870_tumblr_mvqvpc3qkK1s4v84ho1_540.png"
               ],
@@ -1475,10 +1046,7 @@
                 ]
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1
-          }
+          ]
         },
         {
           "id": "v02",
@@ -1486,9 +1054,6 @@
           "media": [
             {
               "id": "artwork-0071/v02/m01",
-              "legacyIds": [
-                "CXikkdzU0AAvnXJ"
-              ],
               "files": [
                 "twitter/682476291841327104_CXikkdzU0AAvnXJ.jpeg"
               ],
@@ -1505,13 +1070,7 @@
                 ]
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 2,
-            "inferredPostIds": [
-              "twitter:682476291841327104"
-            ]
-          }
+          ]
         },
         {
           "id": "v03",
@@ -1519,10 +1078,6 @@
           "media": [
             {
               "id": "artwork-0071/v03/m01",
-              "legacyIds": [
-                "n3byitfswV1s4v84ho4_500",
-                "45737425_p9"
-              ],
               "files": [
                 "tumblr/81351166350_tumblr_n3byitfswV1s4v84ho4_500.png"
               ],
@@ -1539,22 +1094,9 @@
                 ]
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 3,
-            "inferredPostIds": [
-              "pixiv:45737425"
-            ]
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 71,
-        "inferredPostIds": [
-          "twitter:682476291841327104",
-          "pixiv:45737425"
-        ]
-      }
+      ]
     },
     {
       "id": "artwork-0072",
@@ -1568,9 +1110,6 @@
           "media": [
             {
               "id": "artwork-0072/v01/m01",
-              "legacyIds": [
-                "mvqvpc3qkK1s4v84ho2_1280"
-              ],
               "files": [
                 "tumblr/65998519870_tumblr_mvqvpc3qkK1s4v84ho2_1280.png"
               ],
@@ -1587,10 +1126,7 @@
                 ]
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1
-          }
+          ]
         },
         {
           "id": "v02",
@@ -1598,10 +1134,6 @@
           "media": [
             {
               "id": "artwork-0072/v02/m01",
-              "legacyIds": [
-                "o13zdtDHPu1s4v84ho1_500",
-                "56793430-4"
-              ],
               "files": [
                 "tumblr/137491300699_tumblr_o13zdtDHPu1s4v84ho1_500.png"
               ],
@@ -1618,13 +1150,7 @@
                 ]
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 2,
-            "inferredPostIds": [
-              "pixiv:56793430"
-            ]
-          }
+          ]
         },
         {
           "id": "v03",
@@ -1632,9 +1158,6 @@
           "media": [
             {
               "id": "artwork-0072/v03/m01",
-              "legacyIds": [
-                "CXikju8UMAAIRNR"
-              ],
               "files": [
                 "twitter/682476291841327104_CXikju8UMAAIRNR.jpeg"
               ],
@@ -1651,22 +1174,9 @@
                 ]
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 3,
-            "inferredPostIds": [
-              "twitter:682476291841327104"
-            ]
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 72,
-        "inferredPostIds": [
-          "pixiv:56793430",
-          "twitter:682476291841327104"
-        ]
-      }
+      ]
     },
     {
       "id": "artwork-0073",
@@ -1677,22 +1187,13 @@
           "media": [
             {
               "id": "artwork-0073/v01/m01",
-              "legacyIds": [
-                "mwc3cr62SS1s4v84ho1_1280"
-              ],
               "files": [
                 "tumblr/67110559418_tumblr_mwc3cr62SS1s4v84ho1_1280.png"
               ]
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 73
-      }
+      ]
     },
     {
       "id": "artwork-0074",
@@ -1703,22 +1204,13 @@
           "media": [
             {
               "id": "artwork-0074/v01/m01",
-              "legacyIds": [
-                "mwc3cr62SS1s4v84ho2_1280"
-              ],
               "files": [
                 "tumblr/67110559418_tumblr_mwc3cr62SS1s4v84ho2_1280.png"
               ]
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 74
-      }
+      ]
     },
     {
       "id": "artwork-0075",
@@ -1732,29 +1224,13 @@
           "media": [
             {
               "id": "artwork-0075/v01/m01",
-              "legacyIds": [
-                "mwc3cr62SS1s4v84ho3_400",
-                "40147983_p4"
-              ],
               "files": [
                 "tumblr/67110559418_tumblr_mwc3cr62SS1s4v84ho3_400.png"
               ]
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1,
-            "inferredPostIds": [
-              "pixiv:40147983"
-            ]
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 75,
-        "inferredPostIds": [
-          "pixiv:40147983"
-        ]
-      }
+      ]
     },
     {
       "id": "artwork-0076",
@@ -1765,9 +1241,6 @@
           "media": [
             {
               "id": "artwork-0076/v01/m01",
-              "legacyIds": [
-                "mwc3cr62SS1s4v84ho4_400"
-              ],
               "files": [
                 "tumblr/67110559418_tumblr_mwc3cr62SS1s4v84ho4_400.png"
               ],
@@ -1784,10 +1257,7 @@
                 ]
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1
-          }
+          ]
         },
         {
           "id": "v02",
@@ -1795,9 +1265,6 @@
           "media": [
             {
               "id": "artwork-0076/v02/m01",
-              "legacyIds": [
-                "n1ygvurXbo1s4v84ho1_250"
-              ],
               "files": [
                 "tumblr/78635095373_tumblr_n1ygvurXbo1s4v84ho1_250.png"
               ],
@@ -1814,15 +1281,9 @@
                 ]
               }
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 2
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 76
-      }
+      ]
     },
     {
       "id": "artwork-0077",
@@ -1833,22 +1294,13 @@
           "media": [
             {
               "id": "artwork-0077/v01/m01",
-              "legacyIds": [
-                "mwc3cr62SS1s4v84ho5_400"
-              ],
               "files": [
                 "tumblr/67110559418_tumblr_mwc3cr62SS1s4v84ho5_400.png"
               ]
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 77
-      }
+      ]
     },
     {
       "id": "artwork-0078",
@@ -1859,22 +1311,13 @@
           "media": [
             {
               "id": "artwork-0078/v01/m01",
-              "legacyIds": [
-                "mwc3cr62SS1s4v84ho6_400"
-              ],
               "files": [
                 "tumblr/67110559418_tumblr_mwc3cr62SS1s4v84ho6_400.gif"
               ]
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 78
-      }
+      ]
     },
     {
       "id": "artwork-0079",
@@ -1885,22 +1328,13 @@
           "media": [
             {
               "id": "artwork-0079/v01/m01",
-              "legacyIds": [
-                "mwpkjiTFBH1s4v84ho1_400"
-              ],
               "files": [
                 "tumblr/67832137305_tumblr_mwpkjiTFBH1s4v84ho1_400.png"
               ]
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 79
-      }
+      ]
     },
     {
       "id": "artwork-0080",
@@ -1911,22 +1345,13 @@
           "media": [
             {
               "id": "artwork-0080/v01/m01",
-              "legacyIds": [
-                "mwpkjiTFBH1s4v84ho2_400"
-              ],
               "files": [
                 "tumblr/67832137305_tumblr_mwpkjiTFBH1s4v84ho2_400.png"
               ]
             }
-          ],
-          "migration": {
-            "legacyVersionIndex": 1
-          }
+          ]
         }
-      ],
-      "migration": {
-        "legacyGroupIndex": 80
-      }
+      ]
     }
   ]
 }
